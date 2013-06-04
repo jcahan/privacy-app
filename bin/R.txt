@@ -83,6 +83,7 @@ int string common_google_play_services_update_title 0x7f060007
 int string common_signin_button_text 0x7f06000d
 int string common_signin_button_text_long 0x7f06000e
 int string edit_message 0x7f060017
+int string latitude_longitude 0x7f060019
 int string location_client_ulr_inactive_age_under_13 0x7f060012
 int string location_client_ulr_inactive_age_unknown 0x7f060013
 int string location_client_ulr_inactive_unknown_restriction 0x7f060014

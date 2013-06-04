@@ -266,6 +266,7 @@ containing a value of this type.
          */
         public static final int common_signin_button_text_long=0x7f06000e;
         public static final int edit_message=0x7f060017;
+        public static final int latitude_longitude=0x7f060019;
         /**  Location client code resources (prefix with location_client) 
 
         Begin strings for location.reporting
