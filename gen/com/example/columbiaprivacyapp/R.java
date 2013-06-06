@@ -8,6 +8,9 @@
 package com.example.columbiaprivacyapp;
 
 public final class R {
+    public static final class array {
+        public static final int edit_message=0x7f080000;
+    }
     public static final class attr {
         /** <p>Must be a floating point value, such as "<code>1.2</code>".
 <p>This may also be a reference to a resource (in the form
@@ -196,7 +199,7 @@ containing a value of this type.
         public static final int activity_main=0x7f030000;
     }
     public static final class menu {
-        public static final int main=0x7f090000;
+        public static final int main=0x7f0a0000;
     }
     public static final class string {
         public static final int action_settings=0x7f060016;
@@ -265,7 +268,6 @@ containing a value of this type.
         /**  Long form sign-in button text [CHAR LIMIT=30] 
          */
         public static final int common_signin_button_text_long=0x7f06000e;
-        public static final int edit_message=0x7f060017;
         public static final int latitude_longitude=0x7f060019;
         /**  Location client code resources (prefix with location_client) 
 
@@ -278,6 +280,7 @@ containing a value of this type.
         public static final int location_client_ulr_inactive_age_under_13=0x7f060012;
         public static final int location_client_ulr_inactive_age_unknown=0x7f060013;
         public static final int location_client_ulr_inactive_unknown_restriction=0x7f060014;
+        public static final int my_hint=0x7f060017;
         public static final int update_button=0x7f060018;
     }
     public static final class style {
@@ -302,11 +305,11 @@ containing a value of this type.
     
  API 14 theme customizations can go here. 
          */
-        public static final int AppBaseTheme=0x7f080000;
+        public static final int AppBaseTheme=0x7f090000;
         /**  Application theme. 
  All customizations that are NOT specific to a particular API-level can go here. 
          */
-        public static final int AppTheme=0x7f080001;
+        public static final int AppTheme=0x7f090001;
     }
     public static final class styleable {
         /** Attributes that can be used with a MapAttrs.

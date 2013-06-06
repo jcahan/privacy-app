@@ -19,6 +19,7 @@ import android.os.Bundle;
 import android.provider.Settings.Secure;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -36,12 +37,11 @@ import com.parse.ParseObject;
 //TODO: Need to work on not calling connect() when already connected. Also need to work on battery life
 
 public class MainActivity extends Activity  implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener {
-	private LocationRequest mLocationRequest; 	// A request to connect to Location Services
 	private LocationClient mLocationClient; //Stores the current instantiation of the location client in this object
 	private ArrayAdapter<String> adapter; 
 	private ListView listView; 
 	private final String THE_USER_TABLE = "MyUsers";
-	
+
 	//TODO: Use Comparator!!
 	//Solution: Presently adding all items to TreeSet. No available Adapters that support Trees
 	private TreeSet<String> blackList = new TreeSet<String>();
@@ -67,10 +67,17 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 		Parse.initialize(this, "EPwD8P7HsVS9YlILg9TGTRVTEYRKRAW6VcUN4a7z", "zu6YDecYkeZwDjwjwyuiLhU0sjQFo8Pjln2W5SxS"); 
 		ParseAnalytics.trackAppOpened(getIntent());
 
+		//Auto-Complete
+		AutoCompleteTextView autoView = (AutoCompleteTextView) findViewById(R.id.edit_message);
+		String[] itemOptions = getResources().getStringArray(R.array.edit_message);
+		ArrayAdapter<String> theAdapter = 
+				new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, itemOptions);
+		autoView.setAdapter(theAdapter);
+		
 		//Making BlackList 
 		adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,  list);
 		listView.setAdapter(adapter);
-		
+
 		//Using timer to grab location every hour, will change to 60000*10 later (now every 25 seconds)
 		Timer theTimer = new Timer(); 
 		theTimer.schedule(new TimerTask(){
@@ -208,7 +215,7 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 	public void onProviderEnabled(String provider) {
 	}
 
-	
+
 	//	 Called when the Activity is restarted, even before it becomes visible.
 	@Override
 	public void onStart() {
