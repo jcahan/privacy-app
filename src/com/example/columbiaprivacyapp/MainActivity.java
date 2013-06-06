@@ -98,22 +98,8 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 					Location theLocation = mLocationClient.getLastLocation();
 					System.out.println("my Location is: " + theLocation.getLatitude());
 					if(theLocation!=null) {
-						try {
-							boolean result = checkLocation(theLocation);
-							System.out.println("the result is: "+result);
-							if(!result) {
-								locationItem.put("user", android_id);
-								locationItem.put("latitude", theLocation.getLatitude());
-								locationItem.put("longitude", theLocation.getLongitude());
-								System.out.println("onLocationChanged "+theLocation.getLatitude());
-								System.out.println("onLocationChanged "+theLocation.getLongitude());
-							}
-							else {
-								System.out.println("DID NOT UPDATE");
-							}
-						} catch (IOException e) {
-							e.printStackTrace();
-						}	
+						System.out.println("in the TIMER!!!");
+						checkPostLocation(theLocation);	
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -197,27 +183,29 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 		//instantly get LocationUpdates
 		Location theLocation = mLocationClient.getLastLocation();
 		if(theLocation!=null) {
-			try {
-				boolean result = checkLocation(theLocation);
-				System.out.println("the result is: "+result);
-				if(!result) {
-					System.out.println("Within the postBlacklist");
-					locationItem.put("user", android_id);
-					locationItem.put("lat", theLocation.getLatitude());
-					locationItem.put("long", theLocation.getLongitude());
-					System.out.println("onLocationChanged "+theLocation.getLatitude());
-					System.out.println("onLocationChanged "+theLocation.getLongitude());
-				}
-				else {
-					System.out.println("DID NOT UPDATE");
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			}	
+			System.out.println("Within blacklist");
+			checkPostLocation(theLocation);
 		}
 		locationItem.saveEventually();
 	}
-
+	protected void checkPostLocation(Location theLocation) {
+		try {
+			boolean result = checkLocation(theLocation);
+			System.out.println("the result is: "+result);
+			if(!result) {
+				locationItem.put("user", android_id);
+				locationItem.put("lat", theLocation.getLatitude());
+				locationItem.put("long", theLocation.getLongitude());
+				System.out.println("onLocationChanged "+theLocation.getLatitude());
+				System.out.println("onLocationChanged "+theLocation.getLongitude());
+			}
+			else {
+				System.out.println("DID NOT UPDATE");
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}	
+	}
 	@Override
 	public void onConnectionFailed(ConnectionResult result) {
 		System.out.println("onConnectionFAILED");
