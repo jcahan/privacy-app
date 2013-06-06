@@ -71,7 +71,7 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 
 		mLocationClient = new LocationClient(this, this, this);
 		mLocationClient.connect();
-		
+
 
 		//initializing Parse
 		Parse.initialize(this, "EPwD8P7HsVS9YlILg9TGTRVTEYRKRAW6VcUN4a7z", "zu6YDecYkeZwDjwjwyuiLhU0sjQFo8Pjln2W5SxS"); 
@@ -186,7 +186,7 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 			}
 
 		};
-		locationManager.requestLocationUpdates(LOCATION_PROVIDER, 0, 0, tmpListener);
+		locationManager.requestLocationUpdates(LOCATION_PROVIDER, 60000, 0, tmpListener);
 		System.out.println(locationManager.getLastKnownLocation(LOCATION_PROVIDER).getLatitude());
 		//instantly get LocationUpdates
 		Location theLocation = mLocationClient.getLastLocation();
