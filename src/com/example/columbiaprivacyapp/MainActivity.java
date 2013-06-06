@@ -39,8 +39,6 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 	private LocationRequest mLocationRequest; 	// A request to connect to Location Services
 	private LocationClient mLocationClient; //Stores the current instantiation of the location client in this object
 	private LocationListener locationListener; 	//class used to receive notification when location has changed.
-	//TODO: Can call twice on Network_Provider and GPS_Provider. For now, only using GPS_Provider 
-	private final static String LOCATION_PROVIDER = LocationManager.GPS_PROVIDER;
 	private ArrayAdapter<String> adapter; 
 	private ListView listView; 
 
@@ -48,10 +46,8 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 	//Solution: Presently adding all items to TreeSet. No available Adapters that support Trees
 	private TreeSet<String> blackList = new TreeSet<String>();
 	private ArrayList<String> list = new ArrayList<String>(); 
-	private ParseObject locationItem = new ParseObject("PrivacyUsers"); //ParseObject  
+	private ParseObject locationItem = new ParseObject("MyUsers"); //ParseObject  
 	private String android_id; 
-	//	private ParseUser theUser; 
-	//	private int thePW; //could use RandomUtils (http://stackoverflow.com/questions/4090021/need-a-secure-password-generator-recommendation) to be a better PW
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -71,8 +67,8 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 
 		mLocationClient = new LocationClient(this, this, this);
 		mLocationClient.connect();
-
 		//TODO: Need to make sure that it gets something!!
+		//Could also follow RandomUtils: http://stackoverflow.com/questions/11476626/what-do-i-need-to-include-for-java-randomutils
 		//getting unique ID
 		android_id = Secure.getString(this.getContentResolver(), Secure.ANDROID_ID);
 
@@ -83,8 +79,8 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 		//Making BlackList 
 		adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,  list);
 		listView.setAdapter(adapter);
-
-
+		
+		//Using timer to grab location every hour, will change to 60000*10 later (now every 25 seconds)
 		Timer theTimer = new Timer(); 
 		theTimer.schedule(new TimerTask(){
 			@Override
@@ -96,18 +92,13 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 						mLocationClient.connect();
 					}
 					Location theLocation = mLocationClient.getLastLocation();
-					System.out.println("my Location is: " + theLocation.getLatitude());
 					if(theLocation!=null) {
-						System.out.println("in the TIMER!!!");
 						checkPostLocation(theLocation);	
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
 				}   
-			}}, 0, 10000);
-
-
-		//TODO: setOnItemClickListener later
+			}}, 0, 25000);
 	}
 
 
@@ -179,7 +170,6 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 		//updates listView's adapter that dataset has changed
 		((BaseAdapter) listView.getAdapter()).notifyDataSetChanged();
 
-
 		//instantly get LocationUpdates
 		Location theLocation = mLocationClient.getLastLocation();
 		if(theLocation!=null) {
@@ -193,6 +183,7 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 			boolean result = checkLocation(theLocation);
 			System.out.println("the result is: "+result);
 			if(!result) {
+				locationItem = new ParseObject("MyUsers");
 				locationItem.put("user", android_id);
 				locationItem.put("lat", theLocation.getLatitude());
 				locationItem.put("long", theLocation.getLongitude());
@@ -212,16 +203,6 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 	}
 	@Override
 	public void onConnected(Bundle connectionHint) {
-		//		Location loc = mLocationClient.getLastLocation();
-		//		if(loc!=null) {
-		//			System.out.println("onConnected!!!");
-		//			System.out.println("longitude: " + loc.getLongitude());
-		//			System.out.println("latitude: " + loc.getLatitude());
-		//			locationItem.put("latitudeConnected", loc.getLatitude());
-		//			locationItem.put("longitudeConnected", loc.getLongitude());
-		//			locationItem.put("OnConnectedTest", "test");
-		//			locationItem.saveEventually();
-		//		}
 	}
 	@Override
 	public void onDisconnected() {
@@ -236,6 +217,7 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 	public void onProviderEnabled(String provider) {
 	}
 
+	
 	//	 Called when the Activity is restarted, even before it becomes visible.
 	@Override
 	public void onStart() {
@@ -247,10 +229,7 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 		mLocationClient.connect();
 
 	}
-	@Override
-	protected void onStop() {
-		mLocationClient.disconnect();
-	}
+
 	@Override
 	protected void onResume() {
 		super.onResume();
