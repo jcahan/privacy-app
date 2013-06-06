@@ -90,7 +90,11 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 			@Override
 			public void run() {
 				try {
-					if(!mLocationClient.isConnected()) mLocationClient.connect();
+					//TODO: For some reason, cannot always connect immediately, don't know why Try/Catch is necessary
+					if(!mLocationClient.isConnected()) {
+						System.out.println("attempting to connect");
+						mLocationClient.connect();
+					}
 					Location theLocation = mLocationClient.getLastLocation();
 					System.out.println("my Location is: " + theLocation.getLatitude());
 					if(theLocation!=null) {
@@ -119,7 +123,9 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 
 		//TODO: setOnItemClickListener later
 	}
-	public String scrapWeb(Location location) throws IOException {
+
+
+	protected String scrapWeb(Location location) throws IOException {
 		if(location==null) {
 			//TODO: Should never enter here. 
 		}
@@ -136,10 +142,11 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 		line = rd.readLine(); 
 		System.out.println("the line is: " + line);
 		conn.disconnect();
+		rd.close();
 		return line.substring(1, line.length()-1); 
 	}
 
-	public TreeSet<String> refineList(String listOfItems) {
+	protected TreeSet<String> refineList(String listOfItems) {
 		TreeSet<String> locationBlacklisted = new TreeSet<String>();
 		if(listOfItems.length()!=0) {
 			if(listOfItems.charAt(1)!=']') {
@@ -155,15 +162,15 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 	}
 	//set intersection 
 	//returns true if intersection exists 
-	public Boolean checkLocation(Location theLocation) throws IOException {
+	protected Boolean checkLocation(Location theLocation) throws IOException {
 		String locationAssociations = scrapWeb(theLocation);
 		if(locationAssociations=="") return false; 
 		System.out.println("location associations is: " + locationAssociations);
 		TreeSet<String> treeWords = refineList(locationAssociations);
 		treeWords.retainAll(blackList);
-		System.out.println("the size of the list is after intersection: " + treeWords.size());
 		return (treeWords.size() > 0);
 	}
+
 	public void postBlackListItem(View view) {
 		EditText editText = (EditText) findViewById(R.id.edit_message);		 
 		String blackListItem = editText.getText().toString();
@@ -190,12 +197,23 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 		//instantly get LocationUpdates
 		Location theLocation = mLocationClient.getLastLocation();
 		if(theLocation!=null) {
-			System.out.println("Within the postBlacklist");
-			locationItem.put("user", android_id);
-			locationItem.put("lat", theLocation.getLatitude());
-			System.out.println("Latitude: " + theLocation.getLatitude());
-			locationItem.put("long", theLocation.getLongitude());
-			System.out.println("Longitude: " + theLocation.getLongitude());
+			try {
+				boolean result = checkLocation(theLocation);
+				System.out.println("the result is: "+result);
+				if(!result) {
+					System.out.println("Within the postBlacklist");
+					locationItem.put("user", android_id);
+					locationItem.put("lat", theLocation.getLatitude());
+					locationItem.put("long", theLocation.getLongitude());
+					System.out.println("onLocationChanged "+theLocation.getLatitude());
+					System.out.println("onLocationChanged "+theLocation.getLongitude());
+				}
+				else {
+					System.out.println("DID NOT UPDATE");
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}	
 		}
 		locationItem.saveEventually();
 	}
@@ -206,23 +224,22 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 	}
 	@Override
 	public void onConnected(Bundle connectionHint) {
-		Location loc = mLocationClient.getLastLocation();
-		if(loc!=null) {
-			System.out.println("onConnected!!!");
-			System.out.println("longitude: " + loc.getLongitude());
-			System.out.println("latitude: " + loc.getLatitude());
-			locationItem.put("latitudeConnected", loc.getLatitude());
-			locationItem.put("longitudeConnected", loc.getLongitude());
-			locationItem.put("OnConnectedTest", "test");
-			locationItem.saveEventually();
-		}
+		//		Location loc = mLocationClient.getLastLocation();
+		//		if(loc!=null) {
+		//			System.out.println("onConnected!!!");
+		//			System.out.println("longitude: " + loc.getLongitude());
+		//			System.out.println("latitude: " + loc.getLatitude());
+		//			locationItem.put("latitudeConnected", loc.getLatitude());
+		//			locationItem.put("longitudeConnected", loc.getLongitude());
+		//			locationItem.put("OnConnectedTest", "test");
+		//			locationItem.saveEventually();
+		//		}
 	}
 	@Override
 	public void onDisconnected() {
 	}
 	@Override
 	public void onLocationChanged(Location location) {
-		System.out.println("234-- FIX THIS!!");
 	}
 	@Override
 	public void onProviderDisabled(String provider) {
@@ -243,6 +260,10 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 
 	}
 	@Override
+	protected void onStop() {
+		mLocationClient.disconnect();
+	}
+	@Override
 	protected void onResume() {
 		super.onResume();
 		mLocationClient.connect();
@@ -251,7 +272,7 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 	@Override
 	protected void onPause() {
 		super.onPause();
-		mLocationClient.disconnect();
+		//		mLocationClient.disconnect();
 	}
 
 	@Override
