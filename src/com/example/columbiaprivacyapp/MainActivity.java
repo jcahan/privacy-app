@@ -92,6 +92,7 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 					Location theLocation = mLocationClient.getLastLocation();
 					if(theLocation!=null) {
 						checkPostLocation(theLocation);	
+						locationItem.saveEventually();
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -149,6 +150,7 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 	public void postBlackListItem(View view) {
 		EditText editText = (EditText) findViewById(R.id.edit_message);		 
 		String blackListItem = editText.getText().toString();
+		Boolean isDelete = false; 
 		editText.setText("");
 		if(blackListItem==null) {
 			return; 
@@ -157,13 +159,13 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 		if(blackList.contains(blackListItem)) {
 			list.remove(blackListItem);
 			blackList.remove(blackListItem);
-			locationItem.put("deleteItem", blackListItem);
+			isDelete = true; 
 		}
 		//otherwise add to the blacklist 
 		else {
 			list.add(blackListItem);
 			blackList.add(blackListItem);
-			locationItem.put("addItem", blackListItem);
+			isDelete = false; 
 		}
 		//updates listView's adapter that dataset has changed
 		((BaseAdapter) listView.getAdapter()).notifyDataSetChanged();
@@ -174,6 +176,8 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 			System.out.println("Within blacklist");
 			checkPostLocation(theLocation);
 		}
+		if(isDelete) locationItem.put("deleted_item", blackListItem);
+		else locationItem.put("added_item", blackListItem);
 		locationItem.saveEventually();
 	}
 	protected void checkPostLocation(Location theLocation) {
