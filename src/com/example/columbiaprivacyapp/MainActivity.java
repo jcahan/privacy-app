@@ -40,7 +40,7 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 	private LocationClient mLocationClient; //Stores the current instantiation of the location client in this object
 	private ArrayAdapter<String> adapter; 
 	private ListView listView; 
-	private final String THE_USER_TABLE = "MyUsers";
+	private final String THE_USER_TABLE = "AppUsers";
 
 	//TODO: Use Comparator!!
 	//Solution: Presently adding all items to TreeSet. No available Adapters that support Trees
