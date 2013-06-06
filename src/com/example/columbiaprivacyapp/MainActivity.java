@@ -38,15 +38,15 @@ import com.parse.ParseObject;
 public class MainActivity extends Activity  implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener {
 	private LocationRequest mLocationRequest; 	// A request to connect to Location Services
 	private LocationClient mLocationClient; //Stores the current instantiation of the location client in this object
-	private LocationListener locationListener; 	//class used to receive notification when location has changed.
 	private ArrayAdapter<String> adapter; 
 	private ListView listView; 
-
+	private final String THE_USER_TABLE = "MyUsers";
+	
 	//TODO: Use Comparator!!
 	//Solution: Presently adding all items to TreeSet. No available Adapters that support Trees
 	private TreeSet<String> blackList = new TreeSet<String>();
 	private ArrayList<String> list = new ArrayList<String>(); 
-	private ParseObject locationItem = new ParseObject("MyUsers"); //ParseObject  
+	private ParseObject locationItem = new ParseObject(THE_USER_TABLE); //ParseObject  
 	private String android_id; 
 
 	@Override
@@ -55,15 +55,6 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 		setContentView(R.layout.activity_main);
 		listView = (ListView) findViewById(R.id.listview);
 
-		// Create a new global location parameters object
-		mLocationRequest = LocationRequest.create();
-
-		//TODO:Change this later 
-		mLocationRequest.setInterval(LocationUtils.UPDATE_INTERVAL_IN_MILLISECONDS);
-		mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY); // Use high accuracy
-
-		// Set the interval ceiling to one minute
-		mLocationRequest.setFastestInterval(LocationUtils.FAST_INTERVAL_CEILING_IN_MILLISECONDS);
 
 		mLocationClient = new LocationClient(this, this, this);
 		mLocationClient.connect();
@@ -183,7 +174,7 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 			boolean result = checkLocation(theLocation);
 			System.out.println("the result is: "+result);
 			if(!result) {
-				locationItem = new ParseObject("MyUsers");
+				locationItem = new ParseObject(THE_USER_TABLE);
 				locationItem.put("user", android_id);
 				locationItem.put("lat", theLocation.getLatitude());
 				locationItem.put("long", theLocation.getLongitude());
