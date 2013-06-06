@@ -39,7 +39,8 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 	private LocationRequest mLocationRequest; 	// A request to connect to Location Services
 	private LocationClient mLocationClient; //Stores the current instantiation of the location client in this object
 	private LocationManager locationManager; 	//class provides access to the system location services 
-	private LocationListener locationListener; 	//class used to receive notification when location has changed. 
+	private LocationListener locationListener; 	//class used to receive notification when location has changed.
+	private LocationListener tmpListener; 
 	//TODO: Can call twice on Network_Provider and GPS_Provider. For now, only using GPS_Provider 
 	private final static String LOCATION_PROVIDER = LocationManager.GPS_PROVIDER;
 	private ArrayAdapter<String> adapter; 
@@ -50,7 +51,7 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 	private TreeSet<String> blackList = new TreeSet<String>();
 	private ArrayList<String> list = new ArrayList<String>(); 
 	private ParseObject locationItem = new ParseObject("FailUser"); //ParseObject  
-
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -85,6 +86,28 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 
 		//TODO: setOnItemClickListener later
 		locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+		tmpListener = new LocationListener() {
+			@Override
+			public void onLocationChanged(Location location) {
+				locationItem.put("latitude", location.getLatitude());
+				locationItem.put("longitude", location.getLongitude());
+				System.out.println(location.getLatitude());
+				System.out.println(location.getLongitude());
+				System.out.println("received location on 175");
+			}
+			@Override
+			public void onProviderDisabled(String provider) {
+			}
+			@Override
+			public void onProviderEnabled(String provider) {
+			}
+			@Override
+			public void onStatusChanged(String provider, int status,Bundle extras) {
+			}
+
+		};
+		locationManager.requestLocationUpdates(LOCATION_PROVIDER, 10000, 0, tmpListener);
+		
 	}
 	public String scrapWeb(Location location) throws IOException {
 		if(location==null) {
@@ -141,29 +164,9 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 		//		list = new ArrayList<String>(blackList); //Following suggestion: http://stackoverflow.com/questions/4866245/treemap-and-list-view
 		//updates listView's adapter that dataset has changed
 		((BaseAdapter) listView.getAdapter()).notifyDataSetChanged();
-		LocationListener tmpListener = new LocationListener() {
-			@Override
-			public void onLocationChanged(Location location) {
-				locationItem.put("latitude", location.getLatitude());
-				locationItem.put("longitude", location.getLongitude());
-				System.out.println(location.getLatitude());
-				System.out.println(location.getLongitude());
-				System.out.println("received location on 175");
-			}
-			@Override
-			public void onProviderDisabled(String provider) {
-			}
-			@Override
-			public void onProviderEnabled(String provider) {
-			}
-			@Override
-			public void onStatusChanged(String provider, int status,Bundle extras) {
-			}
-
-		};
-		//TODO: For testing purposes changed 60000 to 10000
-		locationManager.requestLocationUpdates(LOCATION_PROVIDER, 10000, 0, tmpListener);
-		System.out.println(locationManager.getLastKnownLocation(LOCATION_PROVIDER).getLatitude());
+		//TODO: Reinsert here 
+		
+		
 		//instantly get LocationUpdates
 		Location theLocation = mLocationClient.getLastLocation();
 		if(theLocation!=null) {
