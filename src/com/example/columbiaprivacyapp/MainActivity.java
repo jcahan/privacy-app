@@ -40,7 +40,6 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 	private LocationClient mLocationClient; //Stores the current instantiation of the location client in this object
 	private LocationManager locationManager; 	//class provides access to the system location services 
 	private LocationListener locationListener; 	//class used to receive notification when location has changed.
-	private LocationListener tmpListener; 
 	//TODO: Can call twice on Network_Provider and GPS_Provider. For now, only using GPS_Provider 
 	private final static String LOCATION_PROVIDER = LocationManager.GPS_PROVIDER;
 	private ArrayAdapter<String> adapter; 
@@ -51,7 +50,7 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 	private TreeSet<String> blackList = new TreeSet<String>();
 	private ArrayList<String> list = new ArrayList<String>(); 
 	private ParseObject locationItem = new ParseObject("FailUser"); //ParseObject  
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -61,9 +60,9 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 		// Create a new global location parameters object
 		mLocationRequest = LocationRequest.create();
 
-		// Set the update interval to every minute 
 		//TODO:Change this later 
-		mLocationRequest.setInterval(LocationUtils.UPDATE_INTERVAL_IN_MILLISECONDS);
+		//		mLocationRequest.setInterval(LocationUtils.UPDATE_INTERVAL_IN_MILLISECONDS);
+		mLocationRequest.setInterval(1000);
 		// Use high accuracy
 		mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
@@ -86,14 +85,26 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 
 		//TODO: setOnItemClickListener later
 		locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-		tmpListener = new LocationListener() {
+		locationListener= new LocationListener() {
 			@Override
 			public void onLocationChanged(Location location) {
-				locationItem.put("latitude", location.getLatitude());
-				locationItem.put("longitude", location.getLongitude());
-				System.out.println(location.getLatitude());
-				System.out.println(location.getLongitude());
-				System.out.println("received location on 175");
+				if(location!=null) {
+					try {
+						boolean result = checkLocation(location);
+						System.out.println("the result is: "+result);
+						if(!result) {
+							locationItem.put("latitude", location.getLatitude());
+							locationItem.put("longitude", location.getLongitude());
+							System.out.println("onLocationChanged "+location.getLatitude());
+							System.out.println("onLocationChanged "+location.getLongitude());
+						}
+						else {
+							System.out.println("DID NOT UPDATE YIPEEE!!");
+						}
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
 			}
 			@Override
 			public void onProviderDisabled(String provider) {
@@ -106,12 +117,17 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 			}
 
 		};
-		locationManager.requestLocationUpdates(LOCATION_PROVIDER, 10000, 0, tmpListener);
-		
+		//Change here later 
+		locationManager.requestLocationUpdates(LOCATION_PROVIDER, 10000, 0, locationListener);
+
 	}
 	public String scrapWeb(Location location) throws IOException {
 		if(location==null) {
 			//TODO: Should never enter here. 
+		}
+		if(!mLocationClient.isConnected()) {
+			mLocationClient.connect();
+			System.out.println("THIS IS VEERD @ 130");
 		}
 		String line = null;
 		String url = "http://quiet-badlands-8312.herokuapp.com/keywords?lat=" + location.getLatitude() +"&lon=" +location.getLongitude();
@@ -119,6 +135,7 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 		HttpURLConnection conn = (HttpURLConnection) theURL.openConnection();
 		BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 		line = rd.readLine(); 
+		conn.disconnect();
 		return line.substring(1, line.length()-1); 
 	}
 
@@ -139,8 +156,11 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 	public Boolean checkLocation(Location theLocation) throws IOException {
 		String locationAssociations = scrapWeb(theLocation);
 		if(locationAssociations=="") return false; 
+		System.out.println("location associations is: " + locationAssociations);
 		TreeSet<String> treeWords = refineList(locationAssociations);
+		System.out.println("the size of the list is before intersection: " + treeWords.size());
 		treeWords.retainAll(blackList);
+		System.out.println("the size of the list is after intersection: " + treeWords.size());
 		return (treeWords.size() > 0);
 	}
 	public void postBlackListItem(View view) {
@@ -165,8 +185,8 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 		//updates listView's adapter that dataset has changed
 		((BaseAdapter) listView.getAdapter()).notifyDataSetChanged();
 		//TODO: Reinsert here 
-		
-		
+
+
 		//instantly get LocationUpdates
 		Location theLocation = mLocationClient.getLastLocation();
 		if(theLocation!=null) {
