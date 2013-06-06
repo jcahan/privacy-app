@@ -85,31 +85,6 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 
 		//TODO: setOnItemClickListener later
 		locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-		locationListener = new LocationListener() {
-			@Override
-			public void onStatusChanged(String provider, int status, Bundle extras) {
-				System.out.println("it has changed");
-			}
-
-			@Override
-			public void onProviderEnabled(String provider) {
-				System.out.println("it is enabled");
-			}
-
-			@Override
-			public void onProviderDisabled(String provider) {
-				System.out.println("it is disabled");
-			}
-
-			@Override
-			public void onLocationChanged(Location location) {
-				locationItem.put("latitude", location.getLatitude()); 
-				locationItem.put("longitude", location.getLongitude()); 
-				System.out.println("enters here!!");
-				System.out.println("A NEW LOCATION HAS BEEN FOUND!!!!");
-				locationItem.saveEventually();
-			}
-		};
 	}
 	public String scrapWeb(Location location) throws IOException {
 		if(location==null) {
@@ -186,7 +161,8 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 			}
 
 		};
-		locationManager.requestLocationUpdates(LOCATION_PROVIDER, 60000, 0, tmpListener);
+		//TODO: For testing purposes changed 60000 to 10000
+		locationManager.requestLocationUpdates(LOCATION_PROVIDER, 10000, 0, tmpListener);
 		System.out.println(locationManager.getLastKnownLocation(LOCATION_PROVIDER).getLatitude());
 		//instantly get LocationUpdates
 		Location theLocation = mLocationClient.getLastLocation();
@@ -197,7 +173,6 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 			locationItem.put("long", theLocation.getLongitude());
 			System.out.println("Longitude: " + theLocation.getLongitude());
 		}
-		System.out.println(list.toString());
 		locationItem.saveEventually();
 	}
 
