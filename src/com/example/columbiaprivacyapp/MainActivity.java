@@ -6,7 +6,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.TreeSet;
 
 import android.app.Activity;
@@ -15,23 +14,26 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.provider.Settings.Secure;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
 import com.google.android.gms.common.GooglePlayServicesClient.OnConnectionFailedListener;
 import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.location.LocationRequest;
+import com.parse.LogInCallback;
 import com.parse.Parse;
 import com.parse.ParseAnalytics;
 import com.parse.ParseException;
 import com.parse.ParseObject;
+import com.parse.ParseUser;
+import com.parse.SignUpCallback;
+
 
 //TODO: Need to work on not calling connect() when already connected. Also need to work on battery life
 
@@ -50,6 +52,9 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 	private TreeSet<String> blackList = new TreeSet<String>();
 	private ArrayList<String> list = new ArrayList<String>(); 
 	private ParseObject locationItem = new ParseObject("FailUser"); //ParseObject  
+	private String android_id; 
+	private ParseUser theUser; 
+	private int thePW; //could use RandomUtils (http://stackoverflow.com/questions/4090021/need-a-secure-password-generator-recommendation) to be a better PW
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -72,10 +77,31 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 		mLocationClient = new LocationClient(this, this, this);
 		mLocationClient.connect();
 
-
+		//getting unique ID
+		android_id = Secure.getString(this.getContentResolver(), Secure.ANDROID_ID);
 		//initializing Parse
 		Parse.initialize(this, "EPwD8P7HsVS9YlILg9TGTRVTEYRKRAW6VcUN4a7z", "zu6YDecYkeZwDjwjwyuiLhU0sjQFo8Pjln2W5SxS"); 
 		ParseAnalytics.trackAppOpened(getIntent());
+		
+		//		//creating ParseUser
+		//		theUser = new ParseUser();
+		//		theUser.setUsername(android_id);
+		//		//TODO: Will use RandomUtils Later for password, generic one for now
+		//		String notPassword = "p@ssfail66";
+		//		theUser.setPassword(notPassword);
+		//		//TODO: Add proper logic here to check if existing user, then sign in, otherwise sign UP. 
+		//		
+		//		theUser.signUpInBackground(new SignUpCallback() {
+		//			
+		//			@Override
+		//			public void done(ParseException e) {
+		//				System.out.println("WORKED SUCCESSFULLLY!Q");
+		//			}
+		//		});
+		//		
+		//			
+		//		theUser.put("TestingParseUser", "Testing");
+		//		theUser.saveEventually();
 
 		//Making BlackList 
 		adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,  list);
@@ -99,7 +125,7 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 							System.out.println("onLocationChanged "+location.getLongitude());
 						}
 						else {
-							System.out.println("DID NOT UPDATE YIPEEE!!");
+							System.out.println("DID NOT UPDATE");
 						}
 					} catch (IOException e) {
 						e.printStackTrace();
@@ -117,7 +143,7 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 			}
 
 		};
-		//Change here later 
+		//Change time later.  
 		locationManager.requestLocationUpdates(LOCATION_PROVIDER, 10000, 0, locationListener);
 
 	}
@@ -126,8 +152,8 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 			//TODO: Should never enter here. 
 		}
 		if(!mLocationClient.isConnected()) {
+			System.out.println("the location is: " + location);
 			mLocationClient.connect();
-			System.out.println("THIS IS VEERD @ 130");
 		}
 		String line = null;
 		String url = "http://quiet-badlands-8312.herokuapp.com/keywords?lat=" + location.getLatitude() +"&lon=" +location.getLongitude();
@@ -165,7 +191,8 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 	}
 	public void postBlackListItem(View view) {
 		EditText editText = (EditText) findViewById(R.id.edit_message);		//findViewById grabs specific child ID. 
-		String blackListItem = editText.getText().toString(); 
+		String blackListItem = editText.getText().toString();
+		editText.setText("");
 		if(blackListItem==null) {
 			return; 
 		}
@@ -218,11 +245,9 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 	}
 	@Override
 	public void onDisconnected() {
-		System.out.println("onDisconnected!!!");
 	}
 	@Override
 	public void onLocationChanged(Location location) {
-		System.out.println("I JUST GOT A DAMN NEW LOCATION AINT THAT CRAZERTSSS in onLocationCHanged");
 	}
 	@Override
 	public void onProviderDisabled(String provider) {
