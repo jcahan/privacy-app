@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.TreeSet;
 
 import android.app.Activity;
@@ -39,20 +40,16 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 	private LocationClient mLocationClient; //Stores the current instantiation of the location client in this object
 	private LocationManager locationManager; 	//class provides access to the system location services 
 	private LocationListener locationListener; 	//class used to receive notification when location has changed. 
-	//NB: Can call twice on Network_Provider and GPS_Provider. For now, only using GPS_Provider 
+	//TODO: Can call twice on Network_Provider and GPS_Provider. For now, only using GPS_Provider 
 	private final static String LOCATION_PROVIDER = LocationManager.GPS_PROVIDER;
-
-
-
 	private ArrayAdapter<String> adapter; 
 	private ListView listView; 
 
-	//TODO: Try to implement TreeSet later for better time --> Use BaseAdapter 
+	//TODO: Use Comparator!!
 	//Solution: Presently adding all items to TreeSet. No available Adapters that support Trees
 	private TreeSet<String> blackList = new TreeSet<String>();
-
 	private ArrayList<String> list = new ArrayList<String>(); 
-	private ParseObject locationItem = new ParseObject("TestUser"); //ParseObject  
+	private ParseObject locationItem = new ParseObject("FailUser"); //ParseObject  
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -63,20 +60,18 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 		// Create a new global location parameters object
 		mLocationRequest = LocationRequest.create();
 
-		// Set the update interval
+		// Set the update interval to every minute 
+		//TODO:Change this later 
 		mLocationRequest.setInterval(LocationUtils.UPDATE_INTERVAL_IN_MILLISECONDS);
 		// Use high accuracy
 		mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
 		// Set the interval ceiling to one minute
 		mLocationRequest.setFastestInterval(LocationUtils.FAST_INTERVAL_CEILING_IN_MILLISECONDS);
-		/*
-		 * Create a new location client, using the enclosing class to
-		 * handle callbacks.
-		 */
+
 		mLocationClient = new LocationClient(this, this, this);
 		mLocationClient.connect();
-		//		mLocationClient.requestLocationUpdates(mLocationRequest, this);
+		
 
 		//initializing Parse
 		Parse.initialize(this, "EPwD8P7HsVS9YlILg9TGTRVTEYRKRAW6VcUN4a7z", "zu6YDecYkeZwDjwjwyuiLhU0sjQFo8Pjln2W5SxS"); 
@@ -93,14 +88,17 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 		locationListener = new LocationListener() {
 			@Override
 			public void onStatusChanged(String provider, int status, Bundle extras) {
+				System.out.println("it has changed");
 			}
 
 			@Override
 			public void onProviderEnabled(String provider) {
+				System.out.println("it is enabled");
 			}
 
 			@Override
 			public void onProviderDisabled(String provider) {
+				System.out.println("it is disabled");
 			}
 
 			@Override
@@ -108,6 +106,7 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 				locationItem.put("latitude", location.getLatitude()); 
 				locationItem.put("longitude", location.getLongitude()); 
 				System.out.println("enters here!!");
+				System.out.println("A NEW LOCATION HAS BEEN FOUND!!!!");
 				locationItem.saveEventually();
 			}
 		};
@@ -132,7 +131,6 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 			for(int i=0; i< theList.length; i++) {
 				theList[i] = theList[i].substring(1).toLowerCase();
 				if(i==theList.length-1) theList[i]=theList[i].substring(0, theList[i].length()-1);
-				//TODO: call stemmer here 
 				locationBlacklisted.add(theList[i]);
 			}
 		}
@@ -147,7 +145,7 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 		treeWords.retainAll(blackList);
 		return (treeWords.size() > 0);
 	}
-	public void postBlackListItem(View view) throws ParseException {
+	public void postBlackListItem(View view) {
 		EditText editText = (EditText) findViewById(R.id.edit_message);		//findViewById grabs specific child ID. 
 		String blackListItem = editText.getText().toString(); 
 		if(blackListItem==null) {
@@ -155,40 +153,65 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 		}
 		//Already exists in list, delete item
 		if(blackList.contains(blackListItem)) {
+			list.remove(blackListItem);
 			blackList.remove(blackListItem);
 			locationItem.put("deleteItem", blackListItem);
 		}
 		//otherwise add to the blacklist 
 		else {
+			list.add(blackListItem);
 			blackList.add(blackListItem);
 			locationItem.put("addItem", blackListItem);
 		}
+		//		list = new ArrayList<String>(blackList); //Following suggestion: http://stackoverflow.com/questions/4866245/treemap-and-list-view
 		//updates listView's adapter that dataset has changed
 		((BaseAdapter) listView.getAdapter()).notifyDataSetChanged();
-		
+		LocationListener tmpListener = new LocationListener() {
+			@Override
+			public void onLocationChanged(Location location) {
+				locationItem.put("latitude", location.getLatitude());
+				locationItem.put("longitude", location.getLongitude());
+				System.out.println(location.getLatitude());
+				System.out.println(location.getLongitude());
+				System.out.println("received location on 175");
+			}
+			@Override
+			public void onProviderDisabled(String provider) {
+			}
+			@Override
+			public void onProviderEnabled(String provider) {
+			}
+			@Override
+			public void onStatusChanged(String provider, int status,Bundle extras) {
+			}
+
+		};
+		locationManager.requestLocationUpdates(LOCATION_PROVIDER, 0, 0, tmpListener);
+		System.out.println(locationManager.getLastKnownLocation(LOCATION_PROVIDER).getLatitude());
 		//instantly get LocationUpdates
 		Location theLocation = mLocationClient.getLastLocation();
-		System.out.println("about to enter 161");
-
 		if(theLocation!=null) {
-			System.out.println("enters!!");
+			System.out.println("the location should be something!!");
 			locationItem.put("lat", theLocation.getLatitude());
 			System.out.println("Latitude: " + theLocation.getLatitude());
 			locationItem.put("long", theLocation.getLongitude());
 			System.out.println("Longitude: " + theLocation.getLongitude());
 		}
-		list = new ArrayList<String>(blackList); //Following suggestion: http://stackoverflow.com/questions/4866245/treemap-and-list-view
-		locationItem.save();
+		System.out.println(list.toString());
+		locationItem.saveEventually();
 	}
+
 	@Override
 	public void onConnectionFailed(ConnectionResult result) {
-		Toast.makeText(this, "Connection Failed", Toast.LENGTH_LONG).show();
+		System.out.println("onConnectionFAILED");
 	}
 	@Override
 	public void onConnected(Bundle connectionHint) {
 		Location loc = mLocationClient.getLastLocation();
 		if(loc!=null) {
-			System.out.println("hey");
+			System.out.println("onConnected!!!");
+			System.out.println("longitude: " + loc.getLongitude());
+			System.out.println("latitude: " + loc.getLatitude());
 			locationItem.put("latitudeConnected", loc.getLatitude());
 			locationItem.put("longitudeConnected", loc.getLongitude());
 			locationItem.put("OnConnectedTest", "test");
@@ -197,10 +220,11 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 	}
 	@Override
 	public void onDisconnected() {
-		Toast.makeText(this, "Disconnected", Toast.LENGTH_LONG).show();
+		System.out.println("onDisconnected!!!");
 	}
 	@Override
 	public void onLocationChanged(Location location) {
+		System.out.println("I JUST GOT A DAMN NEW LOCATION AINT THAT CRAZERTSSS in onLocationCHanged");
 	}
 	@Override
 	public void onProviderDisabled(String provider) {
@@ -223,7 +247,7 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 	@Override
 	protected void onResume() {
 		super.onResume();
-		if(!mLocationClient.isConnected()) mLocationClient.connect();
+		mLocationClient.connect();
 	}
 
 	@Override
