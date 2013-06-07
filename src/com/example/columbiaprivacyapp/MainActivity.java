@@ -88,16 +88,7 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 						System.out.println("attempting to connect");
 						mLocationClient.connect();
 					}
-					//TODO: For some reason, cannot always connect immediately, don't know why Try/Catch is necessary
-					//inner timer to give it time to connect
-					//TODO: Ask Chris if this is the best way to solve the connection issue: Thread.sleep(10000); 
 
-
-
-
-
-					//TODO: Pick up from here 
-					//TODO: Delay for 10 seconds maybe before attempting to get this? 
 					Location theLocation = mLocationClient.getLastLocation();
 					if(theLocation!=null) {
 						checkPostLocation(theLocation, THE_USER_TABLE);	
@@ -115,12 +106,8 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 			//TODO: Should never enter here. 
 		}
 		System.out.println("-----entering scrapWeb now-----");
-		//		if(!mLocationClient.isConnected()) {
-		//			System.out.println("the location is: " + location);
-		//			mLocationClient.connect();
-		//		}
-		
-		
+
+		//TODO: See if large geographic change. If there isn't then don't look it up. 
 		String line = null;
 		String url = "http://quiet-badlands-8312.herokuapp.com/keywords?lat=" + location.getLatitude() +"&lon=" +location.getLongitude();
 		URL theURL = new URL(url);
@@ -246,7 +233,9 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 	@Override
 	protected void onResume() {
 		super.onResume();
-		mLocationClient.connect();
+		if(!mLocationClient.isConnected()) {
+			mLocationClient.connect();
+		}
 	}
 
 	@Override
