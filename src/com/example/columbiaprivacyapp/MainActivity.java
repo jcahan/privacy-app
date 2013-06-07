@@ -106,7 +106,7 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 				} catch (Exception e) {
 					e.printStackTrace();
 				}   
-			}}, 0, 25000);
+			}}, 5000, 25000);
 	}
 
 
