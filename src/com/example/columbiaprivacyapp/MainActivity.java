@@ -72,7 +72,7 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 		ArrayAdapter<String> theAdapter = 
 				new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, itemOptions);
 		autoView.setAdapter(theAdapter);
-		
+
 		//Making BlackList 
 		adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,  list);
 		listView.setAdapter(adapter);
@@ -83,11 +83,19 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 			@Override
 			public void run() {
 				try {
-					//TODO: For some reason, cannot always connect immediately, don't know why Try/Catch is necessary
+
 					if(!mLocationClient.isConnected()) {
 						System.out.println("attempting to connect");
 						mLocationClient.connect();
 					}
+					//TODO: For some reason, cannot always connect immediately, don't know why Try/Catch is necessary
+					//inner timer to give it time to connect
+					//TODO: Ask Chris if this is the best way to solve the connection issue: Thread.sleep(10000); 
+
+
+
+
+
 					//TODO: Pick up from here 
 					//TODO: Delay for 10 seconds maybe before attempting to get this? 
 					Location theLocation = mLocationClient.getLastLocation();
@@ -106,13 +114,15 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 		if(location==null) {
 			//TODO: Should never enter here. 
 		}
-		if(!mLocationClient.isConnected()) {
-			System.out.println("the location is: " + location);
-			mLocationClient.connect();
-		}
+		System.out.println("-----entering scrapWeb now-----");
+		//		if(!mLocationClient.isConnected()) {
+		//			System.out.println("the location is: " + location);
+		//			mLocationClient.connect();
+		//		}
+		
+		
 		String line = null;
 		String url = "http://quiet-badlands-8312.herokuapp.com/keywords?lat=" + location.getLatitude() +"&lon=" +location.getLongitude();
-		System.out.println("the url is: " + url);
 		URL theURL = new URL(url);
 		HttpURLConnection conn = (HttpURLConnection) theURL.openConnection();
 		BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
@@ -170,7 +180,7 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 		}
 		//updates listView's adapter that dataset has changed
 		((BaseAdapter) listView.getAdapter()).notifyDataSetChanged();
-		
+
 		//instantly get LocationUpdates
 		Location theLocation = mLocationClient.getLastLocation();
 		if(theLocation!=null) {
