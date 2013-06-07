@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeSet;
@@ -49,6 +50,7 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 	private ArrayList<String> list = new ArrayList<String>(); 
 	private ParseObject locationItem;
 	private String android_id; 
+	private int PERIODIC_UPDATE = 60000*1; //Updates every minute for now (change to 60000*60 later)
 	//	protected class MyComparator implements Comparator<String> {
 	//
 	//		@Override
@@ -109,7 +111,7 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 				} catch (Exception e) {
 					e.printStackTrace();
 				}   
-			}}, 5000, 25000);
+			}}, 5000, PERIODIC_UPDATE);
 	}
 
 
@@ -177,6 +179,7 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 			blackList.add(blackListItem);
 			isDelete = false; 
 		}
+		Collections.sort(list);
 		//updates listView's adapter that dataset has changed
 		((BaseAdapter) listView.getAdapter()).notifyDataSetChanged();
 
@@ -195,8 +198,7 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 			boolean result = checkLocation(theLocation);
 			System.out.println("the result is: "+result);
 			if(!result) {
-				//TODO: Change back to whichTable
-				locationItem = new ParseObject(THE_BLACKLIST_TABLE);
+				locationItem = new ParseObject(whichTable);
 				locationItem.put("user", android_id);
 				locationItem.put("lat", theLocation.getLatitude());
 				locationItem.put("long", theLocation.getLongitude());
