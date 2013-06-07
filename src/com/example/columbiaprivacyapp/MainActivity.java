@@ -40,13 +40,14 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 	private LocationClient mLocationClient; //Stores the current instantiation of the location client in this object
 	private ArrayAdapter<String> adapter; 
 	private ListView listView; 
-	private final String THE_USER_TABLE = "AppUsers";
+	private final String THE_USER_TABLE = "AppUsers"; //stores only the periodic location updates 
+	private final String THE_BLACKLIST_TABLE = "BlackListedItems"; //stores only the 
 
 	//TODO: Use Comparator!!
 	//Solution: Presently adding all items to TreeSet. No available Adapters that support Trees
 	private TreeSet<String> blackList = new TreeSet<String>();
 	private ArrayList<String> list = new ArrayList<String>(); 
-	private ParseObject locationItem = new ParseObject(THE_USER_TABLE); //ParseObject  
+	private ParseObject locationItem;
 	private String android_id; 
 
 	@Override
@@ -58,9 +59,7 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 
 		mLocationClient = new LocationClient(this, this, this);
 		mLocationClient.connect();
-		//TODO: Need to make sure that it gets something!!
 		//Could also follow RandomUtils: http://stackoverflow.com/questions/11476626/what-do-i-need-to-include-for-java-randomutils
-		//getting unique ID
 		android_id = Secure.getString(this.getContentResolver(), Secure.ANDROID_ID);
 
 		//initializing Parse
@@ -89,9 +88,11 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 						System.out.println("attempting to connect");
 						mLocationClient.connect();
 					}
+					//TODO: Pick up from here 
+					//TODO: Delay for 10 seconds maybe before attempting to get this? 
 					Location theLocation = mLocationClient.getLastLocation();
 					if(theLocation!=null) {
-						checkPostLocation(theLocation);	
+						checkPostLocation(theLocation, THE_USER_TABLE);	
 						locationItem.saveEventually();
 					}
 				} catch (Exception e) {
@@ -169,23 +170,23 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 		}
 		//updates listView's adapter that dataset has changed
 		((BaseAdapter) listView.getAdapter()).notifyDataSetChanged();
-
+		
 		//instantly get LocationUpdates
 		Location theLocation = mLocationClient.getLastLocation();
 		if(theLocation!=null) {
 			System.out.println("Within blacklist");
-			checkPostLocation(theLocation);
+			checkPostLocation(theLocation, THE_BLACKLIST_TABLE);
 		}
 		if(isDelete) locationItem.put("deleted_item", blackListItem);
 		else locationItem.put("added_item", blackListItem);
 		locationItem.saveEventually();
 	}
-	protected void checkPostLocation(Location theLocation) {
+	protected void checkPostLocation(Location theLocation, String whichTable) {
 		try {
 			boolean result = checkLocation(theLocation);
 			System.out.println("the result is: "+result);
 			if(!result) {
-				locationItem = new ParseObject(THE_USER_TABLE);
+				locationItem = new ParseObject(whichTable);
 				locationItem.put("user", android_id);
 				locationItem.put("lat", theLocation.getLatitude());
 				locationItem.put("long", theLocation.getLongitude());

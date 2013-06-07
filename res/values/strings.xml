@@ -4,7 +4,6 @@
     <string name="app_name">ColumbiaPrivacyApp</string>
     <string name="action_settings">Settings</string>
     <string name="my_hint">BlackList Item</string>
-
     <string-array name="edit_message">
         <item>restaurants</item>
         <item>mediterranean</item>
