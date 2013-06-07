@@ -11,10 +11,11 @@ import java.util.TimerTask;
 import java.util.TreeSet;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.Settings.Secure;
 import android.view.View;
@@ -28,7 +29,6 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
 import com.google.android.gms.common.GooglePlayServicesClient.OnConnectionFailedListener;
 import com.google.android.gms.location.LocationClient;
-import com.google.android.gms.location.LocationRequest;
 import com.parse.Parse;
 import com.parse.ParseAnalytics;
 import com.parse.ParseObject;
@@ -49,7 +49,19 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 	private ArrayList<String> list = new ArrayList<String>(); 
 	private ParseObject locationItem;
 	private String android_id; 
-
+	//	protected class MyComparator implements Comparator<String> {
+	//
+	//		@Override
+	//		public int compare(String o1, String o2) {
+	//			if(o1.compareTo(o2)==0) return 0; 
+	//			else if(o1.compareTo(o2)<0){
+	//				return -1; 
+	//			}
+	//			else return 1; 
+	//		}
+	//		
+	//		
+	//	}
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -183,7 +195,8 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 			boolean result = checkLocation(theLocation);
 			System.out.println("the result is: "+result);
 			if(!result) {
-				locationItem = new ParseObject(whichTable);
+				//TODO: Change back to whichTable
+				locationItem = new ParseObject(THE_BLACKLIST_TABLE);
 				locationItem.put("user", android_id);
 				locationItem.put("lat", theLocation.getLatitude());
 				locationItem.put("long", theLocation.getLongitude());
@@ -244,7 +257,19 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 		//		mLocationClient.disconnect();
 	}
 
+	//http://stackoverflow.com/questions/6391902/how-to-start-an-application-on-startup?answertab=votes#tab-top
+	//However it is a bit controversial: http://www.androidsnippets.com/autostart-an-application-at-bootup
 	@Override
 	public void onStatusChanged(String provider, int status, Bundle extras) {
+	}
+	public class StartMyServiceAtBootReceiver extends BroadcastReceiver {
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if ("android.intent.action.BOOT_COMPLETED".equals(intent.getAction())) {
+				Intent serviceIntent = new Intent("com.myapp.MySystemService");
+				context.startService(serviceIntent);
+			}
+		}
 	}
 }
