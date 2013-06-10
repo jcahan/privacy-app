@@ -48,7 +48,7 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 	//Solution: Presently adding all items to TreeSet. No available Adapters that support Trees
 	private TreeSet<String> blackList = new TreeSet<String>();
 	private ArrayList<String> list = new ArrayList<String>(); 
-	private ParseObject locationItem;
+	private ParseObject locationItem = new ParseObject(THE_BLACKLIST_TABLE);
 	private String android_id; 
 	private int PERIODIC_UPDATE = 60000*1; //Updates every minute for now (change to 60000*60 later)
 	//	protected class MyComparator implements Comparator<String> {
@@ -179,7 +179,9 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 			blackList.add(blackListItem);
 			isDelete = false; 
 		}
+		
 		Collections.sort(list);
+		
 		//updates listView's adapter that dataset has changed
 		((BaseAdapter) listView.getAdapter()).notifyDataSetChanged();
 
