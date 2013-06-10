@@ -4,454 +4,877 @@
     <string name="app_name">ColumbiaPrivacyApp</string>
     <string name="action_settings">Settings</string>
     <string name="my_hint">BlackList Item</string>
+
     <string-array name="edit_message">
-        <item>restaurants</item>
-        <item>mediterranean</item>
-        <item>spanish</item>
-        <item>tapas bars</item>
-        <item>bars</item>
-        <item>hotels</item>
-        <item>bakeries</item>
-        <item>local flavor</item>
-        <item>coffee &amp;amp; tea</item>
-        <item>women\'s clothing</item>
-        <item>japanese</item>
-        <item>italian</item>
-        <item>bookstores</item>
-        <item>dive bars</item>
-        <item>tapas/small plates</item>
-        <item>food delivery services</item>
-        <item>pizza</item>
-        <item>desserts</item>
-        <item>beer</item>
-        <item>wine</item>
-        <item>spirits</item>
-        <item>specialty food</item>
-        <item>pubs</item>
-        <item>cafes</item>
-        <item>music venues</item>
-        <item>wineries</item>
-        <item>breakfast &amp;amp; brunch</item>
-        <item>accessories</item>
-        <item>home decor</item>
-        <item>shoe stores</item>
-        <item>arts &amp;amp; crafts</item>
-        <item>toy stores</item>
-        <item>meat shops</item>
-        <item>grocery</item>
-        <item>museums</item>
-        <item>ice cream &amp; frozen yogurt</item>
-        <item>art galleries</item>
-        <item>lounges</item>
-        <item>men\'s clothing</item>
-        <item>seafood</item>
-        <item>personal shopping</item>
-        <item>hair salons</item>
-        <item>landmarks &amp; historical buildings</item>
-        <item>burgers</item>
-        <item>dance clubs</item>
-        <item>social clubs</item>
-        <item>performing arts</item>
-        <item>cards &amp; stationery</item>
-        <item>antiques</item>
-        <item>furniture stores</item>
-        <item>fruits &amp; veggies</item>
-        <item>children\'s clothing</item>
-        <item>drugstores</item>
-        <item>fashion</item>
-        <item>cheese shops</item>
-        <item>florists</item>
-        <item>modern european</item>
-        <item>sports clubs</item>
-        <item>food</item>
-        <item>specialty schools</item>
-        <item>cosmetics &amp; beauty supply</item>
-        <item>candy stores</item>
-        <item>printing services</item>
-        <item>breweries</item>
-        <item>health markets</item>
-        <item>basque</item>
-        <item>libraries</item>
-        <item>cinema</item>
-        <item>juice bars &amp; smoothies</item>
-        <item>outlet stores</item>
-        <item>parks</item>
-        <item>electronics</item>
-        <item>books</item>
-        <item>mags</item>
-        <item>music</item>
-        <item>video</item>
-        <item>mexican</item>
-        <item>chocolatiers and shops</item>
-        <item>chinese</item>
-        <item>baby gear &amp; furniture</item>
-        <item>sandwiches</item>
-        <item>sports wear</item>
-        <item>shopping</item>
-        <item>argentine</item>
-        <item>flowers &amp; gifts</item>
-        <item>tea rooms</item>
-        <item>farmers market</item>
-        <item>brasseries</item>
-        <item>shopping centers</item>
-        <item>vegetarian</item>
-        <item>music &amp; dvds</item>
-        <item>steakhouses</item>
-        <item>local services</item>
-        <item>medical centers</item>
-        <item>home &amp; garden</item>
-        <item>knitting supplies</item>
-        <item>churches</item>
-        <item>comic books</item>
-        <item>computers</item>
-        <item>french</item>
-        <item>indian</item>
-        <item>photography stores &amp; services</item>
-        <item>eyewear &amp; opticians</item>
-        <item>asian fusion</item>
-        <item>fast food</item>
-        <item>sporting goods</item>
-        <item>public services &amp; government</item>
-        <item>thai</item>
-        <item>educational services</item>
-        <item>diners</item>
-        <item>travel services</item>
-        <item>adult education</item>
-        <item>gyms</item>
-        <item>health and medical</item>
-        <item>nail salons</item>
-        <item>greek</item>
-        <item>musical instruments &amp; teachers</item>
-        <item>kitchen &amp; bath</item>
-        <item>veterinarians</item>
-        <item>hobby shops</item>
-        <item>hardware stores</item>
-        <item>hostels</item>
-        <item>middle eastern</item>
-        <item>physical therapy</item>
-        <item>interior design</item>
-        <item>art supplies</item>
-        <item>jewelry</item>
-        <item>gluten-free</item>
-        <item>outdoor gear</item>
-        <item>skin care</item>
-        <item>framing</item>
-        <item>massage</item>
-        <item>department stores</item>
-        <item>hair removal</item>
-        <item>delis</item>
-        <item>jazz &amp; blues</item>
-        <item>thrift stores</item>
-        <item>colleges &amp; universities</item>
-        <item>arts &amp; entertainment</item>
-        <item>used clothing</item>
-        <item>vintage</item>
-        <item>consignment</item>
-        <item>pet stores</item>
-        <item>hot dogs</item>
-        <item>office equipment</item>
-        <item>buffets</item>
-        <item>education</item>
-        <item>graphic design</item>
-        <item>creperies</item>
-        <item>lingerie</item>
-        <item>art schools</item>
-        <item>do-it-yourself food</item>
-        <item>vinyl records</item>
-        <item>barbers</item>
-        <item>bikes</item>
-        <item>dim sum</item>
-        <item>professional services</item>
-        <item>videos and video game rental</item>
-        <item>appliances</item>
-        <item>catalan</item>
-        <item>advertising</item>
-        <item>motorcycle repair</item>
-        <item>motorcycle dealers</item>
-        <item>dentists</item>
-        <item>building supplies</item>
-        <item>adult</item>
-        <item>wine bars</item>
-        <item>pakistani</item>
         <item>active life</item>
-        <item>auto repair</item>
-        <item>fabric stores</item>
-        <item>venues &amp; event spaces</item>
-        <item>sushi bars</item>
-        <item>tobacco shops</item>
-        <item>ethnic food</item>
-        <item>language schools</item>
-        <item>newspapers &amp; magazines</item>
-        <item>handyman</item>
-        <item>tours</item>
-        <item>gay bars</item>
-        <item>american traditional</item>
-        <item>lighting fixtures &amp; equipment</item>
-        <item>photographers</item>
-        <item>day spas</item>
-        <item>leather goods</item>
-        <item>community service/non-profit</item>
-        <item>nightlife</item>
-        <item>tattoo</item>
-        <item>vegan</item>
-        <item>parking</item>
-        <item>yoga</item>
-        <item>leisure centers</item>
-        <item>festivals</item>
-        <item>car wash</item>
-        <item>midwives</item>
-        <item>soccer</item>
-        <item>hotels &amp; travel</item>
-        <item>airlines</item>
-        <item>dog parks</item>
-        <item>nutritionists</item>
-        <item>video/film production</item>
-        <item>hospitals</item>
-        <item>latin american</item>
-        <item>caterers</item>
-        <item>sewing &amp; alterations</item>
-        <item>karaoke</item>
-        <item>elementary schools</item>
-        <item>electricians</item>
-        <item>skating rinks</item>
-        <item>playgrounds</item>
-        <item>shoe repair</item>
-        <item>contractors</item>
-        <item>discount store</item>
-        <item>guest houses</item>
-        <item>speech therapists</item>
-        <item>doctors</item>
-        <item>cooking schools</item>
-        <item>churros</item>
-        <item>seafood markets</item>
-        <item>german</item>
-        <item>british</item>
-        <item>public transportation</item>
-        <item>body shops</item>
-        <item>acupuncture</item>
-        <item>bed &amp; breakfast</item>
-        <item>laser eye surgery/lasik</item>
-        <item>sports bars</item>
-        <item>orthopedists</item>
-        <item>print media</item>
-        <item>arcades</item>
-        <item>stadiums &amp; arenas</item>
-        <item>pet services</item>
-        <item>traditional chinese medicine</item>
-        <item>auto parts &amp; supplies</item>
-        <item>preschools</item>
-        <item>painters</item>
-        <item>counseling &amp; mental health</item>
-        <item>bike rentals</item>
-        <item>middle schools &amp; high schools</item>
-        <item>lawyers</item>
-        <item>keys &amp; locksmiths</item>
-        <item>nurseries &amp; gardening</item>
-        <item>convenience stores</item>
-        <item>swimming pools</item>
-        <item>child care &amp; day care</item>
-        <item>beauty and spas</item>
-        <item>home cleaning</item>
-        <item>party &amp; event planning</item>
-        <item>mattresses</item>
-        <item>event planning &amp; services</item>
-        <item>funeral services &amp; cemeteries</item>
-        <item>gardeners</item>
-        <item>limos</item>
-        <item>shades &amp; blinds</item>
-        <item>apartments</item>
-        <item>tutoring centers</item>
-        <item>portuguese</item>
-        <item>signature cuisine</item>
-        <item>adult entertainment</item>
-        <item>hookah bars</item>
-        <item>costumes</item>
-        <item>chiropractors</item>
-        <item>watches</item>
-        <item>dance schools</item>
-        <item>transportation</item>
-        <item>plumbing</item>
-        <item>gas &amp; service stations</item>
-        <item>home health care</item>
-        <item>luggage</item>
-        <item>korean</item>
-        <item>insurance</item>
-        <item>driving schools</item>
-        <item>bowling</item>
-        <item>food stands</item>
-        <item>marketing</item>
-        <item>web design</item>
-        <item>butcher</item>
-        <item>radio stations</item>
-        <item>wedding planning</item>
-        <item>mobile phones</item>
-        <item>brazilian</item>
-        <item>car dealers</item>
-        <item>climbing</item>
-        <item>test preparation</item>
-        <item>general litigation</item>
-        <item>dance studios</item>
-        <item>real estate services</item>
-        <item>cuban</item>
-        <item>maternity wear</item>
-        <item>oil change stations</item>
-        <item>beer bar</item>
-        <item>tires</item>
-        <item>cannabis clinics</item>
-        <item>dry cleaning &amp; laundry</item>
-        <item>galician</item>
-        <item>pool halls</item>
-        <item>medical spas</item>
-        <item>it services &amp; computer repair</item>
-        <item>property management</item>
-        <item>career counseling</item>
-        <item>recording &amp; rehearsal studios</item>
-        <item>beaches</item>
-        <item>comedy clubs</item>
-        <item>halal</item>
-        <item>furniture reupholstery</item>
-        <item>oral surgeons</item>
         <item>amateur sports teams</item>
-        <item>obstetricians and gynecologists</item>
-        <item>moroccan</item>
-        <item>casinos</item>
-        <item>salad</item>
-        <item>golf</item>
-        <item>departments of motor vehicles</item>
-        <item>persian/iranian</item>
-        <item>kosher</item>
-        <item>home services</item>
-        <item>naturopathic/holistic</item>
-        <item>self storage</item>
-        <item>internet cafes</item>
-        <item>botanical gardens</item>
-        <item>bridal</item>
-        <item>wholesale stores</item>
-        <item>train stations</item>
-        <item>boating</item>
-        <item>orthodontists</item>
-        <item>animal shelters</item>
-        <item>mass media</item>
-        <item>ophthalmologists</item>
-        <item>tabernas</item>
-        <item>trainers</item>
-        <item>retirement homes</item>
-        <item>champagne bars</item>
-        <item>heating &amp; air conditioning/hvac</item>
         <item>amusement parks</item>
-        <item>pets</item>
-        <item>party supplies</item>
-        <item>banks &amp; credit unions</item>
-        <item>family practice</item>
-        <item>opera &amp; ballet</item>
-        <item>djs</item>
-        <item>automotive</item>
-        <item>cosmetic surgeons</item>
-        <item>airports</item>
-        <item>couriers &amp; delivery services</item>
-        <item>real estate law</item>
-        <item>campgrounds</item>
-        <item>university housing</item>
-        <item>makeup artists</item>
-        <item>urgent care</item>
-        <item>architects</item>
-        <item>zoos</item>
-        <item>watch repair</item>
-        <item>piercing</item>
-        <item>massage schools</item>
-        <item>pediatric dentists</item>
-        <item>weight loss centers</item>
-        <item>optometrists</item>
-        <item>pet groomers</item>
-        <item>tai chi</item>
-        <item>car rental</item>
-        <item>belgian</item>
-        <item>carpeting</item>
-        <item>flooring</item>
-        <item>windows installation</item>
-        <item>internal medicine</item>
-        <item>vocational and technical school</item>
-        <item>public relations</item>
-        <item>pilates</item>
-        <item>office cleaning</item>
-        <item>television stations</item>
-        <item>window washing</item>
-        <item>real estate</item>
-        <item>martial arts</item>
-        <item>fishing</item>
-        <item>live/raw food</item>
-        <item>religious organizations</item>
-        <item>accountants</item>
-        <item>swimming lessons/schools</item>
-        <item>arabian</item>
-        <item>dermatologists</item>
-        <item>security systems</item>
-        <item>gastropubs</item>
-        <item>horseback riding</item>
-        <item>hiking</item>
-        <item>diving</item>
-        <item>swimwear</item>
-        <item>peruvian</item>
-        <item>bespoke clothing</item>
-        <item>caribbean</item>
-        <item>buddhist temples</item>
-        <item>notaries</item>
-        <item>go karts</item>
-        <item>electronics repair</item>
-        <item>flight instruction</item>
-        <item>financial services</item>
-        <item>appliances &amp; repair</item>
         <item>aquariums</item>
-        <item>rv rental</item>
-        <item>police departments</item>
-        <item>tennis</item>
-        <item>carpet installation</item>
-        <item>real estate agents</item>
-        <item>personal chefs</item>
-        <item>pool cleaners</item>
-        <item>cajun</item>
-        <item>creole</item>
-        <item>street vendors</item>
-        <item>gun ranges</item>
-        <item>rifle ranges</item>
-        <item>cosmetology schools</item>
-        <item>private tutors</item>
-        <item>tablao flamenco</item>
-        <item>endodontists</item>
-        <item>landscape architects</item>
-        <item>mountain biking</item>
-        <item>private investigation</item>
-        <item>herbs and spices</item>
-        <item>internet service providers</item>
-        <item>psychics &amp; astrologers</item>
-        <item>rafting</item>
-        <item>kayaking</item>
+        <item>archery</item>
+        <item>badminton</item>
+        <item>bathing area</item>
+        <item>beaches</item>
+        <item>bicycle paths</item>
+        <item>bike rentals</item>
+        <item>boating</item>
+        <item>bowling</item>
+        <item>bungee jumping</item>
+        <item>climbing</item>
+        <item>disc golf</item>
+        <item>diving</item>
+        <item>free diving</item>
+        <item>scuba diving</item>
+        <item>experiences</item>
+        <item>fishing</item>
         <item>fitness &amp; instruction</item>
-        <item>life coach</item>
-        <item>junk removal and hauling</item>
-        <item>financial advising</item>
-        <item>tree services</item>
-        <item>russian</item>
-        <item>afghan</item>
-        <item>pet boarding</item>
-        <item>pet sitting</item>
-        <item>osteopathic physicians</item>
-        <item>dog walkers</item>
-        <item>movers</item>
-        <item>post offices</item>
-        <item>pawn shops</item>
-        <item>professional sports teams</item>
-        <item>african</item>
-        <item>taxis</item>
-        <item>fertility</item>
-        <item>screen printing</item>
-        <item>irish</item>
-        <item>audiologist</item>
-        <item>taiwanese</item>
+        <item>barre classes</item>
+        <item>boot camps</item>
+        <item>boxing</item>
+        <item>dance studios</item>
+        <item>gyms</item>
+        <item>martial arts</item>
+        <item>pilates</item>
+        <item>swimming lessons/schools</item>
+        <item>tai chi</item>
+        <item>trainers</item>
+        <item>yoga</item>
+        <item>gliding</item>
+        <item>go karts</item>
+        <item>golf</item>
+        <item>gun/rifle ranges</item>
+        <item>gymnastics</item>
+        <item>hang gliding</item>
+        <item>hiking</item>
+        <item>horse racing</item>
+        <item>horseback riding</item>
+        <item>hot air balloons</item>
+        <item>indoor playcentre</item>
+        <item>kids activities</item>
+        <item>kiteboarding</item>
+        <item>lakes</item>
+        <item>laser tag</item>
+        <item>lawn bowling</item>
+        <item>leisure centers</item>
+        <item>mini golf</item>
+        <item>mountain biking</item>
+        <item>nudist</item>
+        <item>paddleboarding</item>
+        <item>paintball</item>
+        <item>parks</item>
+        <item>dog parks</item>
+        <item>skate parks</item>
+        <item>playgrounds</item>
+        <item>public plazas</item>
+        <item>rafting/kayaking</item>
+        <item>recreation centers</item>
+        <item>rock climbing</item>
+        <item>sailing</item>
+        <item>skating rinks</item>
+        <item>skiing</item>
         <item>skydiving</item>
+        <item>soccer</item>
+        <item>spin classes</item>
+        <item>sport equipment hire</item>
+        <item>sports clubs</item>
+        <item>squash</item>
+        <item>summer camps</item>
+        <item>surfing</item>
+        <item>swimming pools</item>
+        <item>tennis</item>
+        <item>trampoline parks</item>
+        <item>tubing</item>
+        <item>zoos</item>
+        <item>zorbing</item>
+        <item>arts &amp; entertainment</item>
+        <item>arcades</item>
+        <item>art galleries</item>
+        <item>betting centers</item>
+        <item>botanical gardens</item>
+        <item>casinos</item>
+        <item>castles</item>
+        <item>choirs</item>
+        <item>cinema</item>
+        <item>cultural center</item>
+        <item>festivals</item>
+        <item>christmas markets</item>
+        <item>fun fair</item>
+        <item>general festivals</item>
+        <item>trade fairs</item>
+        <item>jazz &amp; blues</item>
+        <item>marching bands</item>
+        <item>museums</item>
+        <item>music venues</item>
+        <item>opera &amp; ballet</item>
+        <item>performing arts</item>
+        <item>professional sports teams</item>
+        <item>psychics &amp; astrologers</item>
+        <item>race tracks</item>
+        <item>social clubs</item>
+        <item>stadiums &amp; arenas</item>
+        <item>street art</item>
+        <item>tablao flamenco</item>
+        <item>ticket sales</item>
+        <item>wineries</item>
+        <item>automotive</item>
+        <item>auto detailing</item>
+        <item>auto glass services</item>
+        <item>auto loan providers</item>
+        <item>auto parts &amp; supplies</item>
+        <item>auto repair</item>
+        <item>boat dealers</item>
+        <item>body shops</item>
+        <item>car dealers</item>
+        <item>car stereo installation</item>
+        <item>car wash</item>
+        <item>gas &amp; service stations</item>
+        <item>motorcycle dealers</item>
+        <item>motorcycle repair</item>
+        <item>oil change stations</item>
+        <item>parking</item>
+        <item>rv dealers</item>
+        <item>smog check stations</item>
+        <item>tires</item>
+        <item>towing</item>
+        <item>truck rental</item>
+        <item>windshield installation &amp; repair</item>
+        <item>beauty &amp; spas</item>
+        <item>barbers</item>
+        <item>cosmetics &amp; beauty supply</item>
+        <item>day spas</item>
+        <item>eyelash service</item>
+        <item>hair extensions</item>
+        <item>hair removal</item>
+        <item>laser hair removal</item>
+        <item>hair salons</item>
+        <item>blow dry/out services</item>
+        <item>hair extensions</item>
+        <item>hair stylists</item>
+        <item>men\'s hair salons</item>
+        <item>makeup artists</item>
+        <item>massage</item>
+        <item>medical spas</item>
+        <item>nail salons</item>
+        <item>perfume</item>
+        <item>permanent makeup</item>
+        <item>piercing</item>
+        <item>rolfing</item>
+        <item>skin care</item>
         <item>tanning</item>
-        <item>recycling center</item>
+        <item>tattoo</item>
+        <item>bicycles</item>
+        <item>bike associations</item>
+        <item>bike repair</item>
+        <item>bike shop</item>
+        <item>special bikes</item>
+        <item>education</item>
+        <item>adult education</item>
+        <item>college counseling</item>
+        <item>colleges &amp; universities</item>
+        <item>educational services</item>
+        <item>elementary schools</item>
+        <item>middle schools &amp; high schools</item>
+        <item>preschools</item>
+        <item>private schools</item>
+        <item>private tutors</item>
+        <item>religious schools</item>
+        <item>special education</item>
+        <item>specialty schools</item>
+        <item>art schools</item>
+        <item>cpr classes</item>
+        <item>circus schools</item>
+        <item>cooking schools</item>
+        <item>cosmetology schools</item>
+        <item>dance schools</item>
+        <item>driving schools</item>
+        <item>first aid classes</item>
+        <item>flight instruction</item>
+        <item>language schools</item>
+        <item>massage schools</item>
+        <item>swimming lessons/schools</item>
+        <item>vocational &amp; technical school</item>
+        <item>test preparation</item>
+        <item>tutoring centers</item>
+        <item>event planning &amp; services</item>
+        <item>bartenders</item>
+        <item>boat charters</item>
+        <item>cards &amp; stationery</item>
+        <item>caterers</item>
+        <item>clowns</item>
+        <item>djs</item>
+        <item>hotels</item>
+        <item>magicians</item>
+        <item>musicians</item>
+        <item>officiants</item>
+        <item>party &amp; event planning</item>
+        <item>party bus rentals</item>
+        <item>party equipment rentals</item>
+        <item>party supplies</item>
+        <item>personal chefs</item>
+        <item>photographers</item>
+        <item>event photography</item>
+        <item>session photography</item>
+        <item>venues &amp; event spaces</item>
+        <item>videographers</item>
+        <item>wedding planning</item>
+        <item>financial services</item>
+        <item>banks &amp; credit unions</item>
+        <item>check cashing/pay-day loans</item>
+        <item>financial advising</item>
+        <item>insurance</item>
+        <item>investing</item>
+        <item>tax services</item>
+        <item>food</item>
+        <item>bagels</item>
+        <item>bakeries</item>
+        <item>beer, wine &amp; spirits</item>
+        <item>beverage store</item>
+        <item>breweries</item>
+        <item>bubble tea</item>
+        <item>butcher</item>
+        <item>csa</item>
+        <item>churros</item>
+        <item>coffee &amp; tea</item>
+        <item>convenience stores</item>
+        <item>delicatessen</item>
+        <item>desserts</item>
+        <item>do-it-yourself food</item>
+        <item>donairs</item>
+        <item>donuts</item>
+        <item>ethic grocery</item>
+        <item>farmers market</item>
+        <item>food delivery services</item>
+        <item>food trucks</item>
+        <item>friterie</item>
+        <item>gelato</item>
+        <item>grocery</item>
+        <item>ice cream &amp; frozen yogurt</item>
+        <item>internet cafes</item>
+        <item>juice bars &amp; smoothies</item>
+        <item>kiosk</item>
+        <item>mulled wine</item>
+        <item>organic stores</item>
+        <item>parent cafes</item>
+        <item>patisserie/cake shop</item>
+        <item>pretzels</item>
+        <item>shaved ice</item>
+        <item>specialty food</item>
+        <item>candy stores</item>
+        <item>cheese shops</item>
+        <item>chocolatiers &amp; shops</item>
+        <item>ethnic food</item>
+        <item>fruits &amp; veggies</item>
+        <item>health markets</item>
+        <item>herbs &amp; spices</item>
+        <item>meat shops</item>
+        <item>seafood markets</item>
+        <item>street vendors</item>
+        <item>tea rooms</item>
+        <item>wineries</item>
+        <item>zapiekanka</item>
+        <item>health &amp; medical</item>
+        <item>acupuncture</item>
+        <item>cannabis clinics</item>
+        <item>chiropractors</item>
+        <item>counseling &amp; mental health</item>
+        <item>dental hygienists</item>
+        <item>mobile clinics</item>
+        <item>storefront clinics</item>
+        <item>dentists</item>
+        <item>cosmetic dentists</item>
+        <item>endodontists</item>
+        <item>general dentistry</item>
+        <item>oral surgeons</item>
+        <item>orthodontists</item>
+        <item>pediatric dentists</item>
+        <item>periodontists</item>
+        <item>diagnostic services</item>
+        <item>diagnostic imaging</item>
+        <item>laboratory testing</item>
+        <item>doctors</item>
+        <item>allergists</item>
+        <item>anesthesiologists</item>
+        <item>audiologist</item>
+        <item>cardiologists</item>
+        <item>cosmetic surgeons</item>
+        <item>dermatologists</item>
+        <item>ear nose &amp; throat</item>
+        <item>family practice</item>
+        <item>fertility</item>
+        <item>gastroenterologist</item>
+        <item>gerontologists</item>
+        <item>internal medicine</item>
+        <item>naturopathic/holistic</item>
+        <item>neurologist</item>
+        <item>obstetricians &amp; gynecologists</item>
+        <item>oncologist</item>
+        <item>ophthalmologists</item>
+        <item>orthopedists</item>
+        <item>osteopathic physicians</item>
+        <item>pediatricians</item>
+        <item>podiatrists</item>
+        <item>proctologists</item>
+        <item>psychiatrists</item>
+        <item>pulmonologist</item>
+        <item>sports medicine</item>
+        <item>surgeons</item>
+        <item>tattoo removal</item>
+        <item>urologists</item>
+        <item>hearing aid providers</item>
+        <item>hearing aids</item>
+        <item>home health care</item>
+        <item>hospice</item>
+        <item>hospitals</item>
+        <item>lactation services</item>
+        <item>laser eye surgery/lasik</item>
+        <item>massage therapy</item>
+        <item>medical centers</item>
+        <item>bulk billing</item>
+        <item>osteopaths</item>
+        <item>walk-in clinics</item>
+        <item>medical spas</item>
+        <item>medical transportation</item>
+        <item>midwives</item>
+        <item>nutritionists</item>
+        <item>occupational therapy</item>
+        <item>optometrists</item>
+        <item>pharmacy</item>
+        <item>physical therapy</item>
+        <item>reflexology</item>
+        <item>rehabilitation center</item>
+        <item>retirement homes</item>
+        <item>saunas</item>
+        <item>speech therapists</item>
+        <item>traditional chinese medicine</item>
+        <item>urgent care</item>
+        <item>weight loss centers</item>
+        <item>home services</item>
+        <item>building supplies</item>
         <item>carpenters</item>
+        <item>carpet installation</item>
+        <item>carpeting</item>
+        <item>contractors</item>
+        <item>electricians</item>
+        <item>flooring</item>
+        <item>garage door services</item>
+        <item>gardeners</item>
+        <item>handyman</item>
+        <item>heating &amp; air conditioning/hvac</item>
+        <item>home cleaning</item>
+        <item>home inspectors</item>
+        <item>home organization</item>
+        <item>home theatre installation</item>
+        <item>home window tinting</item>
+        <item>interior design</item>
+        <item>internet service providers</item>
+        <item>irrigation</item>
+        <item>keys &amp; locksmiths</item>
+        <item>landscape architects</item>
+        <item>landscaping</item>
+        <item>lighting fixtures &amp; equipment</item>
+        <item>masonry/concrete</item>
+        <item>movers</item>
+        <item>painters</item>
+        <item>plumbing</item>
+        <item>pool cleaners</item>
+        <item>real estate</item>
+        <item>apartments</item>
+        <item>commercial real estate</item>
+        <item>home staging</item>
+        <item>mortgage brokers</item>
+        <item>property management</item>
+        <item>real estate agents</item>
+        <item>real estate services</item>
+        <item>shared office spaces</item>
+        <item>university housing</item>
+        <item>roofing</item>
+        <item>security systems</item>
+        <item>shades &amp; blinds</item>
+        <item>solar installation</item>
+        <item>television service providers</item>
+        <item>tree services</item>
+        <item>utilities</item>
+        <item>window washing</item>
+        <item>windows installation</item>
+        <item>hotels &amp; travel</item>
+        <item>airports</item>
+        <item>bed &amp; breakfast</item>
+        <item>campgrounds</item>
+        <item>car rental</item>
+        <item>guest houses</item>
+        <item>hostels</item>
+        <item>hotels</item>
+        <item>motorcycle rental</item>
+        <item>rv parks</item>
+        <item>rv rental</item>
+        <item>resorts</item>
+        <item>ski resorts</item>
+        <item>tours</item>
+        <item>train stations</item>
+        <item>transportation</item>
+        <item>airlines</item>
+        <item>airport shuttles</item>
+        <item>dolmus station</item>
+        <item>ferries</item>
+        <item>limos</item>
+        <item>public transportation</item>
+        <item>taxis</item>
+        <item>water taxis</item>
+        <item>travel services</item>
+        <item>vacation rental agents</item>
+        <item>vacation rentals</item>
+        <item>local flavor</item>
+        <item>local services</item>
+        <item>appliances &amp; repair</item>
+        <item>bail bondsmen</item>
+        <item>bike repair/maintenance</item>
+        <item>carpet cleaning</item>
+        <item>child care &amp; day care</item>
+        <item>community service/non-profit</item>
+        <item>couriers &amp; delivery services</item>
+        <item>dry cleaning &amp; laundry</item>
+        <item>electronics repair</item>
+        <item>funeral services &amp; cemeteries</item>
+        <item>furniture reupholstery</item>
+        <item>it services &amp; computer repair</item>
+        <item>data recovery</item>
+        <item>mobile phone repair</item>
+        <item>jewelry repair</item>
+        <item>junk removal &amp; hauling</item>
+        <item>notaries</item>
+        <item>pest control</item>
+        <item>printing services</item>
+        <item>record labels</item>
+        <item>recording &amp; rehearsal studios</item>
+        <item>recycling center</item>
+        <item>screen printing</item>
+        <item>screen printing/t-shirt printing</item>
+        <item>self storage</item>
+        <item>sewing &amp; alterations</item>
+        <item>shipping centers</item>
+        <item>shoe repair</item>
+        <item>snow removal</item>
+        <item>watch repair</item>
+        <item>youth club</item>
+        <item>mass media</item>
+        <item>print media</item>
+        <item>radio stations</item>
+        <item>television stations</item>
+        <item>nightlife</item>
+        <item>adult entertainment</item>
+        <item>bars</item>
+        <item>beach bars</item>
+        <item>beer bar</item>
+        <item>champagne bars</item>
+        <item>cocktail bars</item>
+        <item>dive bars</item>
+        <item>gay bars</item>
+        <item>hookah bars</item>
+        <item>hotel bar</item>
+        <item>irish pub</item>
+        <item>lounges</item>
+        <item>pubs</item>
+        <item>sports bars</item>
+        <item>wine bars</item>
+        <item>beer gardens</item>
+        <item>coffeeshops</item>
+        <item>comedy clubs</item>
+        <item>country dance halls</item>
+        <item>dance clubs</item>
+        <item>dance restaurants</item>
+        <item>fasil music</item>
+        <item>jazz &amp; blues</item>
+        <item>karaoke</item>
+        <item>music venues</item>
+        <item>piano bars</item>
+        <item>pool halls</item>
+        <item>pets</item>
+        <item>animal shelters</item>
+        <item>horse boarding</item>
+        <item>pet services</item>
+        <item>dog walkers</item>
+        <item>pet boarding/pet sitting</item>
+        <item>pet groomers</item>
+        <item>pet training</item>
+        <item>pet stores</item>
+        <item>veterinarians</item>
+        <item>professional services</item>
+        <item>accountants</item>
+        <item>advertising</item>
+        <item>architects</item>
+        <item>boat repair</item>
+        <item>career counseling</item>
+        <item>editorial services</item>
+        <item>employment agencies</item>
+        <item>graphic design</item>
+        <item>internet service providers</item>
+        <item>lawyers</item>
+        <item>bankruptcy law</item>
+        <item>business law</item>
+        <item>criminal defense law</item>
+        <item>dui law</item>
+        <item>divorce &amp; family law</item>
+        <item>employment law</item>
+        <item>estate planning law</item>
+        <item>general litigation</item>
+        <item>immigration law</item>
+        <item>personal injury law</item>
+        <item>real estate law</item>
+        <item>life coach</item>
+        <item>marketing</item>
+        <item>matchmakers</item>
+        <item>office cleaning</item>
+        <item>personal assistants</item>
+        <item>private investigation</item>
+        <item>public relations</item>
+        <item>security services</item>
+        <item>talent agencies</item>
+        <item>taxidermy</item>
+        <item>translation services</item>
+        <item>video/film production</item>
+        <item>web design</item>
+        <item>public services &amp; government</item>
+        <item>authorized postal representative</item>
+        <item>community centers</item>
+        <item>courthouses</item>
+        <item>departments of motor vehicles</item>
+        <item>embassy</item>
+        <item>fire departments</item>
+        <item>landmarks &amp; historical buildings</item>
+        <item>libraries</item>
+        <item>police departments</item>
+        <item>post offices</item>
+        <item>registry office</item>
+        <item>tax office</item>
+        <item>real estate</item>
+        <item>apartments</item>
+        <item>commercial real estate</item>
+        <item>home staging</item>
+        <item>mortgage brokers</item>
+        <item>property management</item>
+        <item>real estate agents</item>
+        <item>real estate services</item>
+        <item>shared office spaces</item>
+        <item>university housing</item>
+        <item>religious organizations</item>
+        <item>buddhist temples</item>
+        <item>churches</item>
+        <item>hindu temples</item>
+        <item>mosques</item>
+        <item>synagogues</item>
+        <item>restaurants</item>
+        <item>afghan</item>
+        <item>african</item>
+        <item>senegalese</item>
+        <item>south african</item>
+        <item>american</item>
+        <item>american</item>
+        <item>arabian</item>
+        <item>argentine</item>
+        <item>armenian</item>
+        <item>asian fusion</item>
+        <item>asturian</item>
+        <item>australian</item>
+        <item>austrian</item>
+        <item>baguettes</item>
+        <item>bangladeshi</item>
+        <item>barbeque</item>
+        <item>basque</item>
+        <item>bavarian</item>
+        <item>beer garden</item>
+        <item>beer hall</item>
+        <item>belgian</item>
+        <item>bistros</item>
+        <item>black sea</item>
+        <item>brasseries</item>
+        <item>brazilian</item>
+        <item>breakfast &amp; brunch</item>
+        <item>british</item>
+        <item>buffets</item>
+        <item>bulgarian</item>
+        <item>burgers</item>
+        <item>burmese</item>
+        <item>cafes</item>
+        <item>cafeteria</item>
+        <item>cajun/creole</item>
+        <item>cambodian</item>
+        <item>canadian</item>
+        <item>canteen</item>
+        <item>caribbean</item>
+        <item>dominican</item>
+        <item>haitian</item>
+        <item>puerto rican</item>
+        <item>trinidadian</item>
+        <item>catalan</item>
+        <item>chech</item>
+        <item>cheesesteaks</item>
+        <item>chicken shop</item>
+        <item>chicken wings</item>
+        <item>chinese</item>
+        <item>cantonese</item>
+        <item>dim sum</item>
+        <item>fuzhou</item>
+        <item>hakka</item>
+        <item>henghwa</item>
+        <item>hokkien</item>
+        <item>shanghainese</item>
+        <item>szechuan</item>
+        <item>teochew</item>
+        <item>comfort food</item>
+        <item>corsican</item>
+        <item>creperies</item>
+        <item>cuban</item>
+        <item>curry sausage</item>
+        <item>cypriot</item>
+        <item>czech/slovakian</item>
+        <item>danish</item>
+        <item>delis</item>
+        <item>diners</item>
+        <item>eastern european</item>
+        <item>ethiopian</item>
+        <item>fast food</item>
+        <item>filipino</item>
+        <item>fish &amp; chips</item>
+        <item>fondue</item>
+        <item>food court</item>
+        <item>food stands</item>
+        <item>french</item>
+        <item>french southwest</item>
+        <item>galician</item>
+        <item>gastropubs</item>
+        <item>georgian</item>
+        <item>german</item>
+        <item>baden</item>
+        <item>eastern german</item>
+        <item>hessian</item>
+        <item>northern german</item>
+        <item>palatine</item>
+        <item>rhinelandian</item>
+        <item>giblets</item>
+        <item>gluten-free</item>
+        <item>greek</item>
+        <item>halal</item>
+        <item>hawaiian</item>
+        <item>himalayan/nepalese</item>
+        <item>hot dogs</item>
+        <item>hot pot</item>
+        <item>hungarian</item>
+        <item>iberian</item>
+        <item>indian</item>
+        <item>indonesian</item>
+        <item>international</item>
+        <item>irish</item>
+        <item>island pub</item>
+        <item>israeli</item>
+        <item>italian</item>
+        <item>altoatesine</item>
+        <item>apulian</item>
+        <item>calabrian</item>
+        <item>cucina campana</item>
+        <item>emilian</item>
+        <item>friulan</item>
+        <item>ligurian</item>
+        <item>lumbard</item>
+        <item>roman</item>
+        <item>sardinian</item>
+        <item>sicilian</item>
+        <item>tuscan</item>
+        <item>venetian</item>
+        <item>japanese</item>
+        <item>izakaya</item>
+        <item>ramen</item>
+        <item>teppanyaki</item>
+        <item>jewish</item>
+        <item>kebab</item>
+        <item>korean</item>
+        <item>kosher</item>
+        <item>kurdish</item>
+        <item>laos</item>
+        <item>laotian</item>
+        <item>latin american</item>
+        <item>colombian</item>
+        <item>salvadoran</item>
+        <item>venezuelan</item>
+        <item>live/raw food</item>
+        <item>lyonnais</item>
+        <item>malaysian</item>
+        <item>mamak</item>
+        <item>nyonya</item>
+        <item>meatballs</item>
+        <item>mediterranean</item>
+        <item>mexican</item>
+        <item>middle eastern</item>
+        <item>egyptian</item>
+        <item>lebanese</item>
+        <item>milk bars</item>
+        <item>modern australian</item>
+        <item>modern european</item>
+        <item>mongolian</item>
+        <item>moroccan</item>
+        <item>new zealand</item>
+        <item>night food</item>
+        <item>open sandwiches</item>
+        <item>oriental</item>
+        <item>pakistani</item>
+        <item>parent cafes</item>
+        <item>parma</item>
+        <item>persian/iranian</item>
+        <item>peruvian</item>
+        <item>pita</item>
+        <item>pizza</item>
+        <item>polish</item>
+        <item>pierogis</item>
+        <item>portuguese</item>
+        <item>potatoes</item>
+        <item>poutineries</item>
+        <item>pub food</item>
+        <item>rice</item>
+        <item>romanian</item>
+        <item>rotisserie chicken</item>
+        <item>rumanian</item>
+        <item>russian</item>
+        <item>salad</item>
+        <item>sandwiches</item>
+        <item>scandinavian</item>
+        <item>scottish</item>
+        <item>seafood</item>
+        <item>serbo croatian</item>
+        <item>signature cuisine</item>
+        <item>singaporean</item>
+        <item>soul food</item>
+        <item>soup</item>
+        <item>southern</item>
+        <item>spanish</item>
+        <item>arroceria / paella</item>
+        <item>steakhouses</item>
+        <item>sushi bars</item>
+        <item>swabian</item>
+        <item>swedish</item>
+        <item>swiss food</item>
+        <item>tabernas</item>
+        <item>taiwanese</item>
+        <item>tapas bars</item>
+        <item>tapas/small plates</item>
+        <item>tex-mex</item>
+        <item>thai</item>
+        <item>traditional norwegian</item>
+        <item>traditional swedish</item>
+        <item>turkish</item>
+        <item>chee kufta</item>
+        <item>gozleme</item>
+        <item>turkish ravioli</item>
+        <item>ukrainian</item>
+        <item>vegan</item>
+        <item>vegetarian</item>
+        <item>venison</item>
+        <item>vietnamese</item>
+        <item>wok</item>
+        <item>wraps</item>
+        <item>yugoslav</item>
+        <item>shopping</item>
+        <item>adult</item>
+        <item>antiques</item>
+        <item>art galleries</item>
+        <item>arts &amp; crafts</item>
+        <item>art supplies</item>
+        <item>cards &amp; stationery</item>
+        <item>costumes</item>
+        <item>embroidery &amp; crochet</item>
+        <item>fabric stores</item>
+        <item>framing</item>
+        <item>auction houses</item>
+        <item>baby gear &amp; furniture</item>
+        <item>bespoke clothing</item>
+        <item>books, mags, music &amp; video</item>
+        <item>bookstores</item>
+        <item>comic books</item>
+        <item>music &amp; dvds</item>
+        <item>newspapers &amp; magazines</item>
+        <item>videos &amp; video game rental</item>
+        <item>vinyl records</item>
+        <item>bridal</item>
+        <item>chinese bazaar</item>
+        <item>computers</item>
+        <item>concept shops</item>
+        <item>cosmetics &amp; beauty supply</item>
+        <item>department stores</item>
+        <item>discount store</item>
+        <item>drugstores</item>
+        <item>electronics</item>
+        <item>eyewear &amp; opticians</item>
+        <item>fashion</item>
+        <item>accessories</item>
+        <item>children\'s clothing</item>
+        <item>department stores</item>
+        <item>formal wear</item>
+        <item>hats</item>
+        <item>leather goods</item>
+        <item>lingerie</item>
+        <item>maternity wear</item>
+        <item>men\'s clothing</item>
+        <item>plus size fashion</item>
+        <item>shoe stores</item>
+        <item>sleepwear</item>
+        <item>sports wear</item>
+        <item>surf shop</item>
+        <item>swimwear</item>
+        <item>used, vintage &amp; consignment</item>
+        <item>women\'s clothing</item>
+        <item>fireworks</item>
+        <item>flea markets</item>
+        <item>flowers &amp; gifts</item>
+        <item>cards &amp; stationery</item>
+        <item>florists</item>
+        <item>flowers</item>
+        <item>gift shops</item>
+        <item>golf equipment shops</item>
+        <item>guns &amp; ammo</item>
+        <item>hobby shops</item>
+        <item>home &amp; garden</item>
+        <item>appliances</item>
+        <item>furniture stores</item>
+        <item>hardware stores</item>
+        <item>home decor</item>
+        <item>hot tub &amp; pool</item>
+        <item>kitchen &amp; bath</item>
+        <item>linens</item>
+        <item>mattresses</item>
+        <item>nurseries &amp; gardening</item>
+        <item>tableware</item>
+        <item>jewelry</item>
+        <item>kiosk</item>
+        <item>knitting supplies</item>
+        <item>luggage</item>
+        <item>market stalls</item>
+        <item>medical supplies</item>
+        <item>mobile phones</item>
+        <item>motorcycle gear</item>
+        <item>musical instruments &amp; teachers</item>
+        <item>office equipment</item>
+        <item>outlet stores</item>
+        <item>pawn shops</item>
+        <item>perfume</item>
+        <item>personal shopping</item>
+        <item>photography stores &amp; services</item>
+        <item>pop-up shops</item>
+        <item>scandinavian design</item>
+        <item>shopping centers</item>
+        <item>souvenir shops</item>
+        <item>spiritual shop</item>
+        <item>sporting goods</item>
+        <item>bikes</item>
+        <item>golf equipment</item>
+        <item>outdoor gear</item>
+        <item>sports wear</item>
+        <item>thrift stores</item>
+        <item>tickets</item>
+        <item>tobacco shops</item>
+        <item>toy stores</item>
+        <item>trophy shops</item>
+        <item>uniforms</item>
+        <item>used bookstore</item>
+        <item>watches</item>
+        <item>wholesale stores</item>
+        <item>wigs</item>
     </string-array>
 
     <string name="update_button">Update BlackList</string>

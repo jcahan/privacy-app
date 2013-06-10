@@ -35,7 +35,7 @@ import com.parse.ParseAnalytics;
 import com.parse.ParseObject;
 
 
-//TODO: Need to work on not calling connect() when already connected. Also need to work on battery life
+//TODO: Need to work on not calling connect() when already connected. 
 
 public class MainActivity extends Activity  implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener {
 	private LocationClient mLocationClient; //Stores the current instantiation of the location client in this object
