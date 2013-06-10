@@ -123,6 +123,7 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 
 		//TODO: See if large geographic change. If there isn't then don't look it up. 
 		String line = null;
+		//TODO: Do this in a separate thread 
 		String url = "http://quiet-badlands-8312.herokuapp.com/keywords?lat=" + location.getLatitude() +"&lon=" +location.getLongitude();
 		URL theURL = new URL(url);
 		HttpURLConnection conn = (HttpURLConnection) theURL.openConnection();
