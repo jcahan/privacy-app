@@ -1,12 +1,14 @@
 package com.example.columbiaprivacyapp;
 
 import java.io.BufferedReader;
+import com.squareup.otto.Subscribe;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeSet;
@@ -14,6 +16,7 @@ import java.util.TreeSet;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
@@ -49,60 +52,82 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	protected ListView listView; 
 	private final String THE_USER_TABLE = "AppUsers"; //stores only the periodic location updates 
 	private final String THE_BLACKLIST_TABLE = "BlackListedItems"; //stores only the 
+	private BlacklistWordDataSource datasource;
+
 
 	//Solution: Presently adding all items to TreeSet. No available Adapters that support Trees
-	private TreeSet<String> blackList = new TreeSet<String>();
-	protected ArrayList<String> list = new ArrayList<String>(); 
+	private TreeSet<BlacklistWord> blackList = new TreeSet<BlacklistWord>(new MyComparator());
+	protected ArrayList<String> list = new ArrayList<String>();
+
+
 	private ParseObject locationItem = new ParseObject(THE_BLACKLIST_TABLE);
 	private String android_id; 
 	private int PERIODIC_UPDATE = 60000*1; //Updates every minute for now (change to 60000*60 later)
 
 	//Using Otto's Bus to Share Information 
-	private Bus eventBus = new Bus(); 
-	
-	
+	protected Bus eventBus = new Bus(); 
+
+	//Following SO recommendation...
+	private static MainActivity THIS = null;
+
+	public static MainActivity getInstance() {
+		return THIS;
+	}
+	public ArrayList<String> getList() {
+		return list; 
+	}
+	public ListView getListView() {
+		return this.listView; 
+	}
+
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		//Making an Action Bar
-		ActionBar actionbar = getSupportActionBar();
-		actionbar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-		actionbar.setTitle("Columbia Privacy App");
-		
-		//Creating the Tabs
-		ActionBar.Tab Frag1Tab = actionbar.newTab().setText("BlackList");
-		ActionBar.Tab Frag2Tab = actionbar.newTab().setText("TreeMenu");
-		ActionBar.Tab Frag3Tab = actionbar.newTab().setText("Map");
-		ActionBar.Tab Frag4Tab = actionbar.newTab().setText("Help");
-		
-		//Fragments (Underlying Classes for Each Class)
-		Fragment Fragment1 = new Fragment_1();
-		Fragment Fragment2 = new Fragment_2();
-		Fragment Fragment3 = new Fragment_3();
-		Fragment Fragment4 = new Fragment_4();
-		
-		//Adding Tab Listeners 
-		Frag1Tab.setTabListener(new MyTabsListener(Fragment1));
-		Frag2Tab.setTabListener(new MyTabsListener(Fragment2));
-		Frag3Tab.setTabListener(new MyTabsListener(Fragment3));
-		Frag4Tab.setTabListener(new MyTabsListener(Fragment4));
-		
-		//Adding Tabs to Action Bar
-		actionbar.addTab(Frag1Tab);
-		actionbar.addTab(Frag2Tab);
-		actionbar.addTab(Frag3Tab);
-		actionbar.addTab(Frag4Tab);
-		
-		
-		
+		//Communicating with DataSource
+		datasource = new BlacklistWordDataSource(this);
+		datasource.open();
+		this.blackList= datasource.GetAllWords();
+
+
+		//		//Making an Action Bar
+		//		ActionBar actionbar = getSupportActionBar();
+		//		actionbar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+		//		actionbar.setTitle("Columbia Privacy App");
+		//
+		//		//Creating the Tabs
+		//		ActionBar.Tab Frag1Tab = actionbar.newTab().setText("BlackList");
+		//		ActionBar.Tab Frag2Tab = actionbar.newTab().setText("TreeMenu");
+		//		ActionBar.Tab Frag3Tab = actionbar.newTab().setText("Map");
+		//		ActionBar.Tab Frag4Tab = actionbar.newTab().setText("Help");
+		//
+		//		//Fragments (Underlying Classes for Each Class)
+		//		Fragment Fragment1 = new Fragment_1();
+		//		Fragment Fragment2 = new Fragment_2();
+		//		Fragment Fragment3 = new Fragment_3();
+		//		Fragment Fragment4 = new Fragment_4();
+		//
+		//		//Adding Tab Listeners 
+		//		Frag1Tab.setTabListener(new MyTabsListener(Fragment1));
+		//		Frag2Tab.setTabListener(new MyTabsListener(Fragment2));
+		//		Frag3Tab.setTabListener(new MyTabsListener(Fragment3));
+		//		Frag4Tab.setTabListener(new MyTabsListener(Fragment4));
+		//
+		//		//Adding Tabs to Action Bar
+		//		actionbar.addTab(Frag1Tab);
+		//		actionbar.addTab(Frag2Tab);
+		//		actionbar.addTab(Frag3Tab);
+		//		actionbar.addTab(Frag4Tab);
+
+
 		listView = (ListView) findViewById(R.id.listview);
-		
+
 		//LocationClient to get Location
 		mLocationClient = new LocationClient(this, this, this);
 		mLocationClient.connect();
-		
+
 		//Could also follow RandomUtils: http://stackoverflow.com/questions/11476626/what-do-i-need-to-include-for-java-randomutils
 		android_id = Secure.getString(this.getContentResolver(), Secure.ANDROID_ID);
 
@@ -116,10 +141,10 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		ArrayAdapter<String> theAdapter = 
 				new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, itemOptions);
 		autoView.setAdapter(theAdapter);
-		
+
 		//Making BlackList 
 		adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,  list);
-		listView.setAdapter(adapter);
+		this.listView.setAdapter(adapter);
 
 		//Using timer to grab location every hour, will change to 60000*10 later (now every 25 seconds)
 		Timer theTimer = new Timer(); 
@@ -142,6 +167,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 					e.printStackTrace();
 				}   
 			}}, 5000, PERIODIC_UPDATE);
+		THIS = this;
 	}
 
 
@@ -198,22 +224,29 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 			return; 
 		}
 		//Already exists in list, delete item
-		if(blackList.contains(blackListItem)) {
+		if(blackList.contains(new BlacklistWord(blackListItem))) {
+			//TODO: remove from Datasource
 			list.remove(blackListItem);
-			blackList.remove(blackListItem);
+			blackList.remove(new BlacklistWord(blackListItem));
 			isDelete = true; 
 		}
 		//otherwise add to the blacklist 
 		else {
+			BlacklistWord newWord = this.datasource.CreateBlacklistWord(blackListItem);
+			this.blackList.add(newWord);
 			list.add(blackListItem);
-			blackList.add(blackListItem);
 			isDelete = false; 
 		}
+
+
 
 		Collections.sort(list);
 
 		//updates listView's adapter that dataset has changed
 		((BaseAdapter) listView.getAdapter()).notifyDataSetChanged();
+
+		//Add Bus
+		BusProvider.getInstance().post(list);
 
 		//instantly get LocationUpdates
 		Location theLocation = mLocationClient.getLastLocation();
@@ -283,12 +316,13 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		if(!mLocationClient.isConnected()) {
 			mLocationClient.connect();
 		}
+		BusProvider.getInstance().register(this);
 	}
 
 	@Override
 	protected void onPause() {
 		super.onPause();
-		//		mLocationClient.disconnect();
+		BusProvider.getInstance().unregister(this);
 	}
 
 	//http://stackoverflow.com/questions/6391902/how-to-start-an-application-on-startup?answertab=votes#tab-top
@@ -306,29 +340,44 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 			}
 		}
 	}
-	class MyTabsListener implements ActionBar.TabListener {
-		public Fragment fragment;
-		
-		public MyTabsListener(Fragment fragment){
-			this.fragment = fragment;
+	//	class MyTabsListener implements ActionBar.TabListener {
+	//		public Fragment fragment;
+	//
+	//		public MyTabsListener(Fragment fragment){
+	//			this.fragment = fragment;
+	//		}
+	//
+	//		@Override
+	//		public void onTabSelected(Tab tab, FragmentTransaction ft) {
+	//			//TODO: From here? 
+	//			if(tab.getPosition()==0) {
+	//				Bundle newBundle = new Bundle();
+	//				newBundle.putStringArrayList("theList", list); 
+	//				fragment.setArguments(newBundle);
+	//			}
+	//			// TODO Auto-generated method stub
+	//			ft.replace(R.id.fragment_container, fragment);
+	//		}
+	//
+	//		@Override
+	//		public void onTabUnselected(Tab tab, FragmentTransaction ft) {
+	//		}
+	//
+	//		@Override
+	//		public void onTabReselected(Tab tab, FragmentTransaction ft) {
+	//		}
+	//	}
+
+	// Provided by Square under the Apache License
+	public final static class BusProvider {
+		private static final Bus BUS = new Bus();
+
+		public static Bus getInstance() {
+			return BUS;
 		}
 
-		@Override
-		public void onTabSelected(Tab tab, FragmentTransaction ft) {
-			// TODO Auto-generated method stub
-			ft.replace(R.id.fragment_container, fragment);
-		}
-
-		@Override
-		public void onTabUnselected(Tab tab, FragmentTransaction ft) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public void onTabReselected(Tab tab, FragmentTransaction ft) {
-			// TODO Auto-generated method stub
-			
+		private BusProvider() {
+			// No instances.
 		}
 	}
 }
