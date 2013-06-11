@@ -38,14 +38,15 @@ import com.google.android.gms.location.LocationClient;
 import com.parse.Parse;
 import com.parse.ParseAnalytics;
 import com.parse.ParseObject;
+import com.squareup.otto.Bus;
 
 
 //TODO: Need to work on not calling connect() when already connected. 
 
 public class MainActivity extends SherlockFragmentActivity  implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener {
 	private LocationClient mLocationClient; //Stores the current instantiation of the location client in this object
-	private ArrayAdapter<String> adapter; 
-	private ListView listView; 
+	protected ArrayAdapter<String> adapter; 
+	protected ListView listView; 
 	private final String THE_USER_TABLE = "AppUsers"; //stores only the periodic location updates 
 	private final String THE_BLACKLIST_TABLE = "BlackListedItems"; //stores only the 
 
@@ -56,6 +57,10 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	private String android_id; 
 	private int PERIODIC_UPDATE = 60000*1; //Updates every minute for now (change to 60000*60 later)
 
+	//Using Otto's Bus to Share Information 
+	private Bus eventBus = new Bus(); 
+	
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -78,7 +83,6 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		Fragment Fragment3 = new Fragment_3();
 		Fragment Fragment4 = new Fragment_4();
 		
-		
 		//Adding Tab Listeners 
 		Frag1Tab.setTabListener(new MyTabsListener(Fragment1));
 		Frag2Tab.setTabListener(new MyTabsListener(Fragment2));
@@ -90,6 +94,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		actionbar.addTab(Frag2Tab);
 		actionbar.addTab(Frag3Tab);
 		actionbar.addTab(Frag4Tab);
+		
 		
 		
 		listView = (ListView) findViewById(R.id.listview);
