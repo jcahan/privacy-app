@@ -1158,7 +1158,7 @@ containing a value of this type.
         public static final int abs__search_view=0x7f030013;
         public static final int abs__simple_dropdown_hint=0x7f030014;
         public static final int activity_main=0x7f030015;
-        public static final int fragment_1=0x7f030016;
+        public static final int blacklist=0x7f030016;
         public static final int fragment_2=0x7f030017;
         public static final int fragment_3=0x7f030018;
         public static final int fragment_4=0x7f030019;

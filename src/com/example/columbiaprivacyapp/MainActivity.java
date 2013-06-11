@@ -28,6 +28,7 @@ import android.widget.ListView;
 
 import android.support.v4.app.FragmentTransaction;
 import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.app.ActionBar.Tab;
 import com.google.android.gms.common.ConnectionResult;
@@ -50,7 +51,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 
 	//Solution: Presently adding all items to TreeSet. No available Adapters that support Trees
 	private TreeSet<String> blackList = new TreeSet<String>();
-	private ArrayList<String> list = new ArrayList<String>(); 
+	protected ArrayList<String> list = new ArrayList<String>(); 
 	private ParseObject locationItem = new ParseObject(THE_BLACKLIST_TABLE);
 	private String android_id; 
 	private int PERIODIC_UPDATE = 60000*1; //Updates every minute for now (change to 60000*60 later)
@@ -77,6 +78,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		Fragment Fragment3 = new Fragment_3();
 		Fragment Fragment4 = new Fragment_4();
 		
+		
 		//Adding Tab Listeners 
 		Frag1Tab.setTabListener(new MyTabsListener(Fragment1));
 		Frag2Tab.setTabListener(new MyTabsListener(Fragment2));
@@ -91,9 +93,11 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		
 		
 		listView = (ListView) findViewById(R.id.listview);
+		
 		//LocationClient to get Location
 		mLocationClient = new LocationClient(this, this, this);
 		mLocationClient.connect();
+		
 		//Could also follow RandomUtils: http://stackoverflow.com/questions/11476626/what-do-i-need-to-include-for-java-randomutils
 		android_id = Secure.getString(this.getContentResolver(), Secure.ANDROID_ID);
 
