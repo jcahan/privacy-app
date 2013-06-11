@@ -220,18 +220,23 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		String blackListItem = editText.getText().toString();
 		Boolean isDelete = false; 
 		editText.setText("");
-		if(blackListItem==null) {
+		if(blackListItem==null || blackListItem=="") {
+			System.out.println("NULL blackListItem");
 			return; 
 		}
+		BlacklistWord theWord = new BlacklistWord(blackListItem); 
 		//Already exists in list, delete item
-		if(blackList.contains(new BlacklistWord(blackListItem))) {
-			//TODO: remove from Datasource
+		//SQLite Incorporated 
+		if(blackList.contains(theWord)) {
+			System.out.println("Contains the word");
 			list.remove(blackListItem);
+			this.datasource.DeleteWord(theWord);
 			blackList.remove(new BlacklistWord(blackListItem));
 			isDelete = true; 
 		}
 		//otherwise add to the blacklist 
 		else {
+			System.out.println("SHOULD BE ADDING TO BLACKLIST 237");
 			BlacklistWord newWord = this.datasource.CreateBlacklistWord(blackListItem);
 			this.blackList.add(newWord);
 			list.add(blackListItem);
