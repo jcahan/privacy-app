@@ -11,7 +11,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeSet;
 
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -19,6 +18,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
 import android.provider.Settings.Secure;
+import android.support.v4.app.Fragment;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -26,6 +26,11 @@ import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 
+import android.support.v4.app.FragmentTransaction;
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockFragment;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.app.ActionBar.Tab;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
 import com.google.android.gms.common.GooglePlayServicesClient.OnConnectionFailedListener;
@@ -37,42 +42,62 @@ import com.parse.ParseObject;
 
 //TODO: Need to work on not calling connect() when already connected. 
 
-public class MainActivity extends Activity  implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener {
+public class MainActivity extends SherlockFragmentActivity  implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener {
 	private LocationClient mLocationClient; //Stores the current instantiation of the location client in this object
 	private ArrayAdapter<String> adapter; 
 	private ListView listView; 
 	private final String THE_USER_TABLE = "AppUsers"; //stores only the periodic location updates 
 	private final String THE_BLACKLIST_TABLE = "BlackListedItems"; //stores only the 
 
-	//TODO: Use Comparator!!
 	//Solution: Presently adding all items to TreeSet. No available Adapters that support Trees
 	private TreeSet<String> blackList = new TreeSet<String>();
-	private ArrayList<String> list = new ArrayList<String>(); 
+	protected ArrayList<String> list = new ArrayList<String>(); 
 	private ParseObject locationItem = new ParseObject(THE_BLACKLIST_TABLE);
 	private String android_id; 
 	private int PERIODIC_UPDATE = 60000*1; //Updates every minute for now (change to 60000*60 later)
-	//	protected class MyComparator implements Comparator<String> {
-	//
-	//		@Override
-	//		public int compare(String o1, String o2) {
-	//			if(o1.compareTo(o2)==0) return 0; 
-	//			else if(o1.compareTo(o2)<0){
-	//				return -1; 
-	//			}
-	//			else return 1; 
-	//		}
-	//		
-	//		
-	//	}
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+
+		//Making an Action Bar
+		ActionBar actionbar = getSupportActionBar();
+		actionbar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+		actionbar.setTitle("Columbia Privacy App");
+		
+		//Creating the Tabs
+		ActionBar.Tab Frag1Tab = actionbar.newTab().setText("BlackList");
+		ActionBar.Tab Frag2Tab = actionbar.newTab().setText("TreeMenu");
+		ActionBar.Tab Frag3Tab = actionbar.newTab().setText("Map");
+		ActionBar.Tab Frag4Tab = actionbar.newTab().setText("Help");
+		
+		//Fragments (Underlying Classes for Each Class)
+		Fragment Fragment1 = new Fragment_1();
+		Fragment Fragment2 = new Fragment_2();
+		Fragment Fragment3 = new Fragment_3();
+		Fragment Fragment4 = new Fragment_4();
+		
+		
+		//Adding Tab Listeners 
+		Frag1Tab.setTabListener(new MyTabsListener(Fragment1));
+		Frag2Tab.setTabListener(new MyTabsListener(Fragment2));
+		Frag3Tab.setTabListener(new MyTabsListener(Fragment3));
+		Frag4Tab.setTabListener(new MyTabsListener(Fragment4));
+		
+		//Adding Tabs to Action Bar
+		actionbar.addTab(Frag1Tab);
+		actionbar.addTab(Frag2Tab);
+		actionbar.addTab(Frag3Tab);
+		actionbar.addTab(Frag4Tab);
+		
+		
 		listView = (ListView) findViewById(R.id.listview);
-
-
+		
+		//LocationClient to get Location
 		mLocationClient = new LocationClient(this, this, this);
 		mLocationClient.connect();
+		
 		//Could also follow RandomUtils: http://stackoverflow.com/questions/11476626/what-do-i-need-to-include-for-java-randomutils
 		android_id = Secure.getString(this.getContentResolver(), Secure.ANDROID_ID);
 
@@ -86,7 +111,7 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 		ArrayAdapter<String> theAdapter = 
 				new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, itemOptions);
 		autoView.setAdapter(theAdapter);
-
+		
 		//Making BlackList 
 		adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,  list);
 		listView.setAdapter(adapter);
@@ -119,7 +144,6 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 		if(location==null) {
 			//TODO: Should never enter here. 
 		}
-		System.out.println("-----entering scrapWeb now-----");
 
 		//TODO: See if large geographic change. If there isn't then don't look it up. 
 		String line = null;
@@ -180,9 +204,9 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 			blackList.add(blackListItem);
 			isDelete = false; 
 		}
-		
+
 		Collections.sort(list);
-		
+
 		//updates listView's adapter that dataset has changed
 		((BaseAdapter) listView.getAdapter()).notifyDataSetChanged();
 
@@ -275,6 +299,31 @@ public class MainActivity extends Activity  implements ConnectionCallbacks, OnCo
 				Intent serviceIntent = new Intent("com.myapp.MySystemService");
 				context.startService(serviceIntent);
 			}
+		}
+	}
+	class MyTabsListener implements ActionBar.TabListener {
+		public Fragment fragment;
+		
+		public MyTabsListener(Fragment fragment){
+			this.fragment = fragment;
+		}
+
+		@Override
+		public void onTabSelected(Tab tab, FragmentTransaction ft) {
+			// TODO Auto-generated method stub
+			ft.replace(R.id.fragment_container, fragment);
+		}
+
+		@Override
+		public void onTabUnselected(Tab tab, FragmentTransaction ft) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void onTabReselected(Tab tab, FragmentTransaction ft) {
+			// TODO Auto-generated method stub
+			
 		}
 	}
 }
