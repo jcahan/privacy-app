@@ -252,7 +252,6 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		locationItem.saveEventually();
 		System.out.println("UPDATED WITH THE WORD: " + blackListItem);
 		THIS = this; 
-		
 	}
 
 	protected void checkPostLocation(Location theLocation, String whichTable) {
@@ -293,7 +292,6 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	@Override
 	public void onProviderEnabled(String provider) {
 	}
-
 
 	//	 Called when the Activity is restarted, even before it becomes visible.
 	@Override
