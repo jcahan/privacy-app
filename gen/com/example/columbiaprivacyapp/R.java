@@ -1111,17 +1111,18 @@ containing a value of this type.
         public static final int abs__textButton=0x7f040017;
         public static final int abs__title=0x7f04001f;
         public static final int abs__up=0x7f04000b;
-        public static final int action_settings=0x7f040039;
+        public static final int action_settings=0x7f04003a;
         public static final int disableHome=0x7f040009;
-        public static final int edit_message=0x7f040036;
+        public static final int edit_message=0x7f040037;
         public static final int edit_query=0x7f04002a;
+        public static final int fragment_container=0x7f040036;
         public static final int homeAsUp=0x7f040006;
         public static final int hybrid=0x7f040013;
         public static final int listMode=0x7f040002;
-        public static final int listview=0x7f040038;
+        public static final int listview=0x7f040039;
         public static final int none=0x7f040010;
         public static final int normal=0x7f040001;
-        public static final int post_blacklist_button=0x7f040037;
+        public static final int post_blacklist_button=0x7f040038;
         public static final int satellite=0x7f040011;
         public static final int showCustom=0x7f040008;
         public static final int showHome=0x7f040005;
@@ -1158,12 +1159,11 @@ containing a value of this type.
         public static final int abs__simple_dropdown_hint=0x7f030014;
         public static final int activity_main=0x7f030015;
         public static final int blacklist=0x7f030016;
-        public static final int fragment_1=0x7f030017;
-        public static final int fragment_2=0x7f030018;
-        public static final int fragment_3=0x7f030019;
-        public static final int fragment_4=0x7f03001a;
-        public static final int sherlock_spinner_dropdown_item=0x7f03001b;
-        public static final int sherlock_spinner_item=0x7f03001c;
+        public static final int fragment_2=0x7f030017;
+        public static final int fragment_3=0x7f030018;
+        public static final int fragment_4=0x7f030019;
+        public static final int sherlock_spinner_dropdown_item=0x7f03001a;
+        public static final int sherlock_spinner_item=0x7f03001b;
     }
     public static final class menu {
         public static final int main=0x7f0c0000;

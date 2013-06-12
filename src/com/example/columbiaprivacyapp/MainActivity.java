@@ -28,6 +28,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import android.support.v4.app.FragmentTransaction;
 import com.actionbarsherlock.app.ActionBar;
@@ -41,7 +42,6 @@ import com.google.android.gms.location.LocationClient;
 import com.parse.Parse;
 import com.parse.ParseAnalytics;
 import com.parse.ParseObject;
-import com.squareup.otto.Bus;
 
 
 //TODO: Need to work on not calling connect() when already connected. 
@@ -52,7 +52,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	protected ListView listView; 
 	private final String THE_USER_TABLE = "AppUsers"; //stores only the periodic location updates 
 	private final String THE_BLACKLIST_TABLE = "BlackListedItems"; //stores only the 
-	private BlacklistWordDataSource datasource;
+	protected BlacklistWordDataSource datasource;
 
 
 	//Solution: Presently adding all items to TreeSet. No available Adapters that support Trees
@@ -64,9 +64,8 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	private String android_id; 
 	private int PERIODIC_UPDATE = 60000*1; //Updates every minute for now (change to 60000*60 later)
 
-	//Using Otto's Bus to Share Information 
-	protected Bus eventBus = new Bus(); 
 
+	//TODO: Will potentially delete 
 	//Following SO recommendation...
 	private static MainActivity THIS = null;
 
@@ -91,35 +90,34 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		datasource.open();
 		this.blackList= datasource.GetAllWords();
 
+		//Making an Action Bar
+		ActionBar actionbar = getSupportActionBar();
+		actionbar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+		actionbar.setTitle("Columbia Privacy App");
 
-		//		//Making an Action Bar
-		//		ActionBar actionbar = getSupportActionBar();
-		//		actionbar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-		//		actionbar.setTitle("Columbia Privacy App");
-		//
-		//		//Creating the Tabs
-		//		ActionBar.Tab Frag1Tab = actionbar.newTab().setText("BlackList");
-		//		ActionBar.Tab Frag2Tab = actionbar.newTab().setText("TreeMenu");
-		//		ActionBar.Tab Frag3Tab = actionbar.newTab().setText("Map");
-		//		ActionBar.Tab Frag4Tab = actionbar.newTab().setText("Help");
-		//
-		//		//Fragments (Underlying Classes for Each Class)
-		//		Fragment Fragment1 = new Fragment_1();
-		//		Fragment Fragment2 = new Fragment_2();
-		//		Fragment Fragment3 = new Fragment_3();
-		//		Fragment Fragment4 = new Fragment_4();
-		//
-		//		//Adding Tab Listeners 
-		//		Frag1Tab.setTabListener(new MyTabsListener(Fragment1));
-		//		Frag2Tab.setTabListener(new MyTabsListener(Fragment2));
-		//		Frag3Tab.setTabListener(new MyTabsListener(Fragment3));
-		//		Frag4Tab.setTabListener(new MyTabsListener(Fragment4));
-		//
-		//		//Adding Tabs to Action Bar
-		//		actionbar.addTab(Frag1Tab);
-		//		actionbar.addTab(Frag2Tab);
-		//		actionbar.addTab(Frag3Tab);
-		//		actionbar.addTab(Frag4Tab);
+		//Creating the Tabs
+		ActionBar.Tab Frag1Tab = actionbar.newTab().setText("BlackList");
+		ActionBar.Tab Frag2Tab = actionbar.newTab().setText("TreeMenu");
+		ActionBar.Tab Frag3Tab = actionbar.newTab().setText("Map");
+		ActionBar.Tab Frag4Tab = actionbar.newTab().setText("Help");
+
+		//Fragments (Underlying Classes for Each Class)
+		Fragment Fragment1 = new Fragment_1();
+		Fragment Fragment2 = new Fragment_2();
+		Fragment Fragment3 = new Fragment_3();
+		Fragment Fragment4 = new Fragment_4();
+
+		//Adding Tab Listeners 
+		Frag1Tab.setTabListener(new MyTabsListener(Fragment1));
+		Frag2Tab.setTabListener(new MyTabsListener(Fragment2));
+		Frag3Tab.setTabListener(new MyTabsListener(Fragment3));
+		Frag4Tab.setTabListener(new MyTabsListener(Fragment4));
+
+		//Adding Tabs to Action Bar
+		actionbar.addTab(Frag1Tab);
+		actionbar.addTab(Frag2Tab);
+		actionbar.addTab(Frag3Tab);
+		actionbar.addTab(Frag4Tab);
 
 
 		listView = (ListView) findViewById(R.id.listview);
@@ -242,16 +240,10 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 			list.add(blackListItem);
 			isDelete = false; 
 		}
-
-
-
 		Collections.sort(list);
 
 		//updates listView's adapter that dataset has changed
 		((BaseAdapter) listView.getAdapter()).notifyDataSetChanged();
-
-		//Add Bus
-		BusProvider.getInstance().post(list);
 
 		//instantly get LocationUpdates
 		Location theLocation = mLocationClient.getLastLocation();
@@ -321,13 +313,11 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		if(!mLocationClient.isConnected()) {
 			mLocationClient.connect();
 		}
-		BusProvider.getInstance().register(this);
 	}
 
 	@Override
 	protected void onPause() {
 		super.onPause();
-		BusProvider.getInstance().unregister(this);
 	}
 
 	//http://stackoverflow.com/questions/6391902/how-to-start-an-application-on-startup?answertab=votes#tab-top
@@ -345,44 +335,30 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 			}
 		}
 	}
-	//	class MyTabsListener implements ActionBar.TabListener {
-	//		public Fragment fragment;
-	//
-	//		public MyTabsListener(Fragment fragment){
-	//			this.fragment = fragment;
-	//		}
-	//
-	//		@Override
-	//		public void onTabSelected(Tab tab, FragmentTransaction ft) {
-	//			//TODO: From here? 
-	//			if(tab.getPosition()==0) {
-	//				Bundle newBundle = new Bundle();
-	//				newBundle.putStringArrayList("theList", list); 
-	//				fragment.setArguments(newBundle);
-	//			}
-	//			// TODO Auto-generated method stub
-	//			ft.replace(R.id.fragment_container, fragment);
-	//		}
-	//
-	//		@Override
-	//		public void onTabUnselected(Tab tab, FragmentTransaction ft) {
-	//		}
-	//
-	//		@Override
-	//		public void onTabReselected(Tab tab, FragmentTransaction ft) {
-	//		}
-	//	}
 
-	// Provided by Square under the Apache License
-	public final static class BusProvider {
-		private static final Bus BUS = new Bus();
+	class MyTabsListener implements ActionBar.TabListener {
+		public Fragment fragment;
 
-		public static Bus getInstance() {
-			return BUS;
+		public MyTabsListener(Fragment fragment){
+			this.fragment = fragment;
 		}
 
-		private BusProvider() {
-			// No instances.
+		@Override
+		public void onTabSelected(Tab tab, FragmentTransaction ft) {
+			// TODO Auto-generated method stub
+			if(tab.getPosition()==0) {
+				Toast.makeText(getApplicationContext(), "yolo", Toast.LENGTH_LONG).show();
+			}
+			ft.replace(R.id.fragment_container, fragment);
+		}
+
+		@Override
+		public void onTabUnselected(Tab tab, FragmentTransaction ft) {
+		}
+
+		@Override
+		public void onTabReselected(Tab tab, FragmentTransaction ft) {
 		}
 	}
+
 }

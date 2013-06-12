@@ -1,50 +1,61 @@
 package com.example.columbiaprivacyapp;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.TreeSet;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockFragment;
-import com.example.columbiaprivacyapp.MainActivity.BusProvider;
-import com.squareup.otto.Subscribe;
 
 public class Fragment_1 extends SherlockFragment {
-
-	@Subscribe public void getList(ArrayList<String> theList) {
-		System.out.println("18: " + theList.toString());
-	}
-
+	protected ArrayAdapter<String> adapter;
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
-		
-		
-		//		ListView myView = MainActivity.getInstance().getListView();
-		//		myView.setAdapter(MainActivity.getInstance().adapter);
-		//		((BaseAdapter) myView.getAdapter()).notifyDataSetChanged();
-		//		return inflater.inflate(R.layout.blacklist, myView, false);
-		
-		
-		
-		return inflater.inflate(R.layout.blacklist, container, false);
-	}
-	@Override public void onResume() {
-		super.onResume();
-		// Register ourselves so that we can provide the initial value.
-		BusProvider.getInstance().register(this);
-		Bundle bundle = this.getArguments();
-		ArrayList<String> theList = bundle.getStringArrayList("theList");
+		View view = inflater.inflate(R.layout.blacklist, container, false);
+		ListView listView = (ListView) view.findViewById(R.id.listview);
 
-	}
+		//Making BlackList 
+		TreeSet<BlacklistWord> theSet =  MainActivity.getInstance().datasource.GetAllWords();
+		ArrayList<String> list = new ArrayList<String>();
+		for(BlacklistWord i :theSet){
+			System.out.println(i.getWord());
+			list.add(i.getWord());
+		}
+		Collections.sort(list);
+		adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1,  list);
+		listView.setAdapter(adapter);
+		((BaseAdapter) listView.getAdapter()).notifyDataSetChanged();
 
-	@Override public void onPause() {
-		super.onPause();
+		((ViewGroup) listView.getParent()).removeView(listView);
+		container.addView(listView);
 
-		// Always unregister when an object no longer should be on the bus.
-		BusProvider.getInstance().unregister(this);
+		return view;
+
+		//		//TODO: If time permits, fix the O(n) + O(nlogn) operations by making TreeAdapter
+		//		TreeSet<BlacklistWord> theSet =  MainActivity.getInstance().datasource.GetAllWords();
+		//		ArrayList<String> list = new ArrayList<String>();
+		//		for(BlacklistWord i :theSet){
+		//			System.out.println(i.getWord());
+		//			list.add(i.getWord());
+		//		}
+		//		Collections.sort(list);
+		//
+		//		//Making BlackList 
+		//		listView = new ListView(getActivity());
+		//		listView.findViewById(R.id.listview);
+		//		adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1,  list);
+		//		listView.setAdapter(adapter);
+		//		((BaseAdapter) listView.getAdapter()).notifyDataSetChanged();
+		//		container.addView(listView);
+		//		return inflater.inflate(R.layout.blacklist, container, false);
+		//		return inflater.inflate(R.layout.blacklist, container, false);
 	}
 }
