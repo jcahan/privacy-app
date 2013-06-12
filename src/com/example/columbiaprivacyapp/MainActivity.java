@@ -49,7 +49,7 @@ import com.parse.ParseObject;
 public class MainActivity extends SherlockFragmentActivity  implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener {
 	private LocationClient mLocationClient; //Stores the current instantiation of the location client in this object
 	protected ArrayAdapter<String> adapter; 
-	protected ListView listView; 
+	//	protected ListView listView; 
 	private final String THE_USER_TABLE = "AppUsers"; //stores only the periodic location updates 
 	private final String THE_BLACKLIST_TABLE = "BlackListedItems"; //stores only the 
 	protected BlacklistWordDataSource datasource;
@@ -75,9 +75,10 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	public ArrayList<String> getList() {
 		return list; 
 	}
-	public ListView getListView() {
-		return this.listView; 
-	}
+	private Fragment Fragment1; 
+	private TreeMenuFragment Fragment2;
+	private Fragment Fragment3;
+	private Fragment Fragment4;
 
 
 	@Override
@@ -102,10 +103,10 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		ActionBar.Tab Frag4Tab = actionbar.newTab().setText("Help");
 
 		//Fragments (Underlying Classes for Each Class)
-		Fragment Fragment1 = new BlackistFragment();
-		Fragment Fragment2 = new TreeMenuFragment();
-		Fragment Fragment3 = new Fragment_3();
-		Fragment Fragment4 = new Fragment_4();
+		Fragment1 = new BlackistFragment();
+		Fragment2 = new TreeMenuFragment();
+		Fragment3 = new Fragment_3();
+		Fragment4 = new Fragment_4();
 
 		//Adding Tab Listeners 
 		Frag1Tab.setTabListener(new MyTabsListener(Fragment1));
@@ -176,7 +177,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 
 		//TODO: See if large geographic change. If there isn't then don't look it up. 
 		String line = null;
-		
+
 		//TODO: Do this in a separate thread 
 		String url = "http://quiet-badlands-8312.herokuapp.com/keywords?lat=" + location.getLatitude() +"&lon=" +location.getLongitude();
 		URL theURL = new URL(url);
@@ -214,17 +215,10 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		return (treeWords.size() > 0);
 	}
 
-	public void postBlackListItem(View view) {
-		EditText editText = (EditText) findViewById(R.id.edit_message);		 
-		String blackListItem = editText.getText().toString();
-		Boolean isDelete = false; 
-		editText.setText("");
-		if(blackListItem==null || blackListItem=="") {
-			System.out.println("NULL blackListItem");
-			return; 
-		}
+	public void postBlackListItem(String blackListItem) {
 		BlacklistWord theWord = new BlacklistWord(blackListItem); 
-
+		Boolean isDelete; 
+		System.out.println("the word is: " + blackListItem);
 		//Already exists in list, delete item
 		if(blackList.contains(theWord)) {
 			System.out.println("Contains the word");
@@ -247,7 +241,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		//		((BaseAdapter) listView.getAdapter()).notifyDataSetChanged();
 
 		//instantly get LocationUpdates
-		
+
 		Location theLocation = mLocationClient.getLastLocation();
 		if(theLocation!=null) {
 			System.out.println("Within blacklist");
@@ -256,7 +250,11 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		if(isDelete) locationItem.put("deleted_item", blackListItem);
 		else locationItem.put("added_item", blackListItem);
 		locationItem.saveEventually();
+		System.out.println("UPDATED WITH THE WORD: " + blackListItem);
+		THIS = this; 
+		
 	}
+
 	protected void checkPostLocation(Location theLocation, String whichTable) {
 		try {
 			boolean result = checkLocation(theLocation);
@@ -315,6 +313,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		if(!mLocationClient.isConnected()) {
 			mLocationClient.connect();
 		}
+		THIS = this; 
 	}
 
 	@Override
