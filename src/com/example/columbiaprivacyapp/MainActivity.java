@@ -133,12 +133,12 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		Parse.initialize(this, "EPwD8P7HsVS9YlILg9TGTRVTEYRKRAW6VcUN4a7z", "zu6YDecYkeZwDjwjwyuiLhU0sjQFo8Pjln2W5SxS"); 
 		ParseAnalytics.trackAppOpened(getIntent());
 
-		//Auto-Complete
-		AutoCompleteTextView autoView = (AutoCompleteTextView) findViewById(R.id.edit_message);
-		String[] itemOptions = getResources().getStringArray(R.array.edit_message);
-		ArrayAdapter<String> theAdapter = 
-				new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, itemOptions);
-		autoView.setAdapter(theAdapter);
+		//		//Auto-Complete
+		//		AutoCompleteTextView autoView = (AutoCompleteTextView) findViewById(R.id.edit_message);
+		//		String[] itemOptions = getResources().getStringArray(R.array.edit_message);
+		//		ArrayAdapter<String> theAdapter = 
+		//				new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, itemOptions);
+		//		autoView.setAdapter(theAdapter);
 
 		//Making BlackList 
 		//		adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,  list);
@@ -176,6 +176,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 
 		//TODO: See if large geographic change. If there isn't then don't look it up. 
 		String line = null;
+		
 		//TODO: Do this in a separate thread 
 		String url = "http://quiet-badlands-8312.herokuapp.com/keywords?lat=" + location.getLatitude() +"&lon=" +location.getLongitude();
 		URL theURL = new URL(url);
@@ -188,15 +189,15 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		return line.substring(1, line.length()-1); 
 	}
 
-	protected TreeSet<String> refineList(String listOfItems) {
-		TreeSet<String> locationBlacklisted = new TreeSet<String>();
+	protected TreeSet<BlacklistWord> refineList(String listOfItems) {
+		TreeSet<BlacklistWord> locationBlacklisted = new TreeSet<BlacklistWord>();
 		if(listOfItems.length()!=0) {
 			if(listOfItems.charAt(1)!=']') {
 				String[] theList = listOfItems.split("\", ");
 				for(int i=0; i< theList.length; i++) {
 					theList[i] = theList[i].substring(1).toLowerCase();
 					if(i==theList.length-1) theList[i]=theList[i].substring(0, theList[i].length()-1);
-					locationBlacklisted.add(theList[i]);
+					locationBlacklisted.add(new BlacklistWord(theList[i]));
 				}
 			}
 		}
@@ -208,7 +209,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		String locationAssociations = scrapWeb(theLocation);
 		if(locationAssociations=="") return false; 
 		System.out.println("location associations is: " + locationAssociations);
-		TreeSet<String> treeWords = refineList(locationAssociations);
+		TreeSet<BlacklistWord> treeWords = refineList(locationAssociations);
 		treeWords.retainAll(blackList);
 		return (treeWords.size() > 0);
 	}
@@ -223,8 +224,8 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 			return; 
 		}
 		BlacklistWord theWord = new BlacklistWord(blackListItem); 
+
 		//Already exists in list, delete item
-		//SQLite Incorporated 
 		if(blackList.contains(theWord)) {
 			System.out.println("Contains the word");
 			list.remove(blackListItem);
@@ -246,6 +247,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		//		((BaseAdapter) listView.getAdapter()).notifyDataSetChanged();
 
 		//instantly get LocationUpdates
+		
 		Location theLocation = mLocationClient.getLastLocation();
 		if(theLocation!=null) {
 			System.out.println("Within blacklist");
