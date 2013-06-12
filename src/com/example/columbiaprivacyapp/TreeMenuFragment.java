@@ -13,7 +13,9 @@ import com.actionbarsherlock.app.SherlockFragment;
 
 public class TreeMenuFragment extends SherlockFragment{
 	protected View view; 
+	
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
+		MainActivity.getInstance().invalidateOptionsMenu();
 		view = inflater.inflate(R.layout.treemenu, container, false);
 		//Auto-Complete
 		AutoCompleteTextView autoView = (AutoCompleteTextView) view.findViewById(R.id.edit_message);

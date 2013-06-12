@@ -241,16 +241,17 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		//		((BaseAdapter) listView.getAdapter()).notifyDataSetChanged();
 
 		//instantly get LocationUpdates
+		//TODO: Switch back. Need to check if connected 
+		//		Location theLocation = mLocationClient.getLastLocation();
+		//		if(theLocation!=null) {
+		//			System.out.println("Within blacklist");
+		//			checkPostLocation(theLocation, THE_BLACKLIST_TABLE);
+		//		}
 
-		Location theLocation = mLocationClient.getLastLocation();
-		if(theLocation!=null) {
-			System.out.println("Within blacklist");
-			checkPostLocation(theLocation, THE_BLACKLIST_TABLE);
-		}
+
 		if(isDelete) locationItem.put("deleted_item", blackListItem);
 		else locationItem.put("added_item", blackListItem);
 		locationItem.saveEventually();
-		System.out.println("UPDATED WITH THE WORD: " + blackListItem);
 		THIS = this; 
 	}
 
@@ -344,7 +345,6 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 
 		@Override
 		public void onTabSelected(Tab tab, FragmentTransaction ft) {
-			// TODO Auto-generated method stub
 			if(tab.getPosition()==0) {
 				Toast.makeText(getApplicationContext(), "yolo", Toast.LENGTH_LONG).show();
 			}
@@ -353,6 +353,21 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 
 		@Override
 		public void onTabUnselected(Tab tab, FragmentTransaction ft) {
+			switch (tab.getPosition()) {
+			case 0:
+				ft.remove(Fragment1);
+				break;
+			case 1:
+				ft.remove(Fragment2);
+				break;
+			case 2:
+				ft.remove(Fragment3);
+				break;
+			case 3:
+				ft.remove(Fragment4);
+				break;
+			}
+
 		}
 
 		@Override
