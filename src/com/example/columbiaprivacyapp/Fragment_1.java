@@ -39,23 +39,5 @@ public class Fragment_1 extends SherlockFragment {
 
 		return view;
 
-		//		//TODO: If time permits, fix the O(n) + O(nlogn) operations by making TreeAdapter
-		//		TreeSet<BlacklistWord> theSet =  MainActivity.getInstance().datasource.GetAllWords();
-		//		ArrayList<String> list = new ArrayList<String>();
-		//		for(BlacklistWord i :theSet){
-		//			System.out.println(i.getWord());
-		//			list.add(i.getWord());
-		//		}
-		//		Collections.sort(list);
-		//
-		//		//Making BlackList 
-		//		listView = new ListView(getActivity());
-		//		listView.findViewById(R.id.listview);
-		//		adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1,  list);
-		//		listView.setAdapter(adapter);
-		//		((BaseAdapter) listView.getAdapter()).notifyDataSetChanged();
-		//		container.addView(listView);
-		//		return inflater.inflate(R.layout.blacklist, container, false);
-		//		return inflater.inflate(R.layout.blacklist, container, false);
 	}
 }
