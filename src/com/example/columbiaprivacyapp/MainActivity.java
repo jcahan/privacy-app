@@ -102,8 +102,8 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		ActionBar.Tab Frag4Tab = actionbar.newTab().setText("Help");
 
 		//Fragments (Underlying Classes for Each Class)
-		Fragment Fragment1 = new Fragment_1();
-		Fragment Fragment2 = new Fragment_2();
+		Fragment Fragment1 = new BlackistFragment();
+		Fragment Fragment2 = new TreeMenuFragment();
 		Fragment Fragment3 = new Fragment_3();
 		Fragment Fragment4 = new Fragment_4();
 
@@ -120,7 +120,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		actionbar.addTab(Frag4Tab);
 
 
-//		listView = (ListView) findViewById(R.id.listview);
+		//		listView = (ListView) findViewById(R.id.listview);
 
 		//LocationClient to get Location
 		mLocationClient = new LocationClient(this, this, this);
@@ -141,8 +141,8 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		autoView.setAdapter(theAdapter);
 
 		//Making BlackList 
-//		adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,  list);
-//		this.listView.setAdapter(adapter);
+		//		adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,  list);
+		//		this.listView.setAdapter(adapter);
 
 		//Using timer to grab location every hour, will change to 60000*10 later (now every 25 seconds)
 		Timer theTimer = new Timer(); 
@@ -243,7 +243,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		Collections.sort(list);
 
 		//updates listView's adapter that dataset has changed
-//		((BaseAdapter) listView.getAdapter()).notifyDataSetChanged();
+		//		((BaseAdapter) listView.getAdapter()).notifyDataSetChanged();
 
 		//instantly get LocationUpdates
 		Location theLocation = mLocationClient.getLastLocation();
