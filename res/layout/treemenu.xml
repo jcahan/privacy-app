@@ -14,14 +14,16 @@
         android:id="@+id/post_blacklist_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="90dip"
+        android:layout_marginRight="10dip"
         android:hint="@string/update_button" />
 
-	<ExpandableListView 
-        android:id ="@+id/expandableListView"
+    <ExpandableListView
+        android:id="@+id/expandableListView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:scrollbars="none"
+        android:cacheColorHint="@null"
         android:groupIndicator="@null"
-        android:cacheColorHint="@null"/>
+        android:scrollbars="none" />
 
 </LinearLayout>

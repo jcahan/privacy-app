@@ -22,6 +22,7 @@ public class BlackistFragment extends SherlockFragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
 		view = inflater.inflate(R.layout.blacklist, container, false);
+
 		ListView listView = (ListView) view.findViewById(R.id.listview);
 
 		//Making BlackList 

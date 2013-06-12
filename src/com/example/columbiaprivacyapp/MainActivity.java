@@ -1,7 +1,6 @@
 package com.example.columbiaprivacyapp;
 
 import java.io.BufferedReader;
-import com.squareup.otto.Subscribe;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -45,7 +44,7 @@ import com.parse.ParseObject;
 
 //TODO: Class Cast Exception because of Tree --> Look into later 
 //TODO: Need to work on not calling connect() when already connected. 
-
+//TODO: Need to have GooglePlay, isConnected and other simple checks
 public class MainActivity extends SherlockFragmentActivity  implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener {
 	private LocationClient mLocationClient; //Stores the current instantiation of the location client in this object
 	protected ArrayAdapter<String> adapter; 
@@ -337,6 +336,43 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	}
 
 	class MyTabsListener implements ActionBar.TabListener {
+		//		private final SherlockFragmentActivity mActivity;
+		//	    private final String mTag;
+		//	    private final Class<T> mClass;
+		//
+		//	    private SherlockFragment mFragment;
+		//
+		//	    public MyTabsListener(SherlockFragmentActivity activity, String tag, Class<T> clz) {
+		//	        mActivity = activity;
+		//	        mTag = tag;
+		//	        mClass = clz;
+		//	    }
+		//
+		//	    public void onTabSelected(Tab tab, FragmentTransaction ft) {
+		//	    	SherlockFragment preInitializedFragment = (SherlockFragment) mActivity.getSupportFragmentManager().findFragmentByTag(mTag);
+		//	        if (preInitializedFragment == null) {
+		//	            mFragment = (SherlockFragment) SherlockFragment.instantiate(mActivity, mClass.getName());
+		//	            ft.add(R.id.fragment_container, mFragment, mTag);
+		//	        } else {
+		//	            ft.attach(preInitializedFragment);
+		//	        }
+		//	    }
+		//
+		//	    public void onTabUnselected(Tab tab, FragmentTransaction ft) {
+		//	        SherlockFragment preInitializedFragment = (SherlockFragment) mActivity.getSupportFragmentManager().findFragmentByTag(mTag);
+		//
+		//	        if (preInitializedFragment != null) {
+		//	            ft.detach(preInitializedFragment);
+		//	        } else if (mFragment != null) {
+		//	            ft.detach(mFragment);
+		//	        }
+		//	    }
+
+		//	    public void onTabReselected(Tab tab, FragmentTransaction ft) {
+		//	        // User selected the already selected tab. Usually do nothing.
+		//	    }
+
+
 		public Fragment fragment;
 
 		public MyTabsListener(Fragment fragment){
@@ -349,30 +385,17 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 				Toast.makeText(getApplicationContext(), "yolo", Toast.LENGTH_LONG).show();
 			}
 			ft.replace(R.id.fragment_container, fragment);
+			ft.disallowAddToBackStack();
 		}
 
 		@Override
 		public void onTabUnselected(Tab tab, FragmentTransaction ft) {
-			switch (tab.getPosition()) {
-			case 0:
-				ft.remove(Fragment1);
-				break;
-			case 1:
-				ft.remove(Fragment2);
-				break;
-			case 2:
-				ft.remove(Fragment3);
-				break;
-			case 3:
-				ft.remove(Fragment4);
-				break;
-			}
-
+			ft.detach(Fragment1);
 		}
 
 		@Override
 		public void onTabReselected(Tab tab, FragmentTransaction ft) {
 		}
-	}
 
+	}
 }
