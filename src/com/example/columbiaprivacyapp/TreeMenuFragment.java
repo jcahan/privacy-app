@@ -62,7 +62,6 @@ public class TreeMenuFragment extends SherlockFragment{
 		((ViewGroup) autoView.getParent()).removeView(autoView);
 		container.addView(autoView);
 
-
 		return view;
 	}
 
@@ -72,7 +71,6 @@ public class TreeMenuFragment extends SherlockFragment{
 		if(groupList==null) {
 			initContactList();
 		}
-
 		expandableListView = (ExpandableListView) theView.findViewById(R.id.expandableListView);
 		ExpandableAdapter adapter = new ExpandableAdapter(getActivity(), expandableListView, groupList);
 		expandableListView.setAdapter(adapter);
