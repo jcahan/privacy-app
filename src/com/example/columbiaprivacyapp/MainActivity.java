@@ -16,6 +16,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
@@ -31,6 +32,7 @@ import android.widget.Toast;
 
 import android.support.v4.app.FragmentTransaction;
 import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.ActionBar.TabListener;
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.app.ActionBar.Tab;
@@ -44,7 +46,7 @@ import com.parse.ParseObject;
 
 //TODO: Class Cast Exception because of Tree --> Look into later 
 //TODO: Need to work on not calling connect() when already connected. 
-//TODO: Need to have GooglePlay, isConnected and other simple checks
+//TODO: Need to have GooglePlay, isConnected and other simple check
 public class MainActivity extends SherlockFragmentActivity  implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener {
 	private LocationClient mLocationClient; //Stores the current instantiation of the location client in this object
 	protected ArrayAdapter<String> adapter; 
@@ -104,14 +106,17 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		//Fragments (Underlying Classes for Each Class)
 		Fragment1 = new BlackistFragment();
 		Fragment2 = new TreeMenuFragment();
-		Fragment3 = new Fragment_3();
+		Fragment3 = new MapFrag();
 		Fragment4 = new Fragment_4();
 
+
 		//Adding Tab Listeners 
-		Frag1Tab.setTabListener(new MyTabsListener(Fragment1));
-		Frag2Tab.setTabListener(new MyTabsListener(Fragment2));
-		Frag3Tab.setTabListener(new MyTabsListener(Fragment3));
-		Frag4Tab.setTabListener(new MyTabsListener(Fragment4));
+		//new TabListener<StationsFragment>(this, "stations", StationsFragment.class)
+		Frag1Tab.setTabListener(new TabListener<BlackistFragment>(this, "frag1", BlackistFragment.class));
+		Frag2Tab.setTabListener(new TabListener<TreeMenuFragment>(this, "frag2", TreeMenuFragment.class));
+		Frag3Tab.setTabListener(new TabListener<MapFrag>(this, "frag3", MapFrag.class));
+		Frag4Tab.setTabListener(new TabListener<Fragment_4>(this, "frag4", Fragment_4.class));
+
 
 		//Adding Tabs to Action Bar
 		actionbar.addTab(Frag1Tab);
@@ -119,8 +124,20 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		actionbar.addTab(Frag3Tab);
 		actionbar.addTab(Frag4Tab);
 
+		//		actionbar.addTab(actionbar.newTab()
+		//				.setText("BlackList")
+		//				.setTabListener(new CustomTabListener(Fragment1)));
+		//		actionbar.addTab(actionbar.newTab()
+		//				.setText("TreeMenu")
+		//				.setTabListener(new CustomTabListener(Fragment2)));
+		//		actionbar.addTab(actionbar.newTab()
+		//				.setText("Map")
+		//				.setTabListener(new CustomTabListener(Fragment3)));
+		//		actionbar.addTab(actionbar.newTab()
+		//				.setText("Help")
+		//				.setTabListener(new CustomTabListener(Fragment4)));
 
-		//		listView = (ListView) findViewById(R.id.listview);
+
 
 		//LocationClient to get Location
 		mLocationClient = new LocationClient(this, this, this);
@@ -132,17 +149,6 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		//initializing Parse
 		Parse.initialize(this, "EPwD8P7HsVS9YlILg9TGTRVTEYRKRAW6VcUN4a7z", "zu6YDecYkeZwDjwjwyuiLhU0sjQFo8Pjln2W5SxS"); 
 		ParseAnalytics.trackAppOpened(getIntent());
-
-		//		//Auto-Complete
-		//		AutoCompleteTextView autoView = (AutoCompleteTextView) findViewById(R.id.edit_message);
-		//		String[] itemOptions = getResources().getStringArray(R.array.edit_message);
-		//		ArrayAdapter<String> theAdapter = 
-		//				new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, itemOptions);
-		//		autoView.setAdapter(theAdapter);
-
-		//Making BlackList 
-		//		adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,  list);
-		//		this.listView.setAdapter(adapter);
 
 		//Using timer to grab location every hour, will change to 60000*10 later (now every 25 seconds)
 		Timer theTimer = new Timer(); 
@@ -235,22 +241,6 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 			isDelete = false; 
 		}
 		Collections.sort(list);
-
-		//updates listView's adapter that dataset has changed
-		//		((BaseAdapter) listView.getAdapter()).notifyDataSetChanged();
-
-		//instantly get LocationUpdates
-		//TODO: Switch back. Need to check if connected 
-		//		Location theLocation = mLocationClient.getLastLocation();
-		//		if(theLocation!=null) {
-		//			System.out.println("Within blacklist");
-		//			checkPostLocation(theLocation, THE_BLACKLIST_TABLE);
-		//		}
-
-
-		if(isDelete) locationItem.put("deleted_item", blackListItem);
-		else locationItem.put("added_item", blackListItem);
-		locationItem.saveEventually();
 		THIS = this; 
 	}
 
@@ -334,68 +324,65 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 			}
 		}
 	}
-
-	class MyTabsListener implements ActionBar.TabListener {
-		//		private final SherlockFragmentActivity mActivity;
-		//	    private final String mTag;
-		//	    private final Class<T> mClass;
-		//
-		//	    private SherlockFragment mFragment;
-		//
-		//	    public MyTabsListener(SherlockFragmentActivity activity, String tag, Class<T> clz) {
-		//	        mActivity = activity;
-		//	        mTag = tag;
-		//	        mClass = clz;
-		//	    }
-		//
-		//	    public void onTabSelected(Tab tab, FragmentTransaction ft) {
-		//	    	SherlockFragment preInitializedFragment = (SherlockFragment) mActivity.getSupportFragmentManager().findFragmentByTag(mTag);
-		//	        if (preInitializedFragment == null) {
-		//	            mFragment = (SherlockFragment) SherlockFragment.instantiate(mActivity, mClass.getName());
-		//	            ft.add(R.id.fragment_container, mFragment, mTag);
-		//	        } else {
-		//	            ft.attach(preInitializedFragment);
-		//	        }
-		//	    }
-		//
-		//	    public void onTabUnselected(Tab tab, FragmentTransaction ft) {
-		//	        SherlockFragment preInitializedFragment = (SherlockFragment) mActivity.getSupportFragmentManager().findFragmentByTag(mTag);
-		//
-		//	        if (preInitializedFragment != null) {
-		//	            ft.detach(preInitializedFragment);
-		//	        } else if (mFragment != null) {
-		//	            ft.detach(mFragment);
-		//	        }
-		//	    }
-
-		//	    public void onTabReselected(Tab tab, FragmentTransaction ft) {
-		//	        // User selected the already selected tab. Usually do nothing.
-		//	    }
+	//	public class CustomTabListener implements TabListener {
+	//		private Fragment fragment;
+	//
+	//		public CustomTabListener(Fragment frag){
+	//			fragment = frag;
+	//		}
+	//
+	//		@Override
+	//		public void onTabSelected(Tab tab, FragmentTransaction ft) {
+	//			ft.replace(R.id.fragment_container, fragment);      
+	//		}
+	//
+	//		@Override
+	//		public void onTabUnselected(Tab tab, FragmentTransaction ft) {
+	//			ft.remove(fragment);
+	//		}
+	//
+	//		@Override
+	//		public void onTabReselected(Tab tab, FragmentTransaction ft) {
+	//			//Tab Reselected....    
+	//		}
+	//	}
 
 
-		public Fragment fragment;
+	public class TabListener<T extends SherlockFragment> implements com.actionbarsherlock.app.ActionBar.TabListener {
+		private final SherlockFragmentActivity mActivity;
+		private final String mTag;
+		private final Class<T> mClass;
 
-		public MyTabsListener(Fragment fragment){
-			this.fragment = fragment;
+		private SherlockFragment mFragment;
+
+		public TabListener(SherlockFragmentActivity activity, String tag, Class<T> clz) {
+			mActivity = activity;
+			mTag = tag;
+			mClass = clz;
 		}
 
-		@Override
 		public void onTabSelected(Tab tab, FragmentTransaction ft) {
-			if(tab.getPosition()==0) {
-				Toast.makeText(getApplicationContext(), "yolo", Toast.LENGTH_LONG).show();
+			SherlockFragment preInitializedFragment = (SherlockFragment) mActivity.getSupportFragmentManager().findFragmentByTag(mTag);
+			if (preInitializedFragment == null) {
+				mFragment = (SherlockFragment) SherlockFragment.instantiate(mActivity, mClass.getName());
+				ft.add(R.id.fragment_container, mFragment, mTag);
+			} else {
+				ft.attach(preInitializedFragment);
 			}
-			ft.replace(R.id.fragment_container, fragment);
-			ft.disallowAddToBackStack();
 		}
 
-		@Override
 		public void onTabUnselected(Tab tab, FragmentTransaction ft) {
-			ft.detach(Fragment1);
+			SherlockFragment preInitializedFragment = (SherlockFragment) mActivity.getSupportFragmentManager().findFragmentByTag(mTag);
+
+			if (preInitializedFragment != null) {
+				ft.detach(preInitializedFragment);
+			} else if (mFragment != null) {
+				ft.detach(mFragment);
+			}
 		}
 
-		@Override
 		public void onTabReselected(Tab tab, FragmentTransaction ft) {
+			// User selected the already selected tab. Usually do nothing.
 		}
-
 	}
 }

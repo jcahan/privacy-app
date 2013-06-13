@@ -1165,10 +1165,10 @@ containing a value of this type.
         public static final int abs__simple_dropdown_hint=0x7f030014;
         public static final int activity_main=0x7f030015;
         public static final int blacklist=0x7f030016;
-        public static final int fragment_3=0x7f030017;
-        public static final int fragment_4=0x7f030018;
-        public static final int group_item=0x7f030019;
-        public static final int group_list=0x7f03001a;
+        public static final int fragment_4=0x7f030017;
+        public static final int group_item=0x7f030018;
+        public static final int group_list=0x7f030019;
+        public static final int maptab=0x7f03001a;
         public static final int sherlock_spinner_dropdown_item=0x7f03001b;
         public static final int sherlock_spinner_item=0x7f03001c;
         public static final int treemenu=0x7f03001d;

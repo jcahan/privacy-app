@@ -24,9 +24,11 @@ public class TreeMenuFragment extends SherlockFragment{
 	protected LinkedHashMap<Item,ArrayList<Item>> groupList;
 	protected ExpandableListView expandableListView;
 
+
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
 		MainActivity.getInstance().invalidateOptionsMenu();
 		view = inflater.inflate(R.layout.treemenu, container, false);
+
 		//Auto-Complete
 		AutoCompleteTextView autoView = (AutoCompleteTextView) view.findViewById(R.id.edit_message);
 		String[] itemOptions = getResources().getStringArray(R.array.edit_message);
@@ -49,8 +51,11 @@ public class TreeMenuFragment extends SherlockFragment{
 		});
 		initViews(view);
 		if(view != null) { return view; }
+
+		((ViewGroup) autoView.getParent()).removeView(autoView);
 		container.addView(autoView);
-		MainActivity.getInstance().invalidateOptionsMenu();
+
+		
 		return view;
 	}
 

@@ -77,7 +77,7 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 	public View getChildView(final int groupPosition, int childPosition,
 			boolean isLastChild, View convertView, ViewGroup parent) {
 		// TODO Auto-generated method stub
-		
+
 		final ChildHolder holder;
 		if (convertView == null) {
 			convertView = layoutInflater.inflate(R.layout.group_item, null);
@@ -91,15 +91,14 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 		}
 		final Item child = getChild(groupPosition, childPosition);
 		holder.cb.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-			
 			public void onCheckedChanged(CompoundButton buttonView,
 					boolean isChecked) {
 				Item parentGroup = getGroup(groupPosition);
 				child.isChecked = isChecked;
-				
+
 				//if the CHILD is checked
 				//TODO: Here add/remove from list 
-				
+
 				if (isChecked) {
 					ArrayList<Item> childList = getChild(parentGroup);
 					int childIndex = childList.indexOf(child);
@@ -117,7 +116,7 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 							}
 						}
 					}
-					
+
 					//All the children are checked
 					if (isAllChildClicked) {
 						Log.i("All should be checked", "Each child is Clicked!!");
@@ -144,6 +143,7 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 				notifyDataSetChanged();
 			}
 		});
+		
 		holder.cb.setChecked(child.isChecked);
 		holder.title.setText(child.name);
 		Log.i("The childs/children is/are: ", DataHolder.checkedChilds.toString());
@@ -197,13 +197,13 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 		holder.title.setText(groupItem.name);
 
 		holder.cb.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-			
+
 			public void onCheckedChanged(CompoundButton buttonView,
 					boolean isChecked) {
 				if (checkAll) {
 					Log.i("All items should be affected!!", "All are being affected");
 					ArrayList<Item> childItem = getChild(groupItem);
-					
+
 					for (Item children : childItem) {
 						children.isChecked = isChecked;
 						//TODO: Here update the list 

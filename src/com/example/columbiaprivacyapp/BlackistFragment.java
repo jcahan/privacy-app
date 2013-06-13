@@ -38,6 +38,8 @@ public class BlackistFragment extends SherlockFragment {
 		listView.setAdapter(adapter);
 		((BaseAdapter) listView.getAdapter()).notifyDataSetChanged();
 
+		if(view != null) { return view; }
+
 		((ViewGroup) listView.getParent()).removeView(listView);
 		container.addView(listView);
 
