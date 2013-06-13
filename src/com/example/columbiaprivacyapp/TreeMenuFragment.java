@@ -55,7 +55,7 @@ public class TreeMenuFragment extends SherlockFragment{
 		((ViewGroup) autoView.getParent()).removeView(autoView);
 		container.addView(autoView);
 
-		
+
 		return view;
 	}
 
@@ -282,7 +282,9 @@ public class TreeMenuFragment extends SherlockFragment{
 		for(int i=0; i<restaurantArray.length; i++) {
 			Item item = new Item();
 			item.name = restaurantArray[i];
-			item.id = restaurantArray[i];
+			//TODO: Changing from here
+//			item.id = restaurantArray[i];
+			item.id = new Integer(i).toString();
 			groupMembers.add(item);
 		}
 		return groupMembers; 

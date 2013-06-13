@@ -1,9 +1,11 @@
 package com.example.columbiaprivacyapp;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Handler;
@@ -21,8 +23,9 @@ import android.widget.ExpandableListView.OnGroupExpandListener;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+@SuppressLint("UseSparseArrays")
 public class ExpandableAdapter extends BaseExpandableListAdapter {
-
+	private long lastAction = 0; 
 	private LayoutInflater layoutInflater;
 	private LinkedHashMap<Item, ArrayList<Item>> groupList;
 	private ArrayList<Item> mainGroup;
@@ -35,6 +38,7 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 				.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
 		this.groupList = groupsList;
 		groupStatus = new int[groupsList.size()];
+
 
 		listView.setOnGroupExpandListener(new OnGroupExpandListener() {
 
@@ -62,6 +66,8 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 		}
 	}
 
+
+
 	public Item getChild(int groupPosition, int childPosition) {
 		Item item = mainGroup.get(groupPosition);
 		return groupList.get(item).get(childPosition);
@@ -85,16 +91,32 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 		} 
 		else {
 			holder = (ChildHolder) convertView.getTag();
+			//			holder.cb.setOnCheckedChangeListener(null);
 		}
 		final Item child = getChild(groupPosition, childPosition);
 		holder.cb.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 			public void onCheckedChanged(CompoundButton buttonView,
 					boolean isChecked) {
+				//TODO: Total hack, change later 
+				
+				if(lastAction==0) lastAction = System.currentTimeMillis();
+				else if(System.currentTimeMillis() - lastAction < 125) {
+					long tmp = System.currentTimeMillis()-lastAction;
+					System.out.println("the difference is: " + tmp);
+					System.out.println("currentTime: " + System.currentTimeMillis());
+					System.out.println("the last action: " + lastAction);
+					System.out.println("item erroneously attempted to add: " + child.name);
+					return; 
+				}
+				else {
+					lastAction = System.currentTimeMillis();
+				}
+				
 				Item parentGroup = getGroup(groupPosition);
 				child.isChecked = isChecked;
 				MainActivity.getInstance().postBlackListItem(child.name);
-				//if the CHILD is checked
-				//TODO: Here add/remove from list 
+				
+				//if the CHILD is checked 
 				if (isChecked) {
 					//ITEM was just checked, add it to the list
 					ArrayList<Item> childList = getChild(parentGroup);
@@ -179,6 +201,8 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 			convertView.setTag(holder);
 		} else {
 			holder = (GroupHolder) convertView.getTag();
+			//TODO: Changed this line!!
+			//			holder.cb.setOnCheckedChangeListener(null);
 		}
 
 		holder.imageView
@@ -211,10 +235,9 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 							checkAll = true;
 					}
 				}, 50);
-
 			}
-
 		});
+
 		holder.cb.setChecked(groupItem.isChecked);
 		return convertView;
 	}
@@ -237,7 +260,6 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 		public ImageView imageView;
 		public CheckBox cb;
 		public TextView title;
-
 	}
 
 	private class ChildHolder {
