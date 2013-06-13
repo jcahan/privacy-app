@@ -30,7 +30,7 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 	private LinkedHashMap<Item, ArrayList<Item>> groupList;
 	private ArrayList<Item> mainGroup;
 	private int[] groupStatus;
-	private ExpandableListView listView;
+	
 
 	public ExpandableAdapter(Context context, ExpandableListView listView,
 			LinkedHashMap<Item, ArrayList<Item>> groupsList) {
@@ -38,7 +38,7 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 				.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
 		this.groupList = groupsList;
 		groupStatus = new int[groupsList.size()];
-
+		
 
 		listView.setOnGroupExpandListener(new OnGroupExpandListener() {
 
@@ -219,10 +219,24 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 				if (checkAll) {
 					Log.i("All items should be affected!!", "All are being affected");
 					ArrayList<Item> childItem = getChild(groupItem);
-
-					for (Item children : childItem) {
-						children.isChecked = isChecked;
-						//TODO: Here update the list 
+					
+					
+					//Entire group is checked, add each item
+					if(isChecked) {
+						for (Item children : childItem) {
+							if(!children.isChecked) {
+								MainActivity.getInstance().postBlackListItem(children.name);
+								children.isChecked = true;
+							}
+						}
+					}
+					else {
+						for (Item children : childItem) {
+							if(children.isChecked) {
+								MainActivity.getInstance().postBlackListItem(children.name);
+								children.isChecked = false;
+							}
+						}
 					}
 				}
 				groupItem.isChecked = isChecked;

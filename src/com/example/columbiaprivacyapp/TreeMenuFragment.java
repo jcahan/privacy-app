@@ -24,12 +24,14 @@ public class TreeMenuFragment extends SherlockFragment{
 	protected LinkedHashMap<Item,ArrayList<Item>> groupList;
 	protected ExpandableListView expandableListView;
 
+	private LinkedHashMap<Item, ArrayList<Item>> myHistory;
+
 
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
 		MainActivity.getInstance().invalidateOptionsMenu();
 		view = inflater.inflate(R.layout.treemenu, container, false);
 
-		//Auto-Complete
+		//Creating AutoCompleteTextView, adding adapter, and notifying to update view
 		AutoCompleteTextView autoView = (AutoCompleteTextView) view.findViewById(R.id.edit_message);
 		String[] itemOptions = getResources().getStringArray(R.array.edit_message);
 
@@ -37,7 +39,9 @@ public class TreeMenuFragment extends SherlockFragment{
 				new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, itemOptions);
 		autoView.setAdapter(theAdapter);
 		((BaseAdapter) autoView.getAdapter()).notifyDataSetChanged();
-		//		((ViewGroup) autoView.getParent()).removeView(autoView);
+
+
+		//Creating Button and Setting Listener
 		Button b = (Button) view.findViewById(R.id.post_blacklist_button);
 		b.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
@@ -49,9 +53,12 @@ public class TreeMenuFragment extends SherlockFragment{
 				MainActivity.getInstance().invalidateOptionsMenu();
 			}
 		});
-		initViews(view);
-		if(view != null) { return view; }
 
+		//Creating ExpandableListView Menu Below..
+		initViews(view);
+		
+		if(view != null) { return view; }
+		
 		((ViewGroup) autoView.getParent()).removeView(autoView);
 		container.addView(autoView);
 
@@ -62,8 +69,9 @@ public class TreeMenuFragment extends SherlockFragment{
 
 
 	private void initViews(View theView){
-		System.out.println("SHOULD BE INITIALIZING THE EXPANDABLELISTVIEW!!!");
-		initContactList();
+		if(groupList==null) {
+			initContactList();
+		}
 		expandableListView = (ExpandableListView) theView.findViewById(R.id.expandableListView);
 		ExpandableAdapter adapter = new ExpandableAdapter(getActivity(), expandableListView, groupList);
 		expandableListView.setAdapter(adapter);
@@ -283,7 +291,7 @@ public class TreeMenuFragment extends SherlockFragment{
 			Item item = new Item();
 			item.name = restaurantArray[i];
 			//TODO: Changing from here
-//			item.id = restaurantArray[i];
+			//			item.id = restaurantArray[i];
 			item.id = new Integer(i).toString();
 			groupMembers.add(item);
 		}

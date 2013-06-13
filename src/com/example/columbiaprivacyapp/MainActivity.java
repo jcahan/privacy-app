@@ -66,7 +66,6 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	private int PERIODIC_UPDATE = 60000*1; //Updates every minute for now (change to 60000*60 later)
 
 
-	//TODO: Will potentially delete 
 	//Following SO recommendation...
 	private static MainActivity THIS = null;
 

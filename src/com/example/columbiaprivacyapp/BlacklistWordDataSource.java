@@ -50,6 +50,7 @@ public class BlacklistWordDataSource {
 		newWord.setWord(cursor.getString(1));
 		return newWord;
 	}
+	
 	//TODO: Ask Chris to glance at this method 
 	public void deleteStringWord(String word) {
 		word = DatabaseUtils.sqlEscapeString(word);
