@@ -49,7 +49,6 @@ import com.parse.ParseObject;
 //TODO: Need to have GooglePlay, isConnected and other simple check
 public class MainActivity extends SherlockFragmentActivity  implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener {
 	private LocationClient mLocationClient; //Stores the current instantiation of the location client in this object
-	protected ArrayAdapter<String> adapter; 
 	//	protected ListView listView; 
 	private final String THE_USER_TABLE = "AppUsers"; //stores only the periodic location updates 
 	private final String THE_BLACKLIST_TABLE = "BlackListedItems"; //stores only the 
@@ -79,7 +78,6 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	private TreeMenuFragment Fragment2;
 	private Fragment Fragment3;
 	private Fragment Fragment4;
-
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -211,9 +209,6 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		//Already exists in list, delete item
 		if(blackList.contains(theWord)) {
 			System.out.println("Contains the word, should delete...");
-			//TODO: Ask Chris to make SQL statement to delete, should take a second 
-			//Possibly fixed it 
-			
 			this.datasource.deleteStringWord(blackListItem);
 			this.blackList.remove(new BlacklistWord(blackListItem));
 			list.remove(blackListItem);

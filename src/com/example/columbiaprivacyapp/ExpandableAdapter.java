@@ -98,7 +98,6 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 			public void onCheckedChanged(CompoundButton buttonView,
 					boolean isChecked) {
 				//TODO: Total hack, change later 
-				
 				if(lastAction==0) lastAction = System.currentTimeMillis();
 				else if(System.currentTimeMillis() - lastAction < 125) {
 					long tmp = System.currentTimeMillis()-lastAction;
@@ -201,8 +200,6 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 			convertView.setTag(holder);
 		} else {
 			holder = (GroupHolder) convertView.getTag();
-			//TODO: Changed this line!!
-			//			holder.cb.setOnCheckedChangeListener(null);
 		}
 
 		holder.imageView
@@ -244,7 +241,6 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 				new Handler().postDelayed(new Runnable() {
 
 					public void run() {
-						// TODO Auto-generated method stub
 						if (!checkAll)
 							checkAll = true;
 					}
