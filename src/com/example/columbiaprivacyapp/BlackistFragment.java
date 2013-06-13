@@ -26,7 +26,6 @@ public class BlackistFragment extends SherlockFragment {
 		ListView listView = (ListView) view.findViewById(R.id.listview);
 
 		//Making BlackList 
-		//getInstance() might be wrong 
 		TreeSet<BlacklistWord> theSet =  MainActivity.getInstance().datasource.GetAllWords();
 		ArrayList<String> list = new ArrayList<String>();
 		for(BlacklistWord i :theSet){

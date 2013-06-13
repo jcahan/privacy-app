@@ -63,20 +63,17 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 	}
 
 	public Item getChild(int groupPosition, int childPosition) {
-		// TODO Auto-generated method stub
 		Item item = mainGroup.get(groupPosition);
 		return groupList.get(item).get(childPosition);
 
 	}
 
 	public long getChildId(int groupPosition, int childPosition) {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
 	public View getChildView(final int groupPosition, int childPosition,
 			boolean isLastChild, View convertView, ViewGroup parent) {
-		// TODO Auto-generated method stub
 
 		final ChildHolder holder;
 		if (convertView == null) {
@@ -95,11 +92,11 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 					boolean isChecked) {
 				Item parentGroup = getGroup(groupPosition);
 				child.isChecked = isChecked;
-
+				MainActivity.getInstance().postBlackListItem(child.name);
 				//if the CHILD is checked
 				//TODO: Here add/remove from list 
-
 				if (isChecked) {
+					//ITEM was just checked, add it to the list
 					ArrayList<Item> childList = getChild(parentGroup);
 					int childIndex = childList.indexOf(child);
 					boolean isAllChildClicked = true;
@@ -138,12 +135,11 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 						checkAll = true;
 						DataHolder.checkedChilds.remove(child.name);
 					}
-					// child.isChecked =false;
 				}
 				notifyDataSetChanged();
 			}
 		});
-		
+
 		holder.cb.setChecked(child.isChecked);
 		holder.title.setText(child.name);
 		Log.i("The childs/children is/are: ", DataHolder.checkedChilds.toString());
@@ -151,23 +147,19 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 	}
 
 	public int getChildrenCount(int groupPosition) {
-		// TODO Auto-generated method stub
 		Item item = mainGroup.get(groupPosition);
 		return groupList.get(item).size();
 	}
 
 	public Item getGroup(int groupPosition) {
-		// TODO Auto-generated method stub
 		return mainGroup.get(groupPosition);
 	}
 
 	public int getGroupCount() {
-		// TODO Auto-generated method stub
 		return mainGroup.size();
 	}
 
 	public long getGroupId(int groupPosition) {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 	//works with the GroupView
@@ -234,12 +226,10 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 	}
 
 	public boolean hasStableIds() {
-		// TODO Auto-generated method stub
 		return true;
 	}
 
 	public boolean isChildSelectable(int groupPosition, int childPosition) {
-		// TODO Auto-generated method stub
 		return true;
 	}
 

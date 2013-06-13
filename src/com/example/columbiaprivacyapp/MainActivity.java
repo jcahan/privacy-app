@@ -124,20 +124,6 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		actionbar.addTab(Frag3Tab);
 		actionbar.addTab(Frag4Tab);
 
-		//		actionbar.addTab(actionbar.newTab()
-		//				.setText("BlackList")
-		//				.setTabListener(new CustomTabListener(Fragment1)));
-		//		actionbar.addTab(actionbar.newTab()
-		//				.setText("TreeMenu")
-		//				.setTabListener(new CustomTabListener(Fragment2)));
-		//		actionbar.addTab(actionbar.newTab()
-		//				.setText("Map")
-		//				.setTabListener(new CustomTabListener(Fragment3)));
-		//		actionbar.addTab(actionbar.newTab()
-		//				.setText("Help")
-		//				.setTabListener(new CustomTabListener(Fragment4)));
-
-
 
 		//LocationClient to get Location
 		mLocationClient = new LocationClient(this, this, this);
@@ -221,16 +207,17 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	}
 
 	public void postBlackListItem(String blackListItem) {
-		BlacklistWord theWord = new BlacklistWord(blackListItem); 
-		Boolean isDelete; 
+		BlacklistWord theWord = new BlacklistWord(blackListItem);  
 		System.out.println("the word is: " + blackListItem);
 		//Already exists in list, delete item
 		if(blackList.contains(theWord)) {
-			System.out.println("Contains the word");
+			System.out.println("Contains the word, should delete...");
+			//TODO: Ask Chris to make SQL statement to delete, should take a second 
+			//Possibly fixed it 
+			
+			this.datasource.deleteStringWord(blackListItem);
+			this.blackList.remove(new BlacklistWord(blackListItem));
 			list.remove(blackListItem);
-			this.datasource.DeleteWord(theWord);
-			blackList.remove(new BlacklistWord(blackListItem));
-			isDelete = true; 
 		}
 		//otherwise add to the blacklist 
 		else {
@@ -238,8 +225,8 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 			BlacklistWord newWord = this.datasource.CreateBlacklistWord(blackListItem);
 			this.blackList.add(newWord);
 			list.add(blackListItem);
-			isDelete = false; 
-		}
+		}		
+
 		Collections.sort(list);
 		THIS = this; 
 	}
