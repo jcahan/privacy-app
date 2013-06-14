@@ -34,8 +34,6 @@ public class TreeMenuFragment extends SherlockFragment{
 	//(Key: TextEntry, Value: String Table) 
 	private HashMap<String, String> allStrings = new HashMap<String, String>();
 	private HashMap<String, Integer> groupPositions = new HashMap<String, Integer>();
-
-
 	private HashMap<String, HashMap<String, Integer>> groupChildPosition = new HashMap<String, HashMap<String, Integer>>(); //(Key: 
 
 	private HashMap<String, Integer>  actLifeMap = new HashMap<String, Integer>(); 
@@ -75,7 +73,6 @@ public class TreeMenuFragment extends SherlockFragment{
 		autoView.setAdapter(theAdapter);
 		((BaseAdapter) autoView.getAdapter()).notifyDataSetChanged();
 
-
 		//Creating Button and Setting Listener
 		Button b = (Button) view.findViewById(R.id.post_blacklist_button);
 		b.setOnClickListener(new OnClickListener() {
@@ -107,9 +104,8 @@ public class TreeMenuFragment extends SherlockFragment{
 					//If Checked, then uncheck
 					if(theItem.isChecked) {
 						theItem.isChecked = false; 
-						
 						//TODO:need to see if all others are also checked, use a Set intersection
-						
+
 					}
 					//If unchecked, then check
 					else{
@@ -134,7 +130,31 @@ public class TreeMenuFragment extends SherlockFragment{
 
 		return view;
 	}
+	
+	public void deleteFromMenu(String blackListItem) {
+		if(allStrings.containsKey(blackListItem.toLowerCase())) {
+			//Then check or uncheck, for now just print
+			System.out.println("The all strings does in fact contain this!: " +blackListItem);
 
+			//Get which group position 
+			String theGroupName = allStrings.get(blackListItem.toLowerCase());
+			int theGroupPosition = groupPositions.get(theGroupName);
+
+			//Get which child position
+			int childPosition = groupChildPosition.get(theGroupName).get(blackListItem.toLowerCase());
+
+			System.out.println("The group position is: " + theGroupPosition);
+			System.out.println("The child position is: " + childPosition);
+
+			//TODO: Check if both 0...
+
+			Item theItem = adapter.getChild(theGroupPosition, childPosition);
+			if(theItem==null) return; //TODO: Test if this will happen --> it should not!
+			theItem.isChecked = false; 
+			
+			adapter.notifyDataSetChanged();
+		}
+	}
 
 
 	private void initViews(View theView){

@@ -44,7 +44,6 @@ import com.parse.Parse;
 import com.parse.ParseAnalytics;
 import com.parse.ParseObject;
 
-//TODO: Class Cast Exception because of Tree --> Look into later 
 //TODO: Need to work on not calling connect() when already connected. 
 //TODO: Need to have GooglePlay, isConnected and other simple checks
 
@@ -83,7 +82,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	public ArrayList<String> getList() {
 		return list; 
 	}
-	private Fragment Fragment1; 
+	private BlackistFragment Fragment1; 
 	private TreeMenuFragment Fragment2;
 	private Fragment Fragment3;
 	private Fragment Fragment4;
@@ -92,10 +91,12 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-
-		//		theDatabase = openOrCreateDatabase("MyDB", MODE_PRIVATE, null);
-		//		theDatabase.execSQL("CREATE TABLE IF NOT EXISTS LOCATIONINFO (Latitude VARCHAR, Longitude VARCHAR, LocAssoc VARCHAR)");
-
+		
+		//Making SQLite Database for MapFragment
+		theDatabase = openOrCreateDatabase("MyDB", MODE_PRIVATE, null);
+		theDatabase.execSQL("CREATE TABLE IF NOT EXISTS LocationInfo (Latitude DOUBLE, Longitude DOUBLE, LocAssoc VARCHAR)");
+		
+		
 		//Communicating with DataSource
 		datasource = new BlacklistWordDataSource(this);
 		datasource.open();
@@ -172,7 +173,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 
 	protected String scrapWeb(Location location) throws IOException {
 		if(location==null) {
-			//TODO: Should never enter here. 
+			return "";
 		}
 
 		String line = null;
@@ -184,13 +185,23 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 		line = rd.readLine(); 
 		System.out.println("the line is: " + line);
-
-		//TODO: Save this information on SQLite
+		
+		//Getting recent Latitude, Longitude, and Line
 		recentLatitude = location.getLatitude();
 		recentLongitude = location.getLongitude();
-		recLocAssociations = line.split(", "); 
-		THIS = this; 
+		//this is likely outdated
+		recLocAssociations = line.split(", ");  
 		
+		//Saving information in SQL database
+		//TODO: Ask Chris about creating SQLite databases (he's faster)
+		
+		
+		System.out.println("enters");
+		theDatabase.execSQL("INSERT into LocationInfo VALUES "+ recentLatitude + ", " + recentLongitude + ", " + line + ");");
+		//TODO: Do I need to close this?
+		
+		THIS = this; 
+
 		conn.disconnect();
 		rd.close();
 		return line.substring(1, line.length()-1); 
@@ -224,6 +235,14 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	public void postBlackListItem(String blackListItem) {
 		BlacklistWord theWord = new BlacklistWord(blackListItem);  
 		System.out.println("the word is: " + blackListItem);
+		
+		//Refresh the datasource
+		this.datasource.close();
+		this.datasource = new BlacklistWordDataSource(this);
+		this.datasource.open();
+		this.blackList= this.datasource.GetAllWords();
+		
+		
 		//Already exists in list, delete item
 		if(blackList.contains(theWord)) {
 			System.out.println("Contains the word, should delete...");
@@ -238,11 +257,15 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 			this.blackList.add(newWord);
 			list.add(blackListItem);
 		}		
-
+		Fragment1.refresh();
 		Collections.sort(list);
 		THIS = this; 
 	}
-
+	public void removeFromMenu(String theWord) {
+		Fragment2.deleteFromMenu(theWord);
+		THIS = this; 
+	}
+	
 	protected void checkPostLocation(Location theLocation, String whichTable) {
 		try {
 			boolean result = checkLocation(theLocation);
@@ -323,29 +346,6 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 			}
 		}
 	}
-	//	public class CustomTabListener implements TabListener {
-	//		private Fragment fragment;
-	//
-	//		public CustomTabListener(Fragment frag){
-	//			fragment = frag;
-	//		}
-	//
-	//		@Override
-	//		public void onTabSelected(Tab tab, FragmentTransaction ft) {
-	//			ft.replace(R.id.fragment_container, fragment);      
-	//		}
-	//
-	//		@Override
-	//		public void onTabUnselected(Tab tab, FragmentTransaction ft) {
-	//			ft.remove(fragment);
-	//		}
-	//
-	//		@Override
-	//		public void onTabReselected(Tab tab, FragmentTransaction ft) {
-	//			//Tab Reselected....    
-	//		}
-	//	}
-
 
 	public class TabListener<T extends SherlockFragment> implements com.actionbarsherlock.app.ActionBar.TabListener {
 		private final SherlockFragmentActivity mActivity;
@@ -372,7 +372,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 
 		public void onTabUnselected(Tab tab, FragmentTransaction ft) {
 			SherlockFragment preInitializedFragment = (SherlockFragment) mActivity.getSupportFragmentManager().findFragmentByTag(mTag);
-
+			
 			if (preInitializedFragment != null) {
 				ft.detach(preInitializedFragment);
 			} else if (mFragment != null) {

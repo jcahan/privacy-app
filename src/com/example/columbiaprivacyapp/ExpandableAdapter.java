@@ -39,7 +39,6 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 		this.groupList = groupsList;
 		groupStatus = new int[groupsList.size()];
 
-
 		listView.setOnGroupExpandListener(new OnGroupExpandListener() {
 
 			public void onGroupExpand(int groupPosition) {
@@ -99,19 +98,16 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 				//TODO: Total hack, change later 
 				if(lastAction==0) lastAction = System.currentTimeMillis();
 				else if(System.currentTimeMillis() - lastAction < 125) {
-					long tmp = System.currentTimeMillis()-lastAction;
-					System.out.println("the difference is: " + tmp);
-					System.out.println("currentTime: " + System.currentTimeMillis());
-					System.out.println("the last action: " + lastAction);
-					System.out.println("item erroneously attempted to add: " + child.name);
 					return; 
 				}
 				else {
 					lastAction = System.currentTimeMillis();
 				}
-
+				
 				Item parentGroup = getGroup(groupPosition);
 				child.isChecked = isChecked;
+
+				//Update the BlackList
 				MainActivity.getInstance().postBlackListItem(child.name);
 
 				//if the CHILD is checked 

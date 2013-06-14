@@ -43,7 +43,6 @@ public class BlackistFragment extends SherlockFragment {
 		listView.setAdapter(adapter);
 		((BaseAdapter) listView.getAdapter()).notifyDataSetChanged();
 
-		//TODO: Pick up here 
 		listView.setOnItemLongClickListener(new OnItemLongClickListener() {
 			@Override
 			public boolean onItemLongClick(AdapterView<?> parent, View view,
@@ -51,6 +50,10 @@ public class BlackistFragment extends SherlockFragment {
 				Log.i("ItemListener","Item should be deleted");
 				String theWord = list.get(position);
 				MainActivity.getInstance().datasource.deleteStringWord(theWord);
+
+				//Attempt to delete from TreeMenuFragment to keep consistent
+				MainActivity.getInstance().removeFromMenu(theWord);
+				
 				list.remove(theWord);
 				adapter.notifyDataSetChanged();
 				
@@ -65,5 +68,12 @@ public class BlackistFragment extends SherlockFragment {
 		container.addView(listView);
 
 		return view;
+	}
+	//TODO: need to work on displaying current information 
+	public void refresh() {
+		System.out.println("Calls on it to refresh!!");
+		if(listView!=null) {
+			((BaseAdapter) listView.getAdapter()).notifyDataSetChanged();
+		}
 	}
 }
