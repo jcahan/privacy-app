@@ -50,10 +50,14 @@ public class BlackistFragment extends SherlockFragment {
 					int position, long id) {
 				Log.i("ItemListener","Item should be deleted");
 				String theWord = theList.get(position);
-				MainActivity.getInstance().datasource.deleteStringWord(theWord);
+				
+				MainActivity.getInstance().deleteFromBlackList((theWord));
 
 				//Attempt to delete from TreeMenuFragment to keep consistent
 				MainActivity.getInstance().removeFromMenu(theWord);
+				
+				//Refresh
+				MainActivity.getInstance().treeMenuRefresh();
 				
 				theList.remove(theWord);
 				adapter.notifyDataSetChanged();

@@ -121,7 +121,6 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		Fragment3 = new MapFrag();
 		Fragment4 = new Fragment_4();
 
-
 		//Adding Tab Listeners 
 		//new TabListener<StationsFragment>(this, "stations", StationsFragment.class)
 		Frag1Tab.setTabListener(new TabListener<BlackistFragment>(this, "frag1", BlackistFragment.class));
@@ -260,6 +259,10 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		Fragment1.refresh();
 		//		Collectionds.sort(list);
 		THIS=this;
+	}
+	public void treeMenuRefresh() {
+		Fragment2.refresh();
+		THIS = this; 
 	}
 
 	public void postBlackListItem(String blackListItem) {

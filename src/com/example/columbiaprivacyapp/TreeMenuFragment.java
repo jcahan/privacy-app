@@ -20,6 +20,9 @@ import android.widget.ExpandableListView;
 
 import com.actionbarsherlock.app.SherlockFragment;
 
+
+//TODO: Need to derive list from SQLite database when starting up!
+
 public class TreeMenuFragment extends SherlockFragment{
 	protected View view; 
 	protected LinkedHashMap<Item,ArrayList<Item>> groupList;
@@ -28,7 +31,7 @@ public class TreeMenuFragment extends SherlockFragment{
 
 
 	private LinkedHashMap<Item, ArrayList<Item>> myHistory;
-	//TODO: Check all if textfield is the same 
+	
 	//All strings within string, and whether they are in array 
 	//(Key: TextEntry, Value: String Table) 
 	private HashMap<String, String> allStrings = new HashMap<String, String>();
@@ -138,7 +141,13 @@ public class TreeMenuFragment extends SherlockFragment{
 			}
 		}
 	}
-
+	//TODO: need to work on displaying current information 
+		public void refresh() {
+			System.out.println("Calls on it to refresh!!");
+			if(expandableListView!=null) {
+				((BaseAdapter) expandableListView.getAdapter()).notifyDataSetChanged();
+			}
+		}
 
 
 	//TODO: Abstract this out later
@@ -153,7 +162,7 @@ public class TreeMenuFragment extends SherlockFragment{
 
 			//Get which child position
 			int childPosition = groupChildPosition.get(theGroupName).get(blackListItem.toLowerCase());
-
+			
 			System.out.println("The group position is: " + theGroupPosition);
 			System.out.println("The child position is: " + childPosition);
 
@@ -393,7 +402,6 @@ public class TreeMenuFragment extends SherlockFragment{
 		}
 		return groupMembers;
 	}
-
 
 	private ArrayList<Item> addMyMembers(String[] childrenArray, String groupName, HashMap<String, Integer> groupMap) {
 		//Optimize later, use HashMap instead of a ton of check
