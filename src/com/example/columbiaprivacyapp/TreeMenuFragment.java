@@ -130,7 +130,20 @@ public class TreeMenuFragment extends SherlockFragment{
 
 		return view;
 	}
-	
+
+	public void collapseAll() {
+		if(expandableListView!=null) {
+			for(int i=0; i<expandableListView.getCount(); i++)
+			{
+				System.out.println("collapsing everything ");
+				expandableListView.collapseGroup(i);
+			}
+		}
+	}
+
+
+
+	//TODO: Abstract this out later
 	public void deleteFromMenu(String blackListItem) {
 		if(allStrings.containsKey(blackListItem.toLowerCase())) {
 			//Then check or uncheck, for now just print
@@ -151,7 +164,7 @@ public class TreeMenuFragment extends SherlockFragment{
 			Item theItem = adapter.getChild(theGroupPosition, childPosition);
 			if(theItem==null) return; //TODO: Test if this will happen --> it should not!
 			theItem.isChecked = false; 
-			
+
 			adapter.notifyDataSetChanged();
 		}
 	}

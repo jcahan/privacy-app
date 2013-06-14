@@ -40,8 +40,9 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 		groupStatus = new int[groupsList.size()];
 
 		listView.setOnGroupExpandListener(new OnGroupExpandListener() {
-
+			
 			public void onGroupExpand(int groupPosition) {
+				System.out.println("enters the onGroup EXPAND");
 				Item group = mainGroup.get(groupPosition);
 				if (groupList.get(group).size() > 0)
 					groupStatus[groupPosition] = 1;
@@ -51,6 +52,7 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 		listView.setOnGroupCollapseListener(new OnGroupCollapseListener() {
 
 			public void onGroupCollapse(int groupPosition) {
+				System.out.println("enters the onGroup COLLAPSE");
 				Item group = mainGroup.get(groupPosition);
 				if (groupList.get(group).size() > 0)
 					groupStatus[groupPosition] = 0;

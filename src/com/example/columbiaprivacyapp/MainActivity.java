@@ -372,7 +372,9 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 
 		public void onTabUnselected(Tab tab, FragmentTransaction ft) {
 			SherlockFragment preInitializedFragment = (SherlockFragment) mActivity.getSupportFragmentManager().findFragmentByTag(mTag);
-			
+			if(tab.getPosition()==1) {
+				((TreeMenuFragment) mFragment).collapseAll();
+			}
 			if (preInitializedFragment != null) {
 				ft.detach(preInitializedFragment);
 			} else if (mFragment != null) {
