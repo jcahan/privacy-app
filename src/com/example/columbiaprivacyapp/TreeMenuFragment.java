@@ -193,6 +193,8 @@ public class TreeMenuFragment extends SherlockFragment{
 
 			for(int i=0;i<ids.length;i++){
 				String groupId = ids[i];
+				System.out.println("----------------------------");
+				System.out.println("THE GROUP ID: " +groupId);
 				groupMembers.addAll(fetchGroupMembers(groupId));
 			}
 			String shortName = item.name;
@@ -211,7 +213,7 @@ public class TreeMenuFragment extends SherlockFragment{
 	private ArrayList<Item> fetchGroups(){
 		ArrayList<Item> groupList = new ArrayList<Item>();
 		//List each group 
-		for(int i=0; i<21; i++){
+		for(int i=0; i<22; i++){
 			Item item = new Item();
 			String groupName; 
 			if(i==0) {

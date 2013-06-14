@@ -22,7 +22,7 @@ import android.widget.AdapterView.OnItemLongClickListener;
 public class BlackistFragment extends SherlockFragment {
 	protected ArrayAdapter<String> adapter;
 	protected View view; 
-	protected ArrayList<String> list; 
+	protected ArrayList<String> theList; 
 	protected ListView listView;
 
 	@Override
@@ -33,13 +33,14 @@ public class BlackistFragment extends SherlockFragment {
 
 		//Making BlackList 
 		TreeSet<BlacklistWord> theSet =  MainActivity.getInstance().datasource.GetAllWords();
-		list = new ArrayList<String>();
+		theList = new ArrayList<String>();
 		for(BlacklistWord i :theSet){
 			System.out.println(i.getWord());
-			list.add(i.getWord());
+			theList.add(i.getWord());
 		}
-		Collections.sort(list);
-		adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1,  list);
+		
+		Collections.sort(theList);
+		adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1,  theList);
 		listView.setAdapter(adapter);
 		((BaseAdapter) listView.getAdapter()).notifyDataSetChanged();
 
@@ -48,13 +49,13 @@ public class BlackistFragment extends SherlockFragment {
 			public boolean onItemLongClick(AdapterView<?> parent, View view,
 					int position, long id) {
 				Log.i("ItemListener","Item should be deleted");
-				String theWord = list.get(position);
+				String theWord = theList.get(position);
 				MainActivity.getInstance().datasource.deleteStringWord(theWord);
 
 				//Attempt to delete from TreeMenuFragment to keep consistent
 				MainActivity.getInstance().removeFromMenu(theWord);
 				
-				list.remove(theWord);
+				theList.remove(theWord);
 				adapter.notifyDataSetChanged();
 				
 				return true; 

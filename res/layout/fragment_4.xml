@@ -7,7 +7,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
-        android:text="Fragment 4"/>
+        android:text="For More Information, Go to http://keyword.cs.columbia.edu/. For immediate assistance, please email Chris at mnai@cs.columbia.edu"/>
     
 
 </LinearLayout>

@@ -106,15 +106,13 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 				boolean firstActionOkay = false; 
 				if(lastAction==0) {
 					lastAction = System.currentTimeMillis();
-					System.out.println("ENTERS HERE!!");
 					firstActionOkay = true; 
 				}
 				if(firstActionOkay) {
 					if(System.currentTimeMillis() - lastGroupAction < 145) return; 
 				}
 				if(System.currentTimeMillis() - lastAction < 145 && !firstActionOkay) {
-					System.out.println("Returning because of lastAction");
-					System.out.println((System.currentTimeMillis()-lastAction));
+					//					System.out.println((System.currentTimeMillis()-lastAction));
 					return; 
 				}
 				//TODO: Might be too high
@@ -131,11 +129,12 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 				Item parentGroup = getGroup(groupPosition);
 				child.isChecked = isChecked;
 
-				//Update the BlackList
-				MainActivity.getInstance().postBlackListItem(child.name);
+				MainActivity.getInstance().refreshBlackListTree();
 
 				//if the CHILD is checked 
 				if (isChecked) {
+					holder.cb.setChecked(child.isChecked);
+					MainActivity.getInstance().addToBlackList(child.name);
 					//ITEM was just checked, add it to the list
 					ArrayList<Item> childList = getChild(parentGroup);
 					int childIndex = childList.indexOf(child);
@@ -167,6 +166,8 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 				} 
 				//not all of the children are checked
 				else {
+					holder.cb.setChecked(child.isChecked);
+					MainActivity.getInstance().deleteFromBlackList(child.name);
 					if (parentGroup.isChecked) {
 						parentGroup.isChecked = false;
 						checkAll = false;
@@ -177,6 +178,7 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 					}
 				}
 				notifyDataSetChanged();
+				MainActivity.getInstance().refreshAndSort();
 			}
 		});
 
@@ -236,7 +238,7 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 					Log.i("All items should be affected!!", "All are being affected");
 					ArrayList<Item> childItem = getChild(groupItem);
 
-
+					MainActivity.getInstance().refreshBlackListTree();
 					//Entire group is checked, add each item
 					if(isChecked) {
 						for (Item children : childItem) {
@@ -257,7 +259,7 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 					}
 					MainActivity.getInstance().refreshAndSort();
 				}
-				
+
 				groupItem.isChecked = isChecked;
 				notifyDataSetChanged();
 				new Handler().postDelayed(new Runnable() {

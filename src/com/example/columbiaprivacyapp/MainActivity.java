@@ -58,7 +58,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 
 	//Solution: Presently adding all items to TreeSet. No available Adapters that support Trees
 	private TreeSet<BlacklistWord> blackList = new TreeSet<BlacklistWord>(new MyComparator());
-	protected ArrayList<String> list = new ArrayList<String>();
+	//	protected ArrayList<String> list = new ArrayList<String>();
 
 
 	private ParseObject locationItem = new ParseObject(THE_BLACKLIST_TABLE);
@@ -80,9 +80,9 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	public static MainActivity getInstance() {
 		return THIS;
 	}
-	public ArrayList<String> getList() {
-		return list; 
-	}
+	//	public ArrayList<String> getList() {
+	//		return list; 
+	//	}
 	private BlackistFragment Fragment1; 
 	private TreeMenuFragment Fragment2;
 	private Fragment Fragment3;
@@ -93,7 +93,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-		
+
 		//Making SQLite Database for MapFragment
 		theDatabase = openOrCreateDatabase("MyDB", MODE_PRIVATE, null);
 		theDatabase.execSQL("CREATE TABLE IF NOT EXISTS LocationInfo (Latitude DOUBLE, Longitude DOUBLE, LocAssoc VARCHAR)");
@@ -233,34 +233,35 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		treeWords.retainAll(blackList);
 		return (treeWords.size() > 0);
 	}
-
-	public void addToBlackList(String blackListItem) {
-		BlacklistWord theWord = new BlacklistWord(blackListItem);  
-		System.out.println("the word is: " + blackListItem);
+	public void refreshBlackListTree() {
 		this.blackList= this.datasource.GetAllWords();
-
+		THIS = this; 
+	}
+	public void addToBlackList(String blackListItem) {
+		System.out.println("the word is: " + blackListItem);
+		
 		System.out.println("SHOULD BE ADDING TO BLACKLIST 237");
 		BlacklistWord newWord = this.datasource.CreateBlacklistWord(blackListItem);
 		this.blackList.add(newWord);
-		list.add(blackListItem);
+		//		list.add(blackListItem);
 		THIS=this; 
 	}
+	
 	public void deleteFromBlackList(String blackListItem) {
-		BlacklistWord theWord = new BlacklistWord(blackListItem);  
 		System.out.println("the word is: " + blackListItem);
-		this.blackList= this.datasource.GetAllWords();
 
 		System.out.println("Contains the word, should delete...");
 		this.datasource.deleteStringWord(blackListItem);
 		this.blackList.remove(new BlacklistWord(blackListItem));
-		list.remove(blackListItem);
+		//		list.remove(blackListItem);
 		THIS=this; 
 	}
 	public void refreshAndSort() {
 		Fragment1.refresh();
-		Collections.sort(list);
+		//		Collectionds.sort(list);
 		THIS=this;
 	}
+
 	public void postBlackListItem(String blackListItem) {
 		BlacklistWord theWord = new BlacklistWord(blackListItem);  
 		System.out.println("the word is: " + blackListItem);
@@ -274,14 +275,14 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 			System.out.println("Contains the word, should delete...");
 			this.datasource.deleteStringWord(blackListItem);
 			this.blackList.remove(new BlacklistWord(blackListItem));
-			list.remove(blackListItem);
+			//			list.remove(blackListItem);
 		}
 		//otherwise add to the blacklist 
 		else {
 			System.out.println("SHOULD BE ADDING TO BLACKLIST 237");
 			BlacklistWord newWord = this.datasource.CreateBlacklistWord(blackListItem);
 			this.blackList.add(newWord);
-			list.add(blackListItem);
+			//			list.add(blackListItem);
 		}	
 	}
 	public void removeFromMenu(String theWord) {
