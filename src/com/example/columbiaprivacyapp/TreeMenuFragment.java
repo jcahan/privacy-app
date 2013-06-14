@@ -106,15 +106,15 @@ public class TreeMenuFragment extends SherlockFragment{
 					Item theItem = adapter.getChild(theGroupPosition, childPosition);
 					//If Checked, then uncheck
 					if(theItem.isChecked) {
-						System.out.println("before");
 						theItem.isChecked = false; 
-						System.out.println("after");
+						
+						//TODO:need to see if all others are also checked, use a Set intersection
+						
 					}
 					//If unchecked, then check
 					else{
-						System.out.println("before");
 						theItem.isChecked = true;
-						System.out.println("after");
+						//need to make sure group box is UNCHECKED
 					}
 					adapter.notifyDataSetChanged();
 				}

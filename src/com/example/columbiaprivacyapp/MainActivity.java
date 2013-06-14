@@ -65,7 +65,15 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	private String android_id; 
 	private int PERIODIC_UPDATE = 60000*1; //Updates every minute for now (change to 60000*60 later)
 
+	//For the Map Fragment
+	protected double recentLatitude; 
+	protected double recentLongitude; 
+	protected String[] recLocAssociations; 
 
+	protected SQLiteDatabase theDatabase; 
+
+
+	//TODO: If Time permits, use Otto instead
 	//Following SO recommendation...
 	private static MainActivity THIS = null;
 
@@ -84,6 +92,9 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+
+		//		theDatabase = openOrCreateDatabase("MyDB", MODE_PRIVATE, null);
+		//		theDatabase.execSQL("CREATE TABLE IF NOT EXISTS LOCATIONINFO (Latitude VARCHAR, Longitude VARCHAR, LocAssoc VARCHAR)");
 
 		//Communicating with DataSource
 		datasource = new BlacklistWordDataSource(this);
@@ -164,7 +175,6 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 			//TODO: Should never enter here. 
 		}
 
-		//TODO: See if large geographic change. If there isn't then don't look it up. 
 		String line = null;
 
 		//TODO: Do this in a separate thread 
@@ -174,6 +184,13 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 		line = rd.readLine(); 
 		System.out.println("the line is: " + line);
+
+		//TODO: Save this information on SQLite
+		recentLatitude = location.getLatitude();
+		recentLongitude = location.getLongitude();
+		recLocAssociations = line.split(", "); 
+		THIS = this; 
+		
 		conn.disconnect();
 		rd.close();
 		return line.substring(1, line.length()-1); 

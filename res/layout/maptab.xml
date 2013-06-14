@@ -3,11 +3,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
-    <TextView 
+    
+    
+    <ListView
+        android:id="@+id/map_frag_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:text="Fragment 3"/>
+        android:layout_height="match_parent" />
     
 
 </LinearLayout>
