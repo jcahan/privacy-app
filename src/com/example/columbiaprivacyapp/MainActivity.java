@@ -46,7 +46,8 @@ import com.parse.ParseObject;
 
 //TODO: Class Cast Exception because of Tree --> Look into later 
 //TODO: Need to work on not calling connect() when already connected. 
-//TODO: Need to have GooglePlay, isConnected and other simple check
+//TODO: Need to have GooglePlay, isConnected and other simple checks
+
 public class MainActivity extends SherlockFragmentActivity  implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener {
 	private LocationClient mLocationClient; //Stores the current instantiation of the location client in this object
 	//	protected ListView listView; 

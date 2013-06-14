@@ -23,7 +23,7 @@ import android.widget.ExpandableListView.OnGroupExpandListener;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-@SuppressLint("UseSparseArrays")
+//@SuppressLint("UseSparseArrays")
 public class ExpandableAdapter extends BaseExpandableListAdapter {
 	private long lastAction = 0; 
 	private LayoutInflater layoutInflater;
@@ -31,7 +31,7 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 	private ArrayList<Item> mainGroup;
 	private int[] groupStatus;
 
-
+	//http://stackoverflow.com/questions/6143499/expandablelistview-open-collapse-problem
 	public ExpandableAdapter(Context context, ExpandableListView listView,
 			LinkedHashMap<Item, ArrayList<Item>> groupsList) {
 		layoutInflater = (LayoutInflater) context
