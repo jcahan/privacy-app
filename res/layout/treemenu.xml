@@ -23,7 +23,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:cacheColorHint="@null"
-        android:choiceMode="none"
+        android:choiceMode="multipleChoiceModal"
         android:groupIndicator="@null"
         android:scrollbars="none" />
 

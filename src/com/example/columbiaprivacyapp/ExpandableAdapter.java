@@ -30,6 +30,8 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 	private LinkedHashMap<Item, ArrayList<Item>> groupList;
 	private ArrayList<Item> mainGroup;
 	private int[] groupStatus;
+	private long lastGroupAction = 0; 
+
 
 	//http://stackoverflow.com/questions/6143499/expandablelistview-open-collapse-problem
 	public ExpandableAdapter(Context context, ExpandableListView listView,
@@ -40,9 +42,12 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 		groupStatus = new int[groupsList.size()];
 
 		listView.setOnGroupExpandListener(new OnGroupExpandListener() {
-			
+
 			public void onGroupExpand(int groupPosition) {
+				if(lastGroupAction==0) lastGroupAction= System.currentTimeMillis();
+
 				System.out.println("enters the onGroup EXPAND");
+				lastGroupAction = System.currentTimeMillis();
 				Item group = mainGroup.get(groupPosition);
 				if (groupList.get(group).size() > 0)
 					groupStatus[groupPosition] = 1;
@@ -53,6 +58,7 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 
 			public void onGroupCollapse(int groupPosition) {
 				System.out.println("enters the onGroup COLLAPSE");
+				lastGroupAction = System.currentTimeMillis();
 				Item group = mainGroup.get(groupPosition);
 				if (groupList.get(group).size() > 0)
 					groupStatus[groupPosition] = 0;
@@ -95,17 +101,33 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 		}
 		final Item child = getChild(groupPosition, childPosition);
 		holder.cb.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-			public void onCheckedChanged(CompoundButton buttonView,
-					boolean isChecked) {
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 				//TODO: Total hack, change later 
-				if(lastAction==0) lastAction = System.currentTimeMillis();
-				else if(System.currentTimeMillis() - lastAction < 125) {
+				boolean firstActionOkay = false; 
+				if(lastAction==0) {
+					lastAction = System.currentTimeMillis();
+					System.out.println("ENTERS HERE!!");
+					firstActionOkay = true; 
+				}
+				if(firstActionOkay) {
+					if(System.currentTimeMillis() - lastGroupAction < 145) return; 
+				}
+				if(System.currentTimeMillis() - lastAction < 145 && !firstActionOkay) {
+					System.out.println("Returning because of lastAction");
+					System.out.println((System.currentTimeMillis()-lastAction));
+					return; 
+				}
+				//TODO: Might be too high
+				else if(System.currentTimeMillis() - lastGroupAction < 145) {
+					System.out.println("Returning because of group");
 					return; 
 				}
 				else {
+					System.out.println("change in group: " + (System.currentTimeMillis() - lastGroupAction));
 					lastAction = System.currentTimeMillis();
 				}
-				
+				firstActionOkay = false; 
+
 				Item parentGroup = getGroup(groupPosition);
 				child.isChecked = isChecked;
 
@@ -160,7 +182,6 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 
 		holder.cb.setChecked(child.isChecked);
 		holder.title.setText(child.name);
-		Log.i("The childs/children is/are: ", DataHolder.checkedChilds.toString());
 		return convertView;
 	}
 
@@ -211,6 +232,7 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 			public void onCheckedChanged(CompoundButton buttonView,
 					boolean isChecked) {
 				if (checkAll) {
+					System.out.println("ALL OF THE ITEMS ARE BEING UPDATED!!");
 					Log.i("All items should be affected!!", "All are being affected");
 					ArrayList<Item> childItem = getChild(groupItem);
 
@@ -219,20 +241,23 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 					if(isChecked) {
 						for (Item children : childItem) {
 							if(!children.isChecked) {
-								MainActivity.getInstance().postBlackListItem(children.name);
+								MainActivity.getInstance().addToBlackList(children.name);
 								children.isChecked = true;
 							}
 						}
 					}
+					//deletes all items from list 
 					else {
 						for (Item children : childItem) {
 							if(children.isChecked) {
-								MainActivity.getInstance().postBlackListItem(children.name);
+								MainActivity.getInstance().deleteFromBlackList(children.name);
 								children.isChecked = false;
 							}
 						}
 					}
+					MainActivity.getInstance().refreshAndSort();
 				}
+				
 				groupItem.isChecked = isChecked;
 				notifyDataSetChanged();
 				new Handler().postDelayed(new Runnable() {

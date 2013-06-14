@@ -91,12 +91,12 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		
+
 		//Making SQLite Database for MapFragment
 		theDatabase = openOrCreateDatabase("MyDB", MODE_PRIVATE, null);
 		theDatabase.execSQL("CREATE TABLE IF NOT EXISTS LocationInfo (Latitude DOUBLE, Longitude DOUBLE, LocAssoc VARCHAR)");
-		
-		
+
+
 		//Communicating with DataSource
 		datasource = new BlacklistWordDataSource(this);
 		datasource.open();
@@ -185,21 +185,21 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 		line = rd.readLine(); 
 		System.out.println("the line is: " + line);
-		
+
 		//Getting recent Latitude, Longitude, and Line
 		recentLatitude = location.getLatitude();
 		recentLongitude = location.getLongitude();
 		//this is likely outdated
 		recLocAssociations = line.split(", ");  
-		
+
 		//Saving information in SQL database
 		//TODO: Ask Chris about creating SQLite databases (he's faster)
-		
-		
+
+
 		System.out.println("enters");
 		theDatabase.execSQL("INSERT into LocationInfo VALUES "+ recentLatitude + ", " + recentLongitude + ", " + line + ");");
 		//TODO: Do I need to close this?
-		
+
 		THIS = this; 
 
 		conn.disconnect();
@@ -232,17 +232,41 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		return (treeWords.size() > 0);
 	}
 
+	public void addToBlackList(String blackListItem) {
+		BlacklistWord theWord = new BlacklistWord(blackListItem);  
+		System.out.println("the word is: " + blackListItem);
+		this.blackList= this.datasource.GetAllWords();
+
+		System.out.println("SHOULD BE ADDING TO BLACKLIST 237");
+		BlacklistWord newWord = this.datasource.CreateBlacklistWord(blackListItem);
+		this.blackList.add(newWord);
+		list.add(blackListItem);
+		THIS=this; 
+	}
+	public void deleteFromBlackList(String blackListItem) {
+		BlacklistWord theWord = new BlacklistWord(blackListItem);  
+		System.out.println("the word is: " + blackListItem);
+		this.blackList= this.datasource.GetAllWords();
+
+		System.out.println("Contains the word, should delete...");
+		this.datasource.deleteStringWord(blackListItem);
+		this.blackList.remove(new BlacklistWord(blackListItem));
+		list.remove(blackListItem);
+		THIS=this; 
+	}
+	public void refreshAndSort() {
+		Fragment1.refresh();
+		Collections.sort(list);
+		THIS=this;
+	}
 	public void postBlackListItem(String blackListItem) {
 		BlacklistWord theWord = new BlacklistWord(blackListItem);  
 		System.out.println("the word is: " + blackListItem);
-		
+
 		//Refresh the datasource
-		this.datasource.close();
-		this.datasource = new BlacklistWordDataSource(this);
-		this.datasource.open();
 		this.blackList= this.datasource.GetAllWords();
-		
-		
+
+
 		//Already exists in list, delete item
 		if(blackList.contains(theWord)) {
 			System.out.println("Contains the word, should delete...");
@@ -256,16 +280,13 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 			BlacklistWord newWord = this.datasource.CreateBlacklistWord(blackListItem);
 			this.blackList.add(newWord);
 			list.add(blackListItem);
-		}		
-		Fragment1.refresh();
-		Collections.sort(list);
-		THIS = this; 
+		}	
 	}
 	public void removeFromMenu(String theWord) {
 		Fragment2.deleteFromMenu(theWord);
 		THIS = this; 
 	}
-	
+
 	protected void checkPostLocation(Location theLocation, String whichTable) {
 		try {
 			boolean result = checkLocation(theLocation);
@@ -373,7 +394,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		public void onTabUnselected(Tab tab, FragmentTransaction ft) {
 			SherlockFragment preInitializedFragment = (SherlockFragment) mActivity.getSupportFragmentManager().findFragmentByTag(mTag);
 			if(tab.getPosition()==1) {
-				((TreeMenuFragment) mFragment).collapseAll();
+				if(mFragment!=null)((TreeMenuFragment) mFragment).collapseAll();
 			}
 			if (preInitializedFragment != null) {
 				ft.detach(preInitializedFragment);

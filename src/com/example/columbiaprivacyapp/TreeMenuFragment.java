@@ -29,7 +29,6 @@ public class TreeMenuFragment extends SherlockFragment{
 
 	private LinkedHashMap<Item, ArrayList<Item>> myHistory;
 	//TODO: Check all if textfield is the same 
-	//TODO: setItemChecked()
 	//All strings within string, and whether they are in array 
 	//(Key: TextEntry, Value: String Table) 
 	private HashMap<String, String> allStrings = new HashMap<String, String>();
@@ -135,7 +134,6 @@ public class TreeMenuFragment extends SherlockFragment{
 		if(expandableListView!=null) {
 			for(int i=0; i<expandableListView.getCount(); i++)
 			{
-				System.out.println("collapsing everything ");
 				expandableListView.collapseGroup(i);
 			}
 		}
