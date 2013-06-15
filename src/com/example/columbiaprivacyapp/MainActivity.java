@@ -15,6 +15,7 @@ import java.util.TreeSet;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.Drawable;
@@ -56,8 +57,11 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	private final String THE_USER_TABLE = "AppUsers"; //stores only the periodic location updates 
 	private final String THE_BLACKLIST_TABLE = "BlackListedItems"; //stores only the 
 	protected BlacklistWordDataSource datasource;
-
-
+	private SharedPreferences prefs = this.getSharedPreferences("com.example.columbiaprivacyapp", Context.MODE_PRIVATE);
+	String firstTimeKey = "com.example.columbiaprivacyapp.firstTime";
+	
+	
+	
 	//Solution: Presently adding all items to TreeSet. No available Adapters that support Trees
 	private TreeSet<BlacklistWord> blackList = new TreeSet<BlacklistWord>(new MyComparator());
 	//	protected ArrayList<String> list = new ArrayList<String>();
@@ -65,6 +69,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 
 	private ParseObject locationItem = new ParseObject(THE_BLACKLIST_TABLE);
 	private String android_id; 
+	
 	private int PERIODIC_UPDATE = 60000*60; 
 	private int PERIODIC_RECONNECTION_UPDATE = 60000*59;  
 	//For the Map Fragment
@@ -95,7 +100,13 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-
+		
+		//Preferences 
+		boolean firstTime = prefs.getBoolean(firstTimeKey, false);
+		if(firstTime) {
+			
+		}
+		
 		//Making SQLite Database for MapFragment
 		theDatabase = openOrCreateDatabase("MyDB", MODE_PRIVATE, null);
 		theDatabase.execSQL("CREATE TABLE IF NOT EXISTS LocationInfo (Latitude DOUBLE, Longitude DOUBLE, LocAssoc VARCHAR)");
