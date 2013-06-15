@@ -77,9 +77,9 @@ public class TreeMenuFragment extends SherlockFragment{
 		String[] itemOptions = getResources().getStringArray(R.array.edit_message);
 
 		ArrayAdapter<String> theAdapter = 
-				new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, itemOptions);
+				new ArrayAdapter<String>(getActivity(), android.R.layout.simple_dropdown_item_1line, itemOptions);
 		autoView.setAdapter(theAdapter);
-		
+		autoView.setTextColor(Color.BLACK);
 		((BaseAdapter) autoView.getAdapter()).notifyDataSetChanged();
 
 		//Creating Button and Setting Listener
