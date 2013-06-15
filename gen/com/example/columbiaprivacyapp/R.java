@@ -1170,9 +1170,10 @@ containing a value of this type.
         public static final int group_item=0x7f030018;
         public static final int group_list=0x7f030019;
         public static final int maptab=0x7f03001a;
-        public static final int sherlock_spinner_dropdown_item=0x7f03001b;
-        public static final int sherlock_spinner_item=0x7f03001c;
-        public static final int treemenu=0x7f03001d;
+        public static final int prefrence_screen=0x7f03001b;
+        public static final int sherlock_spinner_dropdown_item=0x7f03001c;
+        public static final int sherlock_spinner_item=0x7f03001d;
+        public static final int treemenu=0x7f03001e;
     }
     public static final class menu {
         public static final int main=0x7f0c0000;
@@ -1283,7 +1284,7 @@ containing a value of this type.
         /**  Long form sign-in button text [CHAR LIMIT=30] 
          */
         public static final int common_signin_button_text_long=0x7f09001b;
-        public static final int latitude_longitude=0x7f090026;
+        public static final int latitude_longitude=0x7f090029;
         /**  Location client code resources (prefix with location_client) 
 
         Begin strings for location.reporting
@@ -1296,7 +1297,12 @@ containing a value of this type.
         public static final int location_client_ulr_inactive_age_unknown=0x7f090020;
         public static final int location_client_ulr_inactive_unknown_restriction=0x7f090021;
         public static final int my_hint=0x7f090024;
-        public static final int update_button=0x7f090025;
+        /**  This is for the preference screen 
+         */
+        public static final int pref_user_name=0x7f090025;
+        public static final int pref_user_name_summary=0x7f090026;
+        public static final int pref_user_profile=0x7f090027;
+        public static final int update_button=0x7f090028;
     }
     public static final class style {
         /** 

@@ -59,9 +59,9 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	protected BlacklistWordDataSource datasource;
 	private SharedPreferences prefs = this.getSharedPreferences("com.example.columbiaprivacyapp", Context.MODE_PRIVATE);
 	String firstTimeKey = "com.example.columbiaprivacyapp.firstTime";
-	
-	
-	
+
+
+
 	//Solution: Presently adding all items to TreeSet. No available Adapters that support Trees
 	private TreeSet<BlacklistWord> blackList = new TreeSet<BlacklistWord>(new MyComparator());
 	//	protected ArrayList<String> list = new ArrayList<String>();
@@ -69,7 +69,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 
 	private ParseObject locationItem = new ParseObject(THE_BLACKLIST_TABLE);
 	private String android_id; 
-	
+
 	private int PERIODIC_UPDATE = 60000*60; 
 	private int PERIODIC_RECONNECTION_UPDATE = 60000*59;  
 	//For the Map Fragment
@@ -100,13 +100,13 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-		
+
 		//Preferences 
 		boolean firstTime = prefs.getBoolean(firstTimeKey, false);
 		if(firstTime) {
-			
+			//			startActivity(new TreeMenu);
 		}
-		
+
 		//Making SQLite Database for MapFragment
 		theDatabase = openOrCreateDatabase("MyDB", MODE_PRIVATE, null);
 		theDatabase.execSQL("CREATE TABLE IF NOT EXISTS LocationInfo (Latitude DOUBLE, Longitude DOUBLE, LocAssoc VARCHAR)");
@@ -162,14 +162,14 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 
 		Timer toReconnect = new Timer();
 		toReconnect.schedule(new TimerTask() {
-			
+
 			@Override
 			public void run() {
 				// TODO Auto-generated method stub
-				
+
 			}
 		}, 5000, PERIODIC_RECONNECTION_UPDATE);
-		
+
 		//Using timer to grab location every hour, will change to 60000*10 later 
 		Timer theTimer = new Timer(); 
 		theTimer.schedule(new TimerTask(){

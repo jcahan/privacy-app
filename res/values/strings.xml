@@ -3,8 +3,13 @@
 
     <string name="app_name">ColumbiaPrivacyApp</string>
     <string name="action_settings">Settings</string>
-    <string name="my_hint">BlackList Item</string>
-
+    <string name="my_hint">Add an Item to Your "Blacklist"</string>
+	
+	<!-- This is for the preference screen -->
+	<string name="pref_user_name">Set Username</string>
+    <string name="pref_user_name_summary">Set Your Username</string>
+    <string name="pref_user_profile">User Profile</string>
+    
     <string-array name="edit_message">
         <item>active life</item>
         <item>amateur sports teams</item>
