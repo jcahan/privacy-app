@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.TreeSet;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -78,6 +79,7 @@ public class TreeMenuFragment extends SherlockFragment{
 		ArrayAdapter<String> theAdapter = 
 				new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, itemOptions);
 		autoView.setAdapter(theAdapter);
+		
 		((BaseAdapter) autoView.getAdapter()).notifyDataSetChanged();
 
 		//Creating Button and Setting Listener

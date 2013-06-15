@@ -8,6 +8,7 @@
         android:id="@+id/edit_message"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:textColor="#000001"
         android:hint="@string/my_hint" />
 
     <Button

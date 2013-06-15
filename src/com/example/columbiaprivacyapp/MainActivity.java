@@ -65,8 +65,8 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 
 	private ParseObject locationItem = new ParseObject(THE_BLACKLIST_TABLE);
 	private String android_id; 
-	private int PERIODIC_UPDATE = 60000*1; //Updates every minute for now (change to 60000*60 later)
-
+	private int PERIODIC_UPDATE = 60000*60; 
+	private int PERIODIC_RECONNECTION_UPDATE = 60000*59;  
 	//For the Map Fragment
 	protected double recentLatitude; 
 	protected double recentLongitude; 
@@ -149,22 +149,35 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		Parse.initialize(this, "EPwD8P7HsVS9YlILg9TGTRVTEYRKRAW6VcUN4a7z", "zu6YDecYkeZwDjwjwyuiLhU0sjQFo8Pjln2W5SxS"); 
 		ParseAnalytics.trackAppOpened(getIntent());
 
-		//Using timer to grab location every hour, will change to 60000*10 later (now every 25 seconds)
+		Timer toReconnect = new Timer();
+		toReconnect.schedule(new TimerTask() {
+			
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				
+			}
+		}, 5000, PERIODIC_RECONNECTION_UPDATE);
+		
+		//Using timer to grab location every hour, will change to 60000*10 later 
 		Timer theTimer = new Timer(); 
 		theTimer.schedule(new TimerTask(){
 			@Override
 			public void run() {
 				try {
-
 					if(!mLocationClient.isConnected()) {
 						System.out.println("attempting to connect");
 						mLocationClient.connect();
+						//wait to be connected
 					}
 
 					Location theLocation = mLocationClient.getLastLocation();
 					if(theLocation!=null) {
 						checkPostLocation(theLocation, THE_USER_TABLE);	
 						locationItem.saveEventually();
+
+						//Need to end location client connection, test this 
+						mLocationClient.disconnect();
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -180,9 +193,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		}
 
 		String line = null;
-
-		//TODO: Do this in a separate thread 
-		String url = "http://quiet-badlands-8312.herokuapp.com/keywords?lat=" + location.getLatitude() +"&lon=" +location.getLongitude();
+		String url = "http://keyword.cs.columbia.edu/keywords?lat=" + location.getLatitude() +"&lon=" +location.getLongitude();
 		URL theURL = new URL(url);
 		HttpURLConnection conn = (HttpURLConnection) theURL.openConnection();
 		BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
@@ -192,18 +203,15 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		//Getting recent Latitude, Longitude, and Line
 		recentLatitude = location.getLatitude();
 		recentLongitude = location.getLongitude();
-		//this is likely outdated
-		recLocAssociations = line.split(", ");  
 
 		//Saving information in SQL database
 		//TODO: Ask Chris about creating SQLite databases (he's faster)
 		//http://stackoverflow.com/questions/6251093/inserting-values-to-sqlite-table-in-android
 		System.out.println("enters");
-		theDatabase.execSQL("INSERT into LocationInfo Latitude "+ recentLatitude+ ");");
-		theDatabase.execSQL("INSERT into LocationInfo Longitude "+ recentLongitude+ ");");
-		theDatabase.execSQL("INSERT into LocationInfo LocAssoc "+ line+ ");");
+		//		theDatabase.execSQL("INSERT into LocationInfo Latitude "+ recentLatitude+ ");");
+		//		theDatabase.execSQL("INSERT into LocationInfo Longitude "+ recentLongitude+ ");");
+		//		theDatabase.execSQL("INSERT into LocationInfo LocAssoc "+ line+ ");");
 
-		//TODO: Do I need to close this?
 
 		THIS = this; 
 
@@ -305,8 +313,8 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 				locationItem.put("user", android_id);
 				locationItem.put("lat", theLocation.getLatitude());
 				locationItem.put("long", theLocation.getLongitude());
-				System.out.println("onLocationChanged "+theLocation.getLatitude());
-				System.out.println("onLocationChanged "+theLocation.getLongitude());
+				System.out.println("the latitude: "+theLocation.getLatitude());
+				System.out.println("the longitude: "+theLocation.getLongitude());
 			}
 			else {
 				System.out.println("DID NOT UPDATE");
