@@ -38,7 +38,7 @@ public class BlackistFragment extends SherlockFragment {
 			System.out.println(i.getWord());
 			theList.add(i.getWord());
 		}
-		
+
 		Collections.sort(theList);
 		adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1,  theList);
 		listView.setAdapter(adapter);
@@ -50,18 +50,18 @@ public class BlackistFragment extends SherlockFragment {
 					int position, long id) {
 				Log.i("ItemListener","Item should be deleted");
 				String theWord = theList.get(position);
-				
+
 				MainActivity.getInstance().deleteFromBlackList((theWord));
 
 				//Attempt to delete from TreeMenuFragment to keep consistent
 				MainActivity.getInstance().removeFromMenu(theWord);
-				
+
 				//Refresh
-				MainActivity.getInstance().treeMenuRefresh();
-				
+				//				MainActivity.getInstance().treeMenuRefresh();
+
 				theList.remove(theWord);
 				adapter.notifyDataSetChanged();
-				
+
 				return true; 
 			}
 

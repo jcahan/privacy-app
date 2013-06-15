@@ -398,7 +398,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 			} else {
 				if(tab.getPosition()==1){
 					System.out.println("already attached, reattaching Tree here ");
-					((TreeMenuFragment) preInitializedFragment).refresh();
+					preInitializedFragment = ((TreeMenuFragment) preInitializedFragment).refresh(); 
 				}
 				ft.attach(preInitializedFragment);
 			}

@@ -18,6 +18,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ExpandableListView;
+import android.widget.ExpandableListView.OnGroupClickListener;
 
 import com.actionbarsherlock.app.SherlockFragment;
 
@@ -68,8 +69,8 @@ public class TreeMenuFragment extends SherlockFragment{
 		view = inflater.inflate(R.layout.treemenu, container, false);
 
 		System.out.println("should recreate in TreeMenuFragment");
-		
-		
+
+
 		//Creating AutoCompleteTextView, adding adapter, and notifying to update view
 		AutoCompleteTextView autoView = (AutoCompleteTextView) view.findViewById(R.id.edit_message);
 		String[] itemOptions = getResources().getStringArray(R.array.edit_message);
@@ -129,7 +130,6 @@ public class TreeMenuFragment extends SherlockFragment{
 
 		//Creating ExpandableListView Menu Below..
 		initViews(view);
-
 		if(view != null) { return view; }
 
 		((ViewGroup) autoView.getParent()).removeView(autoView);
@@ -146,15 +146,45 @@ public class TreeMenuFragment extends SherlockFragment{
 			}
 		}
 	}
-	public void refresh() {
+	
+	public TreeMenuFragment refresh() {
 		System.out.println("Calls on it to refresh!!");
 		if(expandableListView!=null) {
 			System.out.println("it is not null");
-			((BaseAdapter) expandableListView.getAdapter()).notifyDataSetChanged();
+			initContactList();
+			
+			
+			
+			
+			expandableListView = (ExpandableListView) view.findViewById(R.id.expandableListView);
+			adapter = new ExpandableAdapter(getActivity(), expandableListView, groupList);
+			TreeSet<BlacklistWord> setOfWords =  MainActivity.getInstance().datasource.GetAllWords();
+
+			expandableListView.setAdapter(adapter);
+
+			for(BlacklistWord eachWord :setOfWords) {
+				String toCheck = eachWord.getWord(); 
+				System.out.println("this word exists in the current datasource: " + toCheck);
+				if(allStrings.containsKey(eachWord.getWord())) {
+					String theGroupName = allStrings.get(toCheck.toLowerCase());
+					int theGroupPosition = groupPositions.get(theGroupName);
+
+					//Get which child position
+					int childPosition = groupChildPosition.get(theGroupName).get(toCheck.toLowerCase());
+
+					//TODO: Check if both 0...
+
+					Item theItem = adapter.getChild(theGroupPosition, childPosition);
+					if(theItem==null) break; //TODO: Test if this will happen --> it should not!
+					theItem.isChecked = true; 
+				}
+				((BaseAdapter) expandableListView.getAdapter()).notifyDataSetChanged();
+			}
 		}
 		else {
 			System.out.println("IT IS NULL ");
 		}
+		return this; 
 	}
 
 
@@ -227,6 +257,11 @@ public class TreeMenuFragment extends SherlockFragment{
 
 			for(int i=0;i<ids.length;i++){
 				String groupId = ids[i];
+				
+				//TODO: 
+				
+				
+				
 				groupMembers.addAll(fetchGroupMembers(groupId));
 			}
 			String shortName = item.name;
@@ -429,12 +464,12 @@ public class TreeMenuFragment extends SherlockFragment{
 	private ArrayList<Item> addMyMembers(String[] childrenArray, String groupName, HashMap<String, Integer> groupMap) {
 		//Optimize later, use HashMap instead of a ton of check
 
-
+		
 		ArrayList<Item> groupMembers = new ArrayList<Item>();
 		for(int i=0; i<childrenArray.length; i++) {
 			Item item = new Item();
 			item.name = childrenArray[i];
-
+			
 			allStrings.put(childrenArray[i], groupName);
 			//Build inner HashMap
 			groupMap.put(childrenArray[i], i);

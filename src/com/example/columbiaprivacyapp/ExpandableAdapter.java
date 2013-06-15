@@ -1,11 +1,9 @@
 package com.example.columbiaprivacyapp;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Handler;
@@ -18,6 +16,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ExpandableListView;
+import android.widget.ExpandableListView.OnGroupClickListener;
 import android.widget.ExpandableListView.OnGroupCollapseListener;
 import android.widget.ExpandableListView.OnGroupExpandListener;
 import android.widget.ImageView;
@@ -54,7 +53,16 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 			}
 		});
 
-		listView.setOnGroupCollapseListener(new OnGroupCollapseListener() {
+		//new android.widget.ExpandableListView.OnGroupClickListener
+		listView.setOnGroupClickListener(new android.widget.ExpandableListView.OnGroupClickListener() {
+			@Override
+			public boolean onGroupClick(ExpandableListView parent, View v,
+					int groupPosition, long id) {
+				System.out.println("enters the onGroup of the listsener!!");
+				return false;
+			}
+		});
+		listView.setOnGroupCollapseListener(new android.widget.ExpandableListView.OnGroupCollapseListener() {
 
 			public void onGroupCollapse(int groupPosition) {
 				System.out.println("enters the onGroup COLLAPSE");
@@ -65,6 +73,7 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 
 			}
 		});
+
 
 		mainGroup = new ArrayList<Item>();
 		for (Map.Entry<Item, ArrayList<Item>> mapEntry : groupList.entrySet()) {
@@ -86,7 +95,6 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 
 	public View getChildView(final int groupPosition, int childPosition,
 			boolean isLastChild, View convertView, ViewGroup parent) {
-
 		final ChildHolder holder;
 		if (convertView == null) {
 			convertView = layoutInflater.inflate(R.layout.group_item, null);
@@ -102,8 +110,8 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 		final Item child = getChild(groupPosition, childPosition);
 		holder.cb.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				
-				
+
+
 				//TODO: Total hack, change later 
 				boolean firstActionOkay = false; 
 				if(lastAction==0) {
@@ -127,7 +135,7 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 					lastAction = System.currentTimeMillis();
 				}
 				firstActionOkay = false; //might be an unnecessary line  
-				
+
 				Item parentGroup = getGroup(groupPosition);
 				child.isChecked = isChecked;
 
@@ -209,7 +217,7 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 			View convertView, ViewGroup parent) {
 
 		final GroupHolder holder;
-		System.out.println("The group view is now in effect ");
+		//		System.out.println("The group view is now in effect ");
 		if (convertView == null) {
 			convertView = layoutInflater.inflate(R.layout.group_list, null);
 			holder = new GroupHolder();
@@ -230,7 +238,7 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 		holder.title.setText(groupItem.name);
 
 		holder.cb.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-			
+
 			public void onCheckedChanged(CompoundButton buttonView,
 					boolean isChecked) {
 				if (checkAll) {
@@ -271,7 +279,6 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 				}, 50);
 			}
 		});
-
 		holder.cb.setChecked(groupItem.isChecked);
 		return convertView;
 	}
