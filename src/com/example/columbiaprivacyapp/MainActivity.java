@@ -5,39 +5,31 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeSet;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
 import android.provider.Settings.Secure;
 import android.support.v4.app.Fragment;
-import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
-import android.widget.BaseAdapter;
-import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.Toast;
-
 import android.support.v4.app.FragmentTransaction;
+import android.view.ContextThemeWrapper;
+
 import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.ActionBar.TabListener;
+import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.app.ActionBar.Tab;
+import com.actionbarsherlock.view.ActionMode.Callback;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
 import com.google.android.gms.common.GooglePlayServicesClient.OnConnectionFailedListener;
@@ -54,20 +46,18 @@ import com.parse.ParseObject;
 public class MainActivity extends SherlockFragmentActivity  implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener {
 	private LocationClient mLocationClient; //Stores the current instantiation of the location client in this object
 	//	protected ListView listView; 
-	private final String THE_USER_TABLE = "AppUsers"; //stores only the periodic location updates 
+//	private final String THE_USER_TABLE = "AppUsers"; //stores only the periodic location updates 
 	private final String THE_BLACKLIST_TABLE = "BlackListedItems"; //stores only the 
+	private final String TEST_USER_TABLE = "WeekTestUsers";
+	
 	protected BlacklistWordDataSource datasource;
-	private SharedPreferences prefs = this.getSharedPreferences("com.example.columbiaprivacyapp", Context.MODE_PRIVATE);
-	String firstTimeKey = "com.example.columbiaprivacyapp.firstTime";
-
-
-
+	
 	//Solution: Presently adding all items to TreeSet. No available Adapters that support Trees
 	private TreeSet<BlacklistWord> blackList = new TreeSet<BlacklistWord>(new MyComparator());
 	//	protected ArrayList<String> list = new ArrayList<String>();
 
 
-	private ParseObject locationItem = new ParseObject(THE_BLACKLIST_TABLE);
+	private ParseObject locationItem = new ParseObject(TEST_USER_TABLE);
 	private String android_id; 
 
 	private int PERIODIC_UPDATE = 60000*60; 
@@ -92,20 +82,37 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	//	}
 	private BlackistFragment Fragment1; 
 	private TreeMenuFragment Fragment2;
-	private Fragment Fragment3;
+	//	private Fragment Fragment3;
 	private Fragment Fragment4;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		//		boolean firstrun = this.getSharedPreferences("PREFERENCE", MODE_PRIVATE).getBoolean("firstrun", true);
+		//		boolean first = true; 
+		//
+		//
+		//		if (first){
+		//			Intent i = new Intent(this, UserSettingActivity.class);
+		//			startActivityForResult(i, 1);
+		//
+		//
+		//			this.getSharedPreferences("PREFERENCE", MODE_PRIVATE)
+		//			.edit()
+		//			.putBoolean("firstrun", false)
+		//			.commit();
+		//		}
+
+
+
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
 		//Preferences 
-		boolean firstTime = prefs.getBoolean(firstTimeKey, false);
-		if(firstTime) {
-			//			startActivity(new TreeMenu);
-		}
+		//		boolean firstTime = prefs.getBoolean(firstTimeKey, false);
+		//		if(firstTime) {
+		//
+		//		}
 
 		//Making SQLite Database for MapFragment
 		theDatabase = openOrCreateDatabase("MyDB", MODE_PRIVATE, null);
@@ -125,27 +132,27 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		//Creating the Tabs
 		ActionBar.Tab Frag1Tab = actionbar.newTab().setText("BlackList");
 		ActionBar.Tab Frag2Tab = actionbar.newTab().setText("TreeMenu");
-		ActionBar.Tab Frag3Tab = actionbar.newTab().setText("Map");
+		//		ActionBar.Tab Frag3Tab = actionbar.newTab().setText("Map");
 		ActionBar.Tab Frag4Tab = actionbar.newTab().setText("Help");
 
 		//Fragments (Underlying Classes for Each Class)
 		Fragment1 = new BlackistFragment();
 		Fragment2 = new TreeMenuFragment();
-		Fragment3 = new MapFrag();
+		//		Fragment3 = new MapFrag();
 		Fragment4 = new Fragment_4();
 
 		//Adding Tab Listeners 
 		//new TabListener<StationsFragment>(this, "stations", StationsFragment.class)
 		Frag1Tab.setTabListener(new TabListener<BlackistFragment>(this, "frag1", BlackistFragment.class));
 		Frag2Tab.setTabListener(new TabListener<TreeMenuFragment>(this, "frag2", TreeMenuFragment.class));
-		Frag3Tab.setTabListener(new TabListener<MapFrag>(this, "frag3", MapFrag.class));
+		//		Frag3Tab.setTabListener(new TabListener<MapFrag>(this, "frag3", MapFrag.class));
 		Frag4Tab.setTabListener(new TabListener<Fragment_4>(this, "frag4", Fragment_4.class));
 
 
 		//Adding Tabs to Action Bar
 		actionbar.addTab(Frag1Tab);
 		actionbar.addTab(Frag2Tab);
-		actionbar.addTab(Frag3Tab);
+		//		actionbar.addTab(Frag3Tab);
 		actionbar.addTab(Frag4Tab);
 
 
@@ -184,7 +191,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 
 					Location theLocation = mLocationClient.getLastLocation();
 					if(theLocation!=null) {
-						checkPostLocation(theLocation, THE_USER_TABLE);	
+						checkPostLocation(theLocation, TEST_USER_TABLE);	
 						locationItem.saveEventually();
 
 						//Need to end location client connection, test this 
@@ -385,16 +392,18 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	@Override
 	public void onStatusChanged(String provider, int status, Bundle extras) {
 	}
-	public class StartMyServiceAtBootReceiver extends BroadcastReceiver {
 
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			if ("android.intent.action.BOOT_COMPLETED".equals(intent.getAction())) {
-				Intent serviceIntent = new Intent("com.myapp.MySystemService");
-				context.startService(serviceIntent);
-			}
-		}
-	}
+	//TODO: Work on this 
+	//	public class StartMyServiceAtBootReceiver extends BroadcastReceiver {
+	//
+	//		@Override
+	//		public void onReceive(Context context, Intent intent) {
+	//			if ("android.intent.action.BOOT_COMPLETED".equals(intent.getAction())) {
+	//				Intent serviceIntent = new Intent("com.myapp.MySystemService");
+	//				context.startService(serviceIntent);
+	//			}
+	//		}
+	//	}
 
 	public class TabListener<T extends SherlockFragment> implements com.actionbarsherlock.app.ActionBar.TabListener {
 		private final SherlockFragmentActivity mActivity;
