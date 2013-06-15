@@ -202,7 +202,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		theDatabase.execSQL("INSERT into LocationInfo Latitude "+ recentLatitude+ ");");
 		theDatabase.execSQL("INSERT into LocationInfo Longitude "+ recentLongitude+ ");");
 		theDatabase.execSQL("INSERT into LocationInfo LocAssoc "+ line+ ");");
-		
+
 		//TODO: Do I need to close this?
 
 		THIS = this; 
@@ -242,17 +242,16 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	}
 	public void addToBlackList(String blackListItem) {
 		System.out.println("the word is: " + blackListItem);
-		
+
 		System.out.println("SHOULD BE ADDING TO BLACKLIST 237");
 		BlacklistWord newWord = this.datasource.CreateBlacklistWord(blackListItem);
 		this.blackList.add(newWord);
 		//		list.add(blackListItem);
 		THIS=this; 
 	}
-	
+
 	public void deleteFromBlackList(String blackListItem) {
 		System.out.println("the word is: " + blackListItem);
-
 		System.out.println("Contains the word, should delete...");
 		this.datasource.deleteStringWord(blackListItem);
 		this.blackList.remove(new BlacklistWord(blackListItem));
@@ -397,6 +396,10 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 				mFragment = (SherlockFragment) SherlockFragment.instantiate(mActivity, mClass.getName());
 				ft.add(R.id.fragment_container, mFragment, mTag);
 			} else {
+				if(tab.getPosition()==1){
+					System.out.println("already attached, reattaching Tree here ");
+					((TreeMenuFragment) preInitializedFragment).refresh();
+				}
 				ft.attach(preInitializedFragment);
 			}
 		}
@@ -404,7 +407,9 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		public void onTabUnselected(Tab tab, FragmentTransaction ft) {
 			SherlockFragment preInitializedFragment = (SherlockFragment) mActivity.getSupportFragmentManager().findFragmentByTag(mTag);
 			if(tab.getPosition()==1) {
-				if(mFragment!=null)((TreeMenuFragment) mFragment).collapseAll();
+				if(mFragment!=null){
+					((TreeMenuFragment) mFragment).collapseAll();
+				}
 			}
 			if (preInitializedFragment != null) {
 				ft.detach(preInitializedFragment);

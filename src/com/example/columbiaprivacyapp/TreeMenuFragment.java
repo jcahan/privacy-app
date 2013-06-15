@@ -67,6 +67,9 @@ public class TreeMenuFragment extends SherlockFragment{
 		MainActivity.getInstance().invalidateOptionsMenu();
 		view = inflater.inflate(R.layout.treemenu, container, false);
 
+		System.out.println("should recreate in TreeMenuFragment");
+		
+		
 		//Creating AutoCompleteTextView, adding adapter, and notifying to update view
 		AutoCompleteTextView autoView = (AutoCompleteTextView) view.findViewById(R.id.edit_message);
 		String[] itemOptions = getResources().getStringArray(R.array.edit_message);
@@ -143,11 +146,14 @@ public class TreeMenuFragment extends SherlockFragment{
 			}
 		}
 	}
-	//TODO: need to work on displaying current information 
 	public void refresh() {
 		System.out.println("Calls on it to refresh!!");
 		if(expandableListView!=null) {
+			System.out.println("it is not null");
 			((BaseAdapter) expandableListView.getAdapter()).notifyDataSetChanged();
+		}
+		else {
+			System.out.println("IT IS NULL ");
 		}
 	}
 
