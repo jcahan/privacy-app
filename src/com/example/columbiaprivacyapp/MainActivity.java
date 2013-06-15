@@ -47,6 +47,8 @@ import com.parse.ParseObject;
 
 //TODO: Need to work on not calling connect() when already connected. 
 //TODO: Need to have GooglePlay, isConnected and other simple checks
+//TODO: Disconnect when location not needed 
+
 
 public class MainActivity extends SherlockFragmentActivity  implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener {
 	private LocationClient mLocationClient; //Stores the current instantiation of the location client in this object
@@ -195,10 +197,12 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 
 		//Saving information in SQL database
 		//TODO: Ask Chris about creating SQLite databases (he's faster)
-
-
+		//http://stackoverflow.com/questions/6251093/inserting-values-to-sqlite-table-in-android
 		System.out.println("enters");
-		theDatabase.execSQL("INSERT into LocationInfo VALUES "+ recentLatitude + ", " + recentLongitude + ", " + line + ");");
+		theDatabase.execSQL("INSERT into LocationInfo Latitude "+ recentLatitude+ ");");
+		theDatabase.execSQL("INSERT into LocationInfo Longitude "+ recentLongitude+ ");");
+		theDatabase.execSQL("INSERT into LocationInfo LocAssoc "+ line+ ");");
+		
 		//TODO: Do I need to close this?
 
 		THIS = this; 

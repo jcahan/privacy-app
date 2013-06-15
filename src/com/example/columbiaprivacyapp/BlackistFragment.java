@@ -76,7 +76,7 @@ public class BlackistFragment extends SherlockFragment {
 	}
 	//TODO: need to work on displaying current information 
 	public void refresh() {
-		System.out.println("Calls on it to refresh!!");
+		System.out.println("Calls on it to refresh in Blacklist!!");
 		if(listView!=null) {
 			((BaseAdapter) listView.getAdapter()).notifyDataSetChanged();
 		}

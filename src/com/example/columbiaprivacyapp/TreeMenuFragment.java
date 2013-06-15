@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.TreeSet;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -31,7 +32,7 @@ public class TreeMenuFragment extends SherlockFragment{
 
 
 	private LinkedHashMap<Item, ArrayList<Item>> myHistory;
-	
+
 	//All strings within string, and whether they are in array 
 	//(Key: TextEntry, Value: String Table) 
 	private HashMap<String, String> allStrings = new HashMap<String, String>();
@@ -125,6 +126,7 @@ public class TreeMenuFragment extends SherlockFragment{
 
 		//Creating ExpandableListView Menu Below..
 		initViews(view);
+
 		if(view != null) { return view; }
 
 		((ViewGroup) autoView.getParent()).removeView(autoView);
@@ -142,12 +144,12 @@ public class TreeMenuFragment extends SherlockFragment{
 		}
 	}
 	//TODO: need to work on displaying current information 
-		public void refresh() {
-			System.out.println("Calls on it to refresh!!");
-			if(expandableListView!=null) {
-				((BaseAdapter) expandableListView.getAdapter()).notifyDataSetChanged();
-			}
+	public void refresh() {
+		System.out.println("Calls on it to refresh!!");
+		if(expandableListView!=null) {
+			((BaseAdapter) expandableListView.getAdapter()).notifyDataSetChanged();
 		}
+	}
 
 
 	//TODO: Abstract this out later
@@ -162,7 +164,7 @@ public class TreeMenuFragment extends SherlockFragment{
 
 			//Get which child position
 			int childPosition = groupChildPosition.get(theGroupName).get(blackListItem.toLowerCase());
-			
+
 			System.out.println("The group position is: " + theGroupPosition);
 			System.out.println("The child position is: " + childPosition);
 
@@ -184,10 +186,27 @@ public class TreeMenuFragment extends SherlockFragment{
 
 		expandableListView = (ExpandableListView) theView.findViewById(R.id.expandableListView);
 		adapter = new ExpandableAdapter(getActivity(), expandableListView, groupList);
-		//		System.out.println("teh adapter.." + adapter.getChild(1, 1).name);
-
+		TreeSet<BlacklistWord> setOfWords =  MainActivity.getInstance().datasource.GetAllWords();
 
 		expandableListView.setAdapter(adapter);
+
+		for(BlacklistWord eachWord :setOfWords) {
+			String toCheck = eachWord.getWord(); 
+			if(allStrings.containsKey(eachWord.getWord())) {
+				String theGroupName = allStrings.get(toCheck.toLowerCase());
+				int theGroupPosition = groupPositions.get(theGroupName);
+
+				//Get which child position
+				int childPosition = groupChildPosition.get(theGroupName).get(toCheck.toLowerCase());
+
+				//TODO: Check if both 0...
+
+				Item theItem = adapter.getChild(theGroupPosition, childPosition);
+				if(theItem==null) break; //TODO: Test if this will happen --> it should not!
+				theItem.isChecked = true; 
+			}
+			((BaseAdapter) expandableListView.getAdapter()).notifyDataSetChanged();
+		}
 
 	}
 	private void initContactList(){
@@ -202,8 +221,6 @@ public class TreeMenuFragment extends SherlockFragment{
 
 			for(int i=0;i<ids.length;i++){
 				String groupId = ids[i];
-				System.out.println("----------------------------");
-				System.out.println("THE GROUP ID: " +groupId);
 				groupMembers.addAll(fetchGroupMembers(groupId));
 			}
 			String shortName = item.name;

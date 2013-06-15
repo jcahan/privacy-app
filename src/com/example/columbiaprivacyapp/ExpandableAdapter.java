@@ -209,7 +209,7 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 			View convertView, ViewGroup parent) {
 
 		final GroupHolder holder;
-
+		System.out.println("The group view is now in effect ");
 		if (convertView == null) {
 			convertView = layoutInflater.inflate(R.layout.group_list, null);
 			holder = new GroupHolder();
