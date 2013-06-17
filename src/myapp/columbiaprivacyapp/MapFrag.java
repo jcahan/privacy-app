@@ -32,7 +32,7 @@ public class MapFrag extends SherlockFragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
 		//Creating MapFragment from recentLatitude and recentLongitude
 		
-
+		
 		//Most Recent Items List
 
 		mapFragView = inflater.inflate(R.layout.maptab, container, false);

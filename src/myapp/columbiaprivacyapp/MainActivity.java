@@ -45,7 +45,6 @@ import com.parse.ParseQuery;
 
 public class MainActivity extends SherlockFragmentActivity  implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener {
 	private LocationClient mLocationClient; //Stores the current instantiation of the location client in this object
-	//	protected ListView listView; 
 	private final String USER_TABLE = "UserTableOfficial";
 	private final String LOCATION_TABLE = "LocationTableOfficial";
 
@@ -60,7 +59,6 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	private ParseObject locationItem;
 	private String android_id; 
 
-	//TODO: Change back time later 
 	private int PERIODIC_UPDATE = 60000*60;  //gets location and disconnects every hour
 	private int PERIODIC_RECONNECTION_UPDATE = 60000*59;  //connects 1 minute before getLocation call
 
@@ -79,12 +77,10 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	public static MainActivity getInstance() {
 		return THIS;
 	}
-	//	public ArrayList<String> getList() {
-	//		return list; 
-	//	}
+
 	private BlackistFragment Fragment1; 
 	private TreeMenuFragment Fragment2;
-	//	private Fragment Fragment3;
+	private Fragment Fragment3;
 	private Fragment Fragment4;
 
 	//For Preferences
@@ -99,7 +95,6 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		setContentView(R.layout.activity_main);
 		setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-		//Could also follow RandomUtils: http://stackoverflow.com/questions/11476626/what-do-i-need-to-include-for-java-randomutils
 		android_id = Secure.getString(this.getContentResolver(), Secure.ANDROID_ID);
 
 		//Getting User name...
@@ -107,18 +102,18 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		editor = prefs.edit();
 		userNameInPref = prefs.getString("prefUsername", "default");
 		System.out.println("this is the userName from preferences : " + userNameInPref);
-		
+
 		if (userNameInPref.equals("default")) {
 			createDialogBox();
 			userNameInPref = prefs.getString("prefUsername", "default");
 		}
 
-		
-		
+
 		//TODO: Do this later 
 		//Creating Database for MapFragment
 		theDatabase = openOrCreateDatabase("MyDB", MODE_PRIVATE, null);
 		theDatabase.execSQL("CREATE TABLE IF NOT EXISTS LocationInfo (Latitude DOUBLE, Longitude DOUBLE, LocAssoc VARCHAR)");
+
 
 		//Communicating with DataSource
 		datasource = new BlacklistWordDataSource(this);
@@ -133,27 +128,27 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		//Creating the Tabs
 		ActionBar.Tab Frag1Tab = actionbar.newTab().setText("BlackList");
 		ActionBar.Tab Frag2Tab = actionbar.newTab().setText("TreeMenu");
-		//		ActionBar.Tab Frag3Tab = actionbar.newTab().setText("Map");
+		ActionBar.Tab Frag3Tab = actionbar.newTab().setText("Map");
 		ActionBar.Tab Frag4Tab = actionbar.newTab().setText("Help");
 
 		//Fragments (Underlying Classes for Each Class)
 		Fragment1 = new BlackistFragment();
 		Fragment2 = new TreeMenuFragment();
-		//		Fragment3 = new MapFrag();
+		Fragment3 = new MapFrag();
 		Fragment4 = new Fragment_4();
 
 		//Adding Tab Listeners 
 		//new TabListener<StationsFragment>(this, "stations", StationsFragment.class)
 		Frag1Tab.setTabListener(new TabListener<BlackistFragment>(this, "frag1", BlackistFragment.class));
 		Frag2Tab.setTabListener(new TabListener<TreeMenuFragment>(this, "frag2", TreeMenuFragment.class));
-		//		Frag3Tab.setTabListener(new TabListener<MapFrag>(this, "frag3", MapFrag.class));
+		Frag3Tab.setTabListener(new TabListener<MapFrag>(this, "frag3", MapFrag.class));
 		Frag4Tab.setTabListener(new TabListener<Fragment_4>(this, "frag4", Fragment_4.class));
 
 
 		//Adding Tabs to Action Bar
 		actionbar.addTab(Frag1Tab);
 		actionbar.addTab(Frag2Tab);
-		//		actionbar.addTab(Frag3Tab);
+		actionbar.addTab(Frag3Tab);
 		actionbar.addTab(Frag4Tab);
 
 
@@ -165,6 +160,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		Parse.initialize(this, "EPwD8P7HsVS9YlILg9TGTRVTEYRKRAW6VcUN4a7z", "zu6YDecYkeZwDjwjwyuiLhU0sjQFo8Pjln2W5SxS"); 
 		ParseAnalytics.trackAppOpened(getIntent());
 
+		
 		Timer toReconnect = new Timer();
 		toReconnect.schedule(new TimerTask() {
 
@@ -221,7 +217,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 				//Checking if UserName Equals Existing 
 				ParseQuery<ParseObject> query = ParseQuery.getQuery(USER_TABLE);
 				query.whereEqualTo("name", thisUserName);
-				
+
 				//TODO: Add a loading feature here!
 
 				// Checks if name is in table already
@@ -239,7 +235,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 						editor.putString("prefUsername", thisUserName);
 						editor.commit();
 						System.out.println("After setting prefsUserName, it is: " + prefs.getString("prefUsername", "default"));
-						
+
 					} else {
 						Log.i("UserName", "The username exists");
 						Toast.makeText(getApplicationContext(), "Someone has already chosen this name, please choose a new one to continue",  Toast.LENGTH_LONG).show();
@@ -303,7 +299,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		treeWords.retainAll(blackList);
 		return (treeWords.size() > 0);
 	}
-	
+
 	//Refreshes blacklist 
 	public void refreshBlackListTree() {
 		this.blackList= this.datasource.GetAllWords();
@@ -314,10 +310,10 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	public void addToBlackList(String blackListItem) {
 		BlacklistWord newWord = this.datasource.CreateBlacklistWord(blackListItem);
 		this.blackList.add(newWord);
-		
+
 		THIS=this; 
 	}
-	
+
 	//delete element from blacklist 
 	public void deleteFromBlackList(String blackListItem) {
 		this.datasource.deleteStringWord(blackListItem);
