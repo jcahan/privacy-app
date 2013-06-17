@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">ColumbiaPrivacyApp</string>
+    <string name="app_name">Columbia Privacy App</string>
     <string name="action_settings">Settings</string>
     <string name="my_hint">Add an Item to Your "Blacklist"</string>
 	

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.columbiaprivacyapp"
+    package="myapp.columbiaprivacyapp"
     android:versionCode="1"
     android:versionName="1.0" >
 
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -15,12 +15,11 @@
 
     <application
         android:allowBackup="true"
-        android:debuggable="true"
         android:icon="@drawable/columbia_logo"
         android:label="@string/app_name"
         android:theme="@style/Theme.Sherlock" >
         <service
-            android:name=".MyService"
+            android:name="myapp.columbiaprivacyapp.MyService"
             android:label="My Service" >
             <intent-filter>
                 <action android:name="com.myapp.MyService" />
@@ -38,7 +37,7 @@
         </receiver>
 
         <activity
-            android:name="com.example.columbiaprivacyapp.MainActivity"
+            android:name="myapp.columbiaprivacyapp.MainActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
