@@ -41,16 +41,13 @@ import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
-//TODO: Need to work on not calling connect() when already connected. 
 //TODO: Need to have GooglePlay, isConnected and other simple checks
-//TODO: Disconnect when location not needed 
-
 
 public class MainActivity extends SherlockFragmentActivity  implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener {
 	private LocationClient mLocationClient; //Stores the current instantiation of the location client in this object
 	//	protected ListView listView; 
-	private final String USER_TABLE = "UserTable";
-	private final String LOCATION_TABLE = "LocationTable";
+	private final String USER_TABLE = "UserTableOfficial";
+	private final String LOCATION_TABLE = "LocationTableOfficial";
 
 
 	protected BlacklistWordDataSource datasource;
@@ -63,6 +60,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	private ParseObject locationItem;
 	private String android_id; 
 
+	//TODO: Change back time later 
 	private int PERIODIC_UPDATE = 60000*60;  //gets location and disconnects every hour
 	private int PERIODIC_RECONNECTION_UPDATE = 60000*59;  //connects 1 minute before getLocation call
 
@@ -76,7 +74,6 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 
 
 	//TODO: If Time permits, use Otto instead
-	//Following SO recommendation...
 	private static MainActivity THIS = null;
 
 	public static MainActivity getInstance() {
@@ -109,11 +106,15 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
 		editor = prefs.edit();
 		userNameInPref = prefs.getString("prefUsername", "default");
+		System.out.println("this is the userName from preferences : " + userNameInPref);
+		
 		if (userNameInPref.equals("default")) {
 			createDialogBox();
 			userNameInPref = prefs.getString("prefUsername", "default");
 		}
 
+		
+		
 		//TODO: Do this later 
 		//Creating Database for MapFragment
 		theDatabase = openOrCreateDatabase("MyDB", MODE_PRIVATE, null);
@@ -209,7 +210,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 
 		// set dialog message
 		alertDialogBuilder
-		.setMessage("Input")
+		.setMessage("Username")
 		.setView(et)
 		.setCancelable(false)
 		.setPositiveButton("OK", new    DialogInterface.OnClickListener() {
@@ -235,8 +236,10 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 						newUser.saveInBackground();
 
 						// Save that we've run this code
-						editor.putString("prefsUsername", thisUserName);
+						editor.putString("prefUsername", thisUserName);
 						editor.commit();
+						System.out.println("After setting prefsUserName, it is: " + prefs.getString("prefUsername", "default"));
+						
 					} else {
 						Log.i("UserName", "The username exists");
 						Toast.makeText(getApplicationContext(), "Someone has already chosen this name, please choose a new one to continue",  Toast.LENGTH_LONG).show();
@@ -257,33 +260,20 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	}
 
 	protected String scrapWeb(Location location) throws IOException {
+		//If no location can be found, then treat as if it did not find any intersections. 
 		if(location==null) {
 			return "";
 		}
-
+		//Scraping Associations with Coordinates 
 		String line = null;
 		String url = "http://keyword.cs.columbia.edu/keywords?lat=" + location.getLatitude() +"&lon=" +location.getLongitude();
 		URL theURL = new URL(url);
 		HttpURLConnection conn = (HttpURLConnection) theURL.openConnection();
 		BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 		line = rd.readLine(); 
-		//		System.out.println("the line is: " + line);
 
-		//Getting recent Latitude, Longitude, and Line
-		recentLatitude = location.getLatitude();
-		recentLongitude = location.getLongitude();
-
-		//Saving information in SQL database
-		//TODO: Ask Chris about creating SQLite databases (he's faster)
-		//http://stackoverflow.com/questions/6251093/inserting-values-to-sqlite-table-in-android
-		//		System.out.println("enters");
-		//		theDatabase.execSQL("INSERT into LocationInfo Latitude "+ recentLatitude+ ");");
-		//		theDatabase.execSQL("INSERT into LocationInfo Longitude "+ recentLongitude+ ");");
-		//		theDatabase.execSQL("INSERT into LocationInfo LocAssoc "+ line+ ");");
-
-
+		//Saving new Instance, disconnecting/closing reader and connection 
 		THIS = this; 
-
 		conn.disconnect();
 		rd.close();
 		return line.substring(1, line.length()-1); 
@@ -303,7 +293,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		}
 		return locationBlacklisted;
 	}
-	//set intersection 
+
 	//returns true if intersection exists 
 	protected Boolean checkLocation(Location theLocation) throws IOException {
 		String locationAssociations = scrapWeb(theLocation);
@@ -313,26 +303,26 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		treeWords.retainAll(blackList);
 		return (treeWords.size() > 0);
 	}
+	
+	//Refreshes blacklist 
 	public void refreshBlackListTree() {
 		this.blackList= this.datasource.GetAllWords();
 		THIS = this; 
 	}
-	public void addToBlackList(String blackListItem) {
-		//		System.out.println("the word is: " + blackListItem);
 
-		//		System.out.println("SHOULD BE ADDING TO BLACKLIST 237");
+	//Add element to blacklist 
+	public void addToBlackList(String blackListItem) {
 		BlacklistWord newWord = this.datasource.CreateBlacklistWord(blackListItem);
 		this.blackList.add(newWord);
-		//		list.add(blackListItem);
+		
 		THIS=this; 
 	}
-
+	
+	//delete element from blacklist 
 	public void deleteFromBlackList(String blackListItem) {
-		//		System.out.println("the word is: " + blackListItem);
-		//		System.out.println("Contains the word, should delete...");
 		this.datasource.deleteStringWord(blackListItem);
 		this.blackList.remove(new BlacklistWord(blackListItem));
-		//		list.remove(blackListItem);
+
 		THIS=this; 
 	}
 	public void refreshAndSort() {
@@ -344,7 +334,6 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		Fragment2.refresh();
 		THIS = this; 
 	}
-
 	public void postBlackListItem(String blackListItem) {
 		BlacklistWord theWord = new BlacklistWord(blackListItem);  
 		//		System.out.println("the word is: " + blackListItem);
@@ -362,10 +351,8 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		}
 		//otherwise add to the blacklist 
 		else {
-			//			System.out.println("SHOULD BE ADDING TO BLACKLIST 237");
 			BlacklistWord newWord = this.datasource.CreateBlacklistWord(blackListItem);
 			this.blackList.add(newWord);
-			//			list.add(blackListItem);
 		}	
 	}
 	public void removeFromMenu(String theWord) {
@@ -378,9 +365,11 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 			boolean result = checkLocation(theLocation);
 			//			System.out.println("the result is: "+result);
 			if(!result) {
+				String tmpUserName = prefs.getString("prefUsername", "default"); 
+				System.out.println("this is the userName: " + tmpUserName);
 				locationItem = new ParseObject(LOCATION_TABLE);
 				locationItem.put("deviceId", android_id);
-				locationItem.put("name", userNameInPref);
+				locationItem.put("name", tmpUserName);
 				locationItem.put("latitude", theLocation.getLatitude());
 				locationItem.put("longitude", theLocation.getLongitude());
 				locationItem.saveEventually();
