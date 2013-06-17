@@ -22,7 +22,9 @@ import android.preference.PreferenceManager;
 import android.provider.Settings.Secure;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.Tab;
@@ -32,9 +34,12 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
 import com.google.android.gms.common.GooglePlayServicesClient.OnConnectionFailedListener;
 import com.google.android.gms.location.LocationClient;
+import com.parse.GetCallback;
 import com.parse.Parse;
 import com.parse.ParseAnalytics;
+import com.parse.ParseException;
 import com.parse.ParseObject;
+import com.parse.ParseQuery;
 
 //TODO: Need to work on not calling connect() when already connected. 
 //TODO: Need to have GooglePlay, isConnected and other simple checks
@@ -44,8 +49,8 @@ import com.parse.ParseObject;
 public class MainActivity extends SherlockFragmentActivity  implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener {
 	private LocationClient mLocationClient; //Stores the current instantiation of the location client in this object
 	//	protected ListView listView; 
-	private final String THE_BLACKLIST_TABLE = "BlackListedItems"; //stores only the 
-	private final String TEST_USER_TABLE = "WeekTestUsers";
+	private final String USER_TABLE = "UserTable";
+	private final String LOCATION_TABLE = "LocationTable";
 
 
 	protected BlacklistWordDataSource datasource;
@@ -55,11 +60,11 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	//	protected ArrayList<String> list = new ArrayList<String>();
 
 
-	private ParseObject locationItem = new ParseObject(TEST_USER_TABLE);
+	private ParseObject locationItem;
 	private String android_id; 
 
-	private int PERIODIC_UPDATE = 60000*60; 
-	private int PERIODIC_RECONNECTION_UPDATE = 60000*59;  
+	private int PERIODIC_UPDATE = 60000*60;  //gets location and disconnects every hour
+	private int PERIODIC_RECONNECTION_UPDATE = 60000*59;  //connects 1 minute before getLocation call
 
 
 	//For the Map Fragment
@@ -84,25 +89,29 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	private TreeMenuFragment Fragment2;
 	//	private Fragment Fragment3;
 	private Fragment Fragment4;
-	
+
 	//For Preferences
 	SharedPreferences prefs;
 	Editor editor;
-	
+	String userNameInPref; 
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		
+
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-		
+
+		//Could also follow RandomUtils: http://stackoverflow.com/questions/11476626/what-do-i-need-to-include-for-java-randomutils
+		android_id = Secure.getString(this.getContentResolver(), Secure.ANDROID_ID);
+
 		//Getting User name...
 		prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
 		editor = prefs.edit();
-		String p = prefs.getString("prefUsername", "default");
-		if (p.equals("default")) {
+		userNameInPref = prefs.getString("prefUsername", "default");
+		if (userNameInPref.equals("default")) {
 			createDialogBox();
-			p = prefs.getString("prefUsername", "default");
+			userNameInPref = prefs.getString("prefUsername", "default");
 		}
 
 		//TODO: Do this later 
@@ -150,10 +159,6 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		//LocationClient to get Location
 		mLocationClient = new LocationClient(this, this, this);
 		mLocationClient.connect();
-		
-		
-		//Could also follow RandomUtils: http://stackoverflow.com/questions/11476626/what-do-i-need-to-include-for-java-randomutils
-		android_id = Secure.getString(this.getContentResolver(), Secure.ANDROID_ID);
 
 		//initializing Parse
 		Parse.initialize(this, "EPwD8P7HsVS9YlILg9TGTRVTEYRKRAW6VcUN4a7z", "zu6YDecYkeZwDjwjwyuiLhU0sjQFo8Pjln2W5SxS"); 
@@ -164,8 +169,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 
 			@Override
 			public void run() {
-				// TODO Auto-generated method stub
-
+				mLocationClient.connect();
 			}
 		}, 5000, PERIODIC_RECONNECTION_UPDATE);
 
@@ -183,8 +187,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 
 					Location theLocation = mLocationClient.getLastLocation();
 					if(theLocation!=null) {
-						checkPostLocation(theLocation, TEST_USER_TABLE);	
-						locationItem.saveEventually();
+						checkPostLocation(theLocation);	
 
 						//Need to end location client connection, test this 
 						mLocationClient.disconnect();
@@ -197,40 +200,61 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	}
 
 	public void createDialogBox() 
-    {
+	{
 		final EditText et = new EditText(this);
-	    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
 
-	    // set title
-	    alertDialogBuilder.setTitle("Enter a Unique Username");
+		// set title
+		alertDialogBuilder.setTitle("Enter a Unique Username");
 
-	    // set dialog message
-	    alertDialogBuilder
-	            .setMessage("Input")
-	            .setView(et)
-	            .setCancelable(false)
-	            .setPositiveButton("OK", new    DialogInterface.OnClickListener() {
-	                public void onClick(DialogInterface dialog, int id) {
-	                    String c = et.getText().toString().trim();
-	                    editor.putString("prefsUsername", c);
-	                    editor.commit();
-	                }
-	            })
-	            .setNegativeButton("Cancel",
-	                    new DialogInterface.OnClickListener() {
-	                        public void onClick(DialogInterface dialog, int id) {
-	                            dialog.cancel();
-	                        }
-	                    });
+		// set dialog message
+		alertDialogBuilder
+		.setMessage("Input")
+		.setView(et)
+		.setCancelable(false)
+		.setPositiveButton("OK", new    DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+				String thisUserName = et.getText().toString().trim();
+				Log.i("the username", thisUserName);
 
-	    // create alert dialog
-	    AlertDialog alertDialog = alertDialogBuilder.create();
+				//Checking if UserName Equals Existing 
+				ParseQuery<ParseObject> query = ParseQuery.getQuery(USER_TABLE);
+				query.whereEqualTo("name", thisUserName);
+				
+				//TODO: Add a loading feature here!
 
-	    // show it
-	    alertDialog.show();
-    }
+				// Checks if name is in table already
+				int count;
+				try {
+					count = query.count();
+					if (count==0) {
+						Log.i("UserName", "The username does NOT exist");
+						ParseObject newUser = new ParseObject(USER_TABLE);
+						newUser.put("name", thisUserName);
+						newUser.put("deviceId", android_id);
+						newUser.saveInBackground();
 
+						// Save that we've run this code
+						editor.putString("prefsUsername", thisUserName);
+						editor.commit();
+					} else {
+						Log.i("UserName", "The username exists");
+						Toast.makeText(getApplicationContext(), "Someone has already chosen this name, please choose a new one to continue",  Toast.LENGTH_LONG).show();
+						createDialogBox();
+					}
+				} catch (ParseException e) {
+					//TODO: Check later when this could be true.  
+					e.printStackTrace();
+				}
+			}
+		});
 
+		// creates alert dialog
+		AlertDialog alertDialog = alertDialogBuilder.create();
+
+		// show it
+		alertDialog.show();
+	}
 
 	protected String scrapWeb(Location location) throws IOException {
 		if(location==null) {
@@ -349,20 +373,21 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		THIS = this; 
 	}
 
-	protected void checkPostLocation(Location theLocation, String whichTable) {
+	protected void checkPostLocation(Location theLocation) {
 		try {
 			boolean result = checkLocation(theLocation);
 			//			System.out.println("the result is: "+result);
 			if(!result) {
-				locationItem = new ParseObject(whichTable);
-				locationItem.put("user", android_id);
-				locationItem.put("lat", theLocation.getLatitude());
-				locationItem.put("long", theLocation.getLongitude());
-				//				System.out.println("the latitude: "+theLocation.getLatitude());
-				//				System.out.println("the longitude: "+theLocation.getLongitude());
+				locationItem = new ParseObject(LOCATION_TABLE);
+				locationItem.put("deviceId", android_id);
+				locationItem.put("name", userNameInPref);
+				locationItem.put("latitude", theLocation.getLatitude());
+				locationItem.put("longitude", theLocation.getLongitude());
+				locationItem.saveEventually();
+				Log.i("Update", "Did update");
 			}
 			else {
-				//				System.out.println("DID NOT UPDATE");
+				Log.i("Update", "Did not update");
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -370,7 +395,6 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	}
 	@Override
 	public void onConnectionFailed(ConnectionResult result) {
-		//		System.out.println("onConnectionFAILED");
 	}
 	@Override
 	public void onConnected(Bundle connectionHint) {
