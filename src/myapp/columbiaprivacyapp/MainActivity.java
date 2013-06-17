@@ -87,33 +87,28 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	
 	//For Preferences
 	SharedPreferences prefs;
-	Editor editor = prefs.edit();
+	Editor editor;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-
-
-
+		
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-
+		
 		//Getting User name...
+		prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+		editor = prefs.edit();
 		String p = prefs.getString("prefUsername", "default");
 		if (p.equals("default")) {
 			createDialogBox();
 			p = prefs.getString("prefUsername", "default");
 		}
 
-
-
-
-
-
-
+		//TODO: Do this later 
+		//Creating Database for MapFragment
 		theDatabase = openOrCreateDatabase("MyDB", MODE_PRIVATE, null);
 		theDatabase.execSQL("CREATE TABLE IF NOT EXISTS LocationInfo (Latitude DOUBLE, Longitude DOUBLE, LocAssoc VARCHAR)");
-
 
 		//Communicating with DataSource
 		datasource = new BlacklistWordDataSource(this);
@@ -207,7 +202,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
 
 	    // set title
-	    alertDialogBuilder.setTitle("Please give Input");
+	    alertDialogBuilder.setTitle("Enter a Unique Username");
 
 	    // set dialog message
 	    alertDialogBuilder
