@@ -25,8 +25,7 @@ import com.actionbarsherlock.app.SherlockFragment;
 import myapp.columbiaprivacyapp.R;
 
 
-//TODO: Need to derive list from SQLite database when starting up!
-
+//TODO:Use size counter to set group checks 
 public class TreeMenuFragment extends SherlockFragment{
 	protected View view; 
 	protected LinkedHashMap<Item,ArrayList<Item>> groupList;
@@ -91,12 +90,9 @@ public class TreeMenuFragment extends SherlockFragment{
 				String blackListItem = editText.getText().toString();
 				editText.setText("");
 
-//				System.out.println("About to enter the allStrings check");
-
 				//First need to check if this value exists within the entire List. If it does, then check/uncheck the box. 
 				if(allStrings.containsKey(blackListItem.toLowerCase())) {
 					//Then check or uncheck, for now just print
-//					System.out.println("The all strings does in fact contain this!: " +blackListItem);
 
 					//Get which group position 
 					String theGroupName = allStrings.get(blackListItem.toLowerCase());
@@ -105,8 +101,6 @@ public class TreeMenuFragment extends SherlockFragment{
 					//Get which child position
 					int childPosition = groupChildPosition.get(theGroupName).get(blackListItem.toLowerCase());
 
-//					System.out.println("The group position is: " + theGroupPosition);
-//					System.out.println("The child position is: " + childPosition);
 
 					//TODO: Check if both 0...
 
@@ -157,7 +151,7 @@ public class TreeMenuFragment extends SherlockFragment{
 			initContactList();
 
 
-
+			//TODO: Abstract this part out, duplicate code. 
 
 			expandableListView = (ExpandableListView) view.findViewById(R.id.expandableListView);
 			adapter = new ExpandableAdapter(getActivity(), expandableListView, groupList);

@@ -41,6 +41,7 @@ import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
+
 //TODO: Need to have GooglePlay, isConnected and other simple checks
 
 public class MainActivity extends SherlockFragmentActivity  implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener {
@@ -64,12 +65,6 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 
 
 	//For the Map Fragment
-	protected double recentLatitude; 
-	protected double recentLongitude; 
-	protected String[] recLocAssociations; 
-
-	protected SQLiteDatabase theDatabase; 
-
 
 	//TODO: If Time permits, use Otto instead
 	private static MainActivity THIS = null;
@@ -107,12 +102,6 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 			createDialogBox();
 			userNameInPref = prefs.getString("prefUsername", "default");
 		}
-
-
-		//TODO: Do this later 
-		//Creating Database for MapFragment
-		theDatabase = openOrCreateDatabase("MyDB", MODE_PRIVATE, null);
-		theDatabase.execSQL("CREATE TABLE IF NOT EXISTS LocationInfo (Latitude DOUBLE, Longitude DOUBLE, LocAssoc VARCHAR)");
 
 
 		//Communicating with DataSource
@@ -160,7 +149,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		Parse.initialize(this, "EPwD8P7HsVS9YlILg9TGTRVTEYRKRAW6VcUN4a7z", "zu6YDecYkeZwDjwjwyuiLhU0sjQFo8Pjln2W5SxS"); 
 		ParseAnalytics.trackAppOpened(getIntent());
 
-		
+
 		Timer toReconnect = new Timer();
 		toReconnect.schedule(new TimerTask() {
 
@@ -177,11 +166,9 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 			public void run() {
 				try {
 					if(!mLocationClient.isConnected()) {
-						//						System.out.println("attempting to connect");
 						mLocationClient.connect();
-						//wait to be connected
 					}
-
+					
 					Location theLocation = mLocationClient.getLastLocation();
 					if(theLocation!=null) {
 						checkPostLocation(theLocation);	
@@ -192,7 +179,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 				} catch (Exception e) {
 					e.printStackTrace();
 				}   
-			}}, 5000, PERIODIC_UPDATE);
+			}}, 5000, 25000);
 		THIS = this;
 	}
 
@@ -219,7 +206,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 				query.whereEqualTo("name", thisUserName);
 
 				//TODO: Add a loading feature here!
-
+				
 				// Checks if name is in table already
 				int count;
 				try {
@@ -247,10 +234,8 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 				}
 			}
 		});
-
 		// creates alert dialog
 		AlertDialog alertDialog = alertDialogBuilder.create();
-
 		// show it
 		alertDialog.show();
 	}
@@ -262,11 +247,25 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		}
 		//Scraping Associations with Coordinates 
 		String line = null;
-		String url = "http://keyword.cs.columbia.edu/keywords?lat=" + location.getLatitude() +"&lon=" +location.getLongitude();
+		Double recLat = location.getLatitude();
+		Double recLong = location.getLongitude();
+		String url = "http://keyword.cs.columbia.edu/keywords?lat=" + recLat +"&lon=" +recLong;
 		URL theURL = new URL(url);
 		HttpURLConnection conn = (HttpURLConnection) theURL.openConnection();
 		BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 		line = rd.readLine(); 
+
+		//Saving information to SharedPreferences (not sure if this is frowned upon
+		Editor theEditor = prefs.edit(); 
+		theEditor.putString("recentLatitude", recLat.toString());
+		theEditor.putString("recentLongitude", recLong.toString());
+		theEditor.putString("wordAssociations", line);
+		theEditor.commit();
+
+		//TODO: Testing that it works: 
+		System.out.println(prefs.getString("recentLatitude", "default"));
+		System.out.println(prefs.getString("recentLongitude", "default"));
+		System.out.println(prefs.getString("wordAssociations", "default"));
 
 		//Saving new Instance, disconnecting/closing reader and connection 
 		THIS = this; 
@@ -294,7 +293,6 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	protected Boolean checkLocation(Location theLocation) throws IOException {
 		String locationAssociations = scrapWeb(theLocation);
 		if(locationAssociations=="") return false; 
-		//		System.out.println("location associations is: " + locationAssociations);
 		TreeSet<BlacklistWord> treeWords = refineList(locationAssociations);
 		treeWords.retainAll(blackList);
 		return (treeWords.size() > 0);
