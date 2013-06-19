@@ -42,6 +42,7 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
 import com.google.android.gms.common.GooglePlayServicesClient.OnConnectionFailedListener;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.location.LocationClient;
 import com.parse.Parse;
 import com.parse.ParseAnalytics;
@@ -97,6 +98,12 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+		int errorCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+		if (errorCode != ConnectionResult.SUCCESS) {
+			System.out.println("The Google Play Services do not exist");
+			GooglePlayServicesUtil.getErrorDialog(errorCode, this, 0).show();
+		}
 
 		android_id = Secure.getString(this.getContentResolver(), Secure.ANDROID_ID);
 
@@ -479,6 +486,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			if ("android.intent.action.BOOT_COMPLETED".equals(intent.getAction())) {
+				Log.i("Booting up", "The phone is successfully turning on this app on bootUP");
 				Intent serviceIntent = new Intent("myapp.columbiaprivacyapp.MySystemService");
 				context.startService(serviceIntent);
 			}

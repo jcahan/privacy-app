@@ -22,9 +22,7 @@ public class MapFrag extends SherlockFragment {
 	protected String[] assocArrayItems; 
 	protected ArrayAdapter<String> mapAdapter;
 	protected List assocList;
-	//TODO: Need to use SQLite, instead of just getInstance()....
 
-	 
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
 		if (mapFragView != null) {
 			ViewGroup parent = (ViewGroup) mapFragView.getParent();
@@ -36,7 +34,6 @@ public class MapFrag extends SherlockFragment {
 		} catch (InflateException e) {
 			/* map is already there, just return view as it is */
 		}
-
 		
 		//Creating MapFragment from SharedPreferences recently stored information 
 		SharedPreferences tmpManager = MainActivity.getInstance().prefs;
@@ -68,9 +65,13 @@ public class MapFrag extends SherlockFragment {
 				}
 			}
 		}
+		
 		//TODO: ERROR HERE !!!!!!!!ClassCastException NoSaveStateFrameLayout 
 		assocListView = (ListView) mapFragView.findViewById(R.id.map_frag_view);
-
+		
+		if(theList==null) {
+			theList = new String[0];
+		}
 		mapAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1,  theList);
 
 		assocListView.setAdapter(mapAdapter);
@@ -79,7 +80,7 @@ public class MapFrag extends SherlockFragment {
 		if(mapFragView != null) { return mapFragView;}
 
 		((ViewGroup) assocListView.getParent()).removeView(assocListView);
-
+		
 		container.addView(assocListView);
 		container.addView(mapFragView);
 
