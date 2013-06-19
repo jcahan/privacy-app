@@ -26,7 +26,7 @@
         android:cacheColorHint="@null"
         android:choiceMode="multipleChoice"
         android:groupIndicator="@null"
-        android:textSize="50sp" 
+        android:textSize="45pt" 
         android:scrollbars="none" />
 
 </LinearLayout>

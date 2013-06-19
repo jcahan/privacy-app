@@ -69,15 +69,13 @@ public class TreeMenuFragment extends SherlockFragment{
 		MainActivity.getInstance().invalidateOptionsMenu();
 		view = inflater.inflate(R.layout.treemenu, container, false);
 
-		//		System.out.println("should recreate in TreeMenuFragment");
-
-
 		//Creating AutoCompleteTextView, adding adapter, and notifying to update view
 		AutoCompleteTextView autoView = (AutoCompleteTextView) view.findViewById(R.id.edit_message);
 		String[] itemOptions = getResources().getStringArray(R.array.edit_message);
 
 		ArrayAdapter<String> theAdapter = 
-				new ArrayAdapter<String>(getActivity(), android.R.layout.simple_dropdown_item_1line, itemOptions);
+				new ArrayAdapter<String>(
+						getActivity(), android.R.layout.simple_dropdown_item_1line, itemOptions);
 		autoView.setAdapter(theAdapter);
 		autoView.setTextColor(Color.BLACK);
 		((BaseAdapter) autoView.getAdapter()).notifyDataSetChanged();
@@ -145,9 +143,9 @@ public class TreeMenuFragment extends SherlockFragment{
 	}
 
 	public TreeMenuFragment refresh() {
-//		System.out.println("Calls on it to refresh!!");
+		//		System.out.println("Calls on it to refresh!!");
 		if(expandableListView!=null) {
-//			System.out.println("it is not null");
+			//			System.out.println("it is not null");
 			initContactList();
 
 
@@ -161,7 +159,7 @@ public class TreeMenuFragment extends SherlockFragment{
 
 			for(BlacklistWord eachWord :setOfWords) {
 				String toCheck = eachWord.getWord(); 
-//				System.out.println("this word exists in the current datasource: " + toCheck);
+				//				System.out.println("this word exists in the current datasource: " + toCheck);
 				if(allStrings.containsKey(eachWord.getWord())) {
 					String theGroupName = allStrings.get(toCheck.toLowerCase());
 					int theGroupPosition = groupPositions.get(theGroupName);
@@ -179,7 +177,7 @@ public class TreeMenuFragment extends SherlockFragment{
 			}
 		}
 		else {
-//			System.out.println("IT IS NULL ");
+			//			System.out.println("IT IS NULL ");
 		}
 		return this; 
 	}
@@ -189,7 +187,7 @@ public class TreeMenuFragment extends SherlockFragment{
 	public void deleteFromMenu(String blackListItem) {
 		if(allStrings.containsKey(blackListItem.toLowerCase())) {
 			//Then check or uncheck, for now just print
-//			System.out.println("The all strings does in fact contain this!: " +blackListItem);
+			//			System.out.println("The all strings does in fact contain this!: " +blackListItem);
 
 			//Get which group position 
 			String theGroupName = allStrings.get(blackListItem.toLowerCase());
@@ -198,8 +196,8 @@ public class TreeMenuFragment extends SherlockFragment{
 			//Get which child position
 			int childPosition = groupChildPosition.get(theGroupName).get(blackListItem.toLowerCase());
 
-//			System.out.println("The group position is: " + theGroupPosition);
-//			System.out.println("The child position is: " + childPosition);
+			//			System.out.println("The group position is: " + theGroupPosition);
+			//			System.out.println("The child position is: " + childPosition);
 
 			//TODO: Check if both 0...
 
@@ -246,7 +244,7 @@ public class TreeMenuFragment extends SherlockFragment{
 		groupList = new LinkedHashMap<Item,ArrayList<Item>>();
 
 		ArrayList<Item> groupsList = fetchGroups();
-//		Log.i("GroupsListSize",String.valueOf(groupsList.size()));
+		//		Log.i("GroupsListSize",String.valueOf(groupsList.size()));
 		int whatGroup = 0; 
 		for(Item item:groupsList){
 			String[] ids = item.id.split(",");

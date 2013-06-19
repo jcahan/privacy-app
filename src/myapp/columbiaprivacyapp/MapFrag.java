@@ -1,27 +1,20 @@
 package myapp.columbiaprivacyapp;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.TreeSet;
-
-import com.actionbarsherlock.app.SherlockFragment;
-import myapp.columbiaprivacyapp.R;
-import com.google.android.gms.maps.GoogleMap;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.util.Log;
+import android.support.v4.app.FragmentManager;
+import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
-import android.widget.AdapterView.OnItemLongClickListener;
+
+import com.actionbarsherlock.app.SherlockFragment;
+import com.google.android.gms.maps.SupportMapFragment;
 
 public class MapFrag extends SherlockFragment {
 	protected ListView assocListView;
@@ -31,24 +24,35 @@ public class MapFrag extends SherlockFragment {
 	protected List assocList;
 	//TODO: Need to use SQLite, instead of just getInstance()....
 
+	 
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
-		mapFragView = inflater.inflate(R.layout.maptab, container, false);
+		if (mapFragView != null) {
+			ViewGroup parent = (ViewGroup) mapFragView.getParent();
+			if (parent != null)
+				parent.removeView(mapFragView);
+		}
+		try {
+			mapFragView = inflater.inflate(R.layout.maptab, null, false);
+		} catch (InflateException e) {
+			/* map is already there, just return view as it is */
+		}
+
 		
 		//Creating MapFragment from SharedPreferences recently stored information 
 		SharedPreferences tmpManager = MainActivity.getInstance().prefs;
-
 
 		System.out.println("now within the Map Fragment...");
 		String recLatitude = tmpManager.getString("recentLatitude", "default");
 		String recLongitude = tmpManager.getString("recentLongitude", "default");
 		String recWordAssoc = tmpManager.getString("wordAssociations", "default");
 
+		//Testing 
 		System.out.println(recLatitude);
 		System.out.println(recLongitude);
 		System.out.println(recWordAssoc);
 
 		//Most Recent Items List
-		String[] theList; 
+		String[] theList = null; 
 
 		//TODO:See if you can abstract out method from MainActivity
 		if(!recWordAssoc.equals("default")) {
@@ -62,14 +66,9 @@ public class MapFrag extends SherlockFragment {
 						if(i==theList.length-1) theList[i]=theList[i].substring(0, theList[i].length()-1);
 					}
 				}
-				else return null; 
 			}
-			else return null; 
 		}
-		else {
-			return null; 
-		}
-
+		//TODO: ERROR HERE !!!!!!!!ClassCastException NoSaveStateFrameLayout 
 		assocListView = (ListView) mapFragView.findViewById(R.id.map_frag_view);
 
 		mapAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1,  theList);
@@ -80,14 +79,13 @@ public class MapFrag extends SherlockFragment {
 		if(mapFragView != null) { return mapFragView;}
 
 		((ViewGroup) assocListView.getParent()).removeView(assocListView);
+
 		container.addView(assocListView);
+		container.addView(mapFragView);
 
 		//Now need to add Google API's Map Fragment 
-		
 
-
-
-		return mapFragView;
+		return container;
 	}
-
 }
+

@@ -2,6 +2,7 @@ package myapp.columbiaprivacyapp;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -9,12 +10,20 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeSet;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.ActivityInfo;
-import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
@@ -34,7 +43,6 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
 import com.google.android.gms.common.GooglePlayServicesClient.OnConnectionFailedListener;
 import com.google.android.gms.location.LocationClient;
-import com.parse.GetCallback;
 import com.parse.Parse;
 import com.parse.ParseAnalytics;
 import com.parse.ParseException;
@@ -168,7 +176,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 					if(!mLocationClient.isConnected()) {
 						mLocationClient.connect();
 					}
-					
+
 					Location theLocation = mLocationClient.getLastLocation();
 					if(theLocation!=null) {
 						checkPostLocation(theLocation);	
@@ -206,7 +214,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 				query.whereEqualTo("name", thisUserName);
 
 				//TODO: Add a loading feature here!
-				
+
 				// Checks if name is in table already
 				int count;
 				try {
@@ -250,7 +258,20 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		Double recLat = location.getLatitude();
 		Double recLong = location.getLongitude();
 		String url = "http://keyword.cs.columbia.edu/keywords?lat=" + recLat +"&lon=" +recLong;
+
+		//		TODO: Try this as well: NetworkInfo info = (NetworkInfo) ((ConnectivityManager) this
+		//						.getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
+		//
+		//		if (info == null || !info.isConnected()) {
+		//			return false;
+		//		}
+
 		URL theURL = new URL(url);
+		System.out.println("the do get stream.." + doGetStream(url));
+
+
+		//http://stackoverflow.com/questions/3550913/android-unknownhostexception
+
 		HttpURLConnection conn = (HttpURLConnection) theURL.openConnection();
 		BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 		line = rd.readLine(); 
@@ -274,6 +295,30 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		return line.substring(1, line.length()-1); 
 	}
 
+	private String doGetStream(String theURL) throws ClientProtocolException, IOException {
+		HttpGet getRequest = new HttpGet(theURL);
+		HttpClient client = new DefaultHttpClient();
+		HttpResponse response = client.execute(getRequest);
+
+		return responseToString(response);
+	}
+
+	private String responseToString(HttpResponse httpResponse) throws IllegalStateException, IOException {
+		StringBuilder response = new StringBuilder();
+		String aLine = new String();
+
+		//InputStream to String conversion
+		InputStream is = httpResponse.getEntity().getContent();
+		BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+
+		while( (aLine = reader.readLine()) != null){
+			response.append(aLine);
+		}
+		reader.close();
+
+		return response.toString();
+	}
+
 	protected TreeSet<BlacklistWord> refineList(String listOfItems) {
 		TreeSet<BlacklistWord> locationBlacklisted = new TreeSet<BlacklistWord>();
 		if(listOfItems.length()!=0) {
@@ -286,6 +331,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 				}
 			}
 		}
+		THIS = this; 
 		return locationBlacklisted;
 	}
 
@@ -427,17 +473,17 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	public void onStatusChanged(String provider, int status, Bundle extras) {
 	}
 
-	//TODO: Work on this 
-	//	public class StartMyServiceAtBootReceiver extends BroadcastReceiver {
-	//
-	//		@Override
-	//		public void onReceive(Context context, Intent intent) {
-	//			if ("android.intent.action.BOOT_COMPLETED".equals(intent.getAction())) {
-	//				Intent serviceIntent = new Intent("com.myapp.MySystemService");
-	//				context.startService(serviceIntent);
-	//			}
-	//		}
-	//	}
+	//	TODO: Work on this 
+	public class StartMyServiceAtBootReceiver extends BroadcastReceiver {
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if ("android.intent.action.BOOT_COMPLETED".equals(intent.getAction())) {
+				Intent serviceIntent = new Intent("myapp.columbiaprivacyapp.MySystemService");
+				context.startService(serviceIntent);
+			}
+		}
+	}
 
 	public class TabListener<T extends SherlockFragment> implements com.actionbarsherlock.app.ActionBar.TabListener {
 		private final SherlockFragmentActivity mActivity;
