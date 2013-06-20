@@ -239,11 +239,9 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 			public void onCheckedChanged(CompoundButton buttonView,
 					boolean isChecked) {
 				if (checkAll) {
-					//					System.out.println("ALL OF THE ITEMS ARE BEING UPDATED!!");
-					//					Log.i("All items should be affected!!", "All are being affected");
 					ArrayList<Item> childItem = getChild(groupItem);
-
 					MainActivity.getInstance().refreshBlackListTree();
+
 					//Entire group is checked, add each item
 					if(isChecked) {
 						for (Item children : childItem) {
