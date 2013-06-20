@@ -5,6 +5,7 @@ import java.util.List;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.SurfaceView;
@@ -15,6 +16,8 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 
 import com.actionbarsherlock.app.SherlockFragment;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.SupportMapFragment;
 
 public class MapFrag extends SherlockFragment {
 	protected ListView assocListView;
@@ -22,7 +25,8 @@ public class MapFrag extends SherlockFragment {
 	protected String[] assocArrayItems; 
 	protected ArrayAdapter<String> mapAdapter;
 	protected List assocList;
-
+	private SupportMapFragment supportMapFragment; 
+	
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
 		//Checks if GooglePlayService is On--> Should take this out once first check forces user to have it 
 		boolean ifPlay = MainActivity.getInstance().checkIfGooglePlay();
@@ -65,25 +69,19 @@ public class MapFrag extends SherlockFragment {
 		assocListView.setAdapter(mapAdapter);
 		((BaseAdapter) assocListView.getAdapter()).notifyDataSetChanged();
 
-
 		
 		if(mapFragView != null) { 
-			setMapTransparent((ViewGroup)mapFragView);
 			return mapFragView;
 		}
 
 		((ViewGroup) assocListView.getParent()).removeView(assocListView);
 
-
 		container.addView(assocListView);
-		container.addView(mapFragView);
-
-		//Now need to add Google API's Map Fragment 
+		//		container.addView(mapFragView);
 
 		setMapTransparent(container);
 		return container;
 	}
-
 
 	private String[] buildList(String recWordAssoc) {
 		String[] theList = null; 

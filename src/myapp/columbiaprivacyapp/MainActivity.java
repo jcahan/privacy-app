@@ -70,7 +70,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	private String android_id; 
 
 	private int PERIODIC_UPDATE = 60000*60;  //gets location and disconnects every hour
-	private int PERIODIC_RECONNECTION_UPDATE = 60000*59;  //connects 1 minute before getLocation call
+	private int PERIODIC_RECONNECTION_UPDATE = 60000*58;  //connects 2 minutes before getLocation call
 
 
 	//For the Map Fragment
