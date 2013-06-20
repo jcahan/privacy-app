@@ -99,11 +99,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		setContentView(R.layout.activity_main);
 		setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-		int errorCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
-		if (errorCode != ConnectionResult.SUCCESS) {
-			System.out.println("The Google Play Services do not exist");
-			GooglePlayServicesUtil.getErrorDialog(errorCode, this, 0).show();
-		}
+		checkIfGooglePlay();
 
 		android_id = Secure.getString(this.getContentResolver(), Secure.ANDROID_ID);
 
@@ -194,8 +190,18 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 				} catch (Exception e) {
 					e.printStackTrace();
 				}   
-			}}, 5000, 25000);
+			}}, 5000, PERIODIC_UPDATE);
 		THIS = this;
+	}
+
+	protected Boolean checkIfGooglePlay() {
+		int errorCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+		if (errorCode != ConnectionResult.SUCCESS) {
+			System.out.println("The Google Play Services do not exist");
+			GooglePlayServicesUtil.getErrorDialog(errorCode, this, 0).show();
+			return false; 
+		}
+		return true;
 	}
 
 	public void createDialogBox() 
@@ -480,7 +486,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	public void onStatusChanged(String provider, int status, Bundle extras) {
 	}
 
-	//	TODO: Work on this 
+	//Check if GooglePlay and Name currently exists before continuing with this! 
 	public class StartMyServiceAtBootReceiver extends BroadcastReceiver {
 
 		@Override

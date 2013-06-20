@@ -3,10 +3,11 @@ package myapp.columbiaprivacyapp;
 import java.util.List;
 
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
 import android.view.InflateException;
 import android.view.LayoutInflater;
+import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -14,7 +15,6 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 
 import com.actionbarsherlock.app.SherlockFragment;
-import com.google.android.gms.maps.SupportMapFragment;
 
 public class MapFrag extends SherlockFragment {
 	protected ListView assocListView;
@@ -24,17 +24,25 @@ public class MapFrag extends SherlockFragment {
 	protected List assocList;
 
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
-		if (mapFragView != null) {
-			ViewGroup parent = (ViewGroup) mapFragView.getParent();
-			if (parent != null)
-				parent.removeView(mapFragView);
+
+		boolean ifPlay = MainActivity.getInstance().checkIfGooglePlay();
+
+		if(ifPlay) {
+			if (mapFragView != null) {
+				ViewGroup parent = (ViewGroup) mapFragView.getParent();
+				if (parent != null)
+					parent.removeView(mapFragView);
+			}
+			try {
+				mapFragView = inflater.inflate(R.layout.maptab, null, false);
+			} catch (InflateException e) {
+				/* map is already there, just return view as it is */
+			}
 		}
-		try {
-			mapFragView = inflater.inflate(R.layout.maptab, null, false);
-		} catch (InflateException e) {
-			/* map is already there, just return view as it is */
-		}
+
+
 		
+
 		//Creating MapFragment from SharedPreferences recently stored information 
 		SharedPreferences tmpManager = MainActivity.getInstance().prefs;
 
@@ -47,11 +55,39 @@ public class MapFrag extends SherlockFragment {
 		System.out.println(recLatitude);
 		System.out.println(recLongitude);
 		System.out.println(recWordAssoc);
-
 		//Most Recent Items List
 		String[] theList = null; 
 
-		//TODO:See if you can abstract out method from MainActivity
+		//Building list 
+		buildList(theList, recWordAssoc);
+
+		//TODO: ERROR HERE !!!!!!!!ClassCastException NoSaveStateFrameLayout 
+		assocListView = (ListView) mapFragView.findViewById(R.id.map_frag_view);
+
+		if(theList==null) {
+			theList = new String[0];
+		}
+		mapAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1,  theList);
+
+		assocListView.setAdapter(mapAdapter);
+		((BaseAdapter) assocListView.getAdapter()).notifyDataSetChanged();
+
+		if(mapFragView != null) { return mapFragView;}
+
+		setMapTransparent((ViewGroup)mapFragView);
+
+		((ViewGroup) assocListView.getParent()).removeView(assocListView);
+
+		container.addView(assocListView);
+		container.addView(mapFragView);
+
+		//Now need to add Google API's Map Fragment 
+
+		return container;
+	}
+
+	
+	private String[] buildList(String[] theList, String recWordAssoc) {
 		if(!recWordAssoc.equals("default")) {
 			if(recWordAssoc.charAt(1)!=']') {
 				if(recWordAssoc.length()>0) {
@@ -65,28 +101,19 @@ public class MapFrag extends SherlockFragment {
 				}
 			}
 		}
-		
-		//TODO: ERROR HERE !!!!!!!!ClassCastException NoSaveStateFrameLayout 
-		assocListView = (ListView) mapFragView.findViewById(R.id.map_frag_view);
-		
-		if(theList==null) {
-			theList = new String[0];
+		return theList; 
+	}
+
+	private void setMapTransparent(ViewGroup group) {
+		int childCount = group.getChildCount();
+		for (int i = 0; i < childCount; i++) {
+			View child = group.getChildAt(i);
+			if (child instanceof ViewGroup) {
+				setMapTransparent((ViewGroup) child);
+			} else if (child instanceof SurfaceView) {
+				child.setBackgroundColor(Color.TRANSPARENT);
+			}
 		}
-		mapAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1,  theList);
-
-		assocListView.setAdapter(mapAdapter);
-		((BaseAdapter) assocListView.getAdapter()).notifyDataSetChanged();
-
-		if(mapFragView != null) { return mapFragView;}
-
-		((ViewGroup) assocListView.getParent()).removeView(assocListView);
-		
-		container.addView(assocListView);
-		container.addView(mapFragView);
-
-		//Now need to add Google API's Map Fragment 
-
-		return container;
 	}
 }
 
