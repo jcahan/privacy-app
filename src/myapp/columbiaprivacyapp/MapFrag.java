@@ -24,7 +24,7 @@ public class MapFrag extends SherlockFragment {
 	protected List assocList;
 
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
-
+		//Checks if GooglePlayService is On--> Should take this out once first check forces user to have it 
 		boolean ifPlay = MainActivity.getInstance().checkIfGooglePlay();
 
 		if(ifPlay) {
@@ -40,9 +40,6 @@ public class MapFrag extends SherlockFragment {
 			}
 		}
 
-
-		
-
 		//Creating MapFragment from SharedPreferences recently stored information 
 		SharedPreferences tmpManager = MainActivity.getInstance().prefs;
 
@@ -55,39 +52,41 @@ public class MapFrag extends SherlockFragment {
 		System.out.println(recLatitude);
 		System.out.println(recLongitude);
 		System.out.println(recWordAssoc);
-		//Most Recent Items List
-		String[] theList = null; 
 
 		//Building list 
-		buildList(theList, recWordAssoc);
-
-		//TODO: ERROR HERE !!!!!!!!ClassCastException NoSaveStateFrameLayout 
+		String[] theList = buildList(recWordAssoc);
 		assocListView = (ListView) mapFragView.findViewById(R.id.map_frag_view);
 
 		if(theList==null) {
 			theList = new String[0];
 		}
-		mapAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1,  theList);
 
+		mapAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1,  theList);
 		assocListView.setAdapter(mapAdapter);
 		((BaseAdapter) assocListView.getAdapter()).notifyDataSetChanged();
 
-		if(mapFragView != null) { return mapFragView;}
 
-		setMapTransparent((ViewGroup)mapFragView);
+		
+		if(mapFragView != null) { 
+			setMapTransparent((ViewGroup)mapFragView);
+			return mapFragView;
+		}
 
 		((ViewGroup) assocListView.getParent()).removeView(assocListView);
+
 
 		container.addView(assocListView);
 		container.addView(mapFragView);
 
 		//Now need to add Google API's Map Fragment 
 
+		setMapTransparent(container);
 		return container;
 	}
 
-	
-	private String[] buildList(String[] theList, String recWordAssoc) {
+
+	private String[] buildList(String recWordAssoc) {
+		String[] theList = null; 
 		if(!recWordAssoc.equals("default")) {
 			if(recWordAssoc.charAt(1)!=']') {
 				if(recWordAssoc.length()>0) {

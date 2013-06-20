@@ -107,13 +107,10 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 		} 
 		else {
 			holder = (ChildHolder) convertView.getTag();
-			//			holder.cb.setOnCheckedChangeListener(null);
 		}
 		final Item child = getChild(groupPosition, childPosition);
 		holder.cb.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-
-
 				//TODO: Total hack, change later 
 				boolean firstActionOkay = false; 
 				if(lastAction==0) {
@@ -128,14 +125,12 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 				}
 				//TODO: Might be too high
 				else if(System.currentTimeMillis() - lastGroupAction < 145) {
-					//					System.out.println("Returning because of group");
 					return; 
 				}
 				else {
-					//					System.out.println("change in group: " + (System.currentTimeMillis() - lastGroupAction));
-					//					System.out.println("is Checked..." + isChecked);
 					lastAction = System.currentTimeMillis();
 				}
+
 				firstActionOkay = false; //might be an unnecessary line  
 
 				Item parentGroup = getGroup(groupPosition);

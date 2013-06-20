@@ -19,10 +19,8 @@ import android.widget.AutoCompleteTextView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ExpandableListView;
-import android.widget.ExpandableListView.OnGroupClickListener;
 
 import com.actionbarsherlock.app.SherlockFragment;
-import myapp.columbiaprivacyapp.R;
 
 
 //TODO:Use size counter to set group checks 
@@ -36,6 +34,7 @@ public class TreeMenuFragment extends SherlockFragment{
 	private LinkedHashMap<Item, ArrayList<Item>> myHistory;
 
 	//All strings within string, and whether they are in array 
+
 	//(Key: TextEntry, Value: String Table) 
 	private HashMap<String, String> allStrings = new HashMap<String, String>();
 	private HashMap<String, Integer> groupPositions = new HashMap<String, Integer>();
@@ -64,6 +63,12 @@ public class TreeMenuFragment extends SherlockFragment{
 	private HashMap<String, Integer>  relMap= new HashMap<String, Integer>();
 	private HashMap<String, Integer>  restMap= new HashMap<String, Integer>();
 	private HashMap<String, Integer>  shopMap= new HashMap<String, Integer>();
+
+	//For setting the parent checkbox to true
+	private Integer[] eachGroupSize = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,};
+	
+	private Integer[] actualGroupSize = {79, 30, 22, 24, 5, 27, 105, 48, 76, 29, 105, 1, 32, 4, 105, 10, 35, 13, 29, 6, 209, 105}; 
+	
 
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
 		MainActivity.getInstance().invalidateOptionsMenu();
@@ -133,6 +138,7 @@ public class TreeMenuFragment extends SherlockFragment{
 		return view;
 	}
 
+	//Collapses all windows 
 	public void collapseAll() {
 		if(expandableListView!=null) {
 			for(int i=0; i<expandableListView.getCount(); i++)
@@ -142,27 +148,25 @@ public class TreeMenuFragment extends SherlockFragment{
 		}
 	}
 
+	//Refreshes the TreeMenuFragment with Updated 
+	//TODO: Need to abstract parts of this out 
 	public TreeMenuFragment refresh() {
-		//		System.out.println("Calls on it to refresh!!");
 		if(expandableListView!=null) {
-			//			System.out.println("it is not null");
 			initContactList();
 
-
 			//TODO: Abstract this part out, duplicate code. 
-
 			expandableListView = (ExpandableListView) view.findViewById(R.id.expandableListView);
 			adapter = new ExpandableAdapter(getActivity(), expandableListView, groupList);
 			TreeSet<BlacklistWord> setOfWords =  MainActivity.getInstance().datasource.GetAllWords();
 
 			expandableListView.setAdapter(adapter);
-
 			for(BlacklistWord eachWord :setOfWords) {
 				String toCheck = eachWord.getWord(); 
-				//				System.out.println("this word exists in the current datasource: " + toCheck);
 				if(allStrings.containsKey(eachWord.getWord())) {
 					String theGroupName = allStrings.get(toCheck.toLowerCase());
 					int theGroupPosition = groupPositions.get(theGroupName);
+					incrementGroupSize(theGroupPosition);
+
 
 					//Get which child position
 					int childPosition = groupChildPosition.get(theGroupName).get(toCheck.toLowerCase());
@@ -170,36 +174,36 @@ public class TreeMenuFragment extends SherlockFragment{
 					//TODO: Check if both 0...
 
 					Item theItem = adapter.getChild(theGroupPosition, childPosition);
-					if(theItem==null) break; //TODO: Test if this will happen --> it should not!
+					if(theItem==null) break; 
 					theItem.isChecked = true; 
 				}
 				((BaseAdapter) expandableListView.getAdapter()).notifyDataSetChanged();
 			}
 		}
 		else {
-			//			System.out.println("IT IS NULL ");
+
 		}
 		return this; 
 	}
 
 
+	private void incrementGroupSize(int groupSize) {
+		eachGroupSize[groupSize]++; 
+		if(eachGroupSize[groupSize]==actualGroupSize[groupSize]) {
+			Log.i("Setting entire group to true", "setting this group to true " + eachGroupSize[groupSize]);
+			adapter.getGroup(groupSize).isChecked = true; 
+		}
+	}
+
 	//TODO: Abstract this out later
 	public void deleteFromMenu(String blackListItem) {
 		if(allStrings.containsKey(blackListItem.toLowerCase())) {
-			//Then check or uncheck, for now just print
-			//			System.out.println("The all strings does in fact contain this!: " +blackListItem);
-
 			//Get which group position 
 			String theGroupName = allStrings.get(blackListItem.toLowerCase());
 			int theGroupPosition = groupPositions.get(theGroupName);
 
 			//Get which child position
 			int childPosition = groupChildPosition.get(theGroupName).get(blackListItem.toLowerCase());
-
-			//			System.out.println("The group position is: " + theGroupPosition);
-			//			System.out.println("The child position is: " + childPosition);
-
-			//TODO: Check if both 0...
 
 			Item theItem = adapter.getChild(theGroupPosition, childPosition);
 			if(theItem==null) return; //TODO: Test if this will happen --> it should not!
@@ -244,7 +248,7 @@ public class TreeMenuFragment extends SherlockFragment{
 		groupList = new LinkedHashMap<Item,ArrayList<Item>>();
 
 		ArrayList<Item> groupsList = fetchGroups();
-		//		Log.i("GroupsListSize",String.valueOf(groupsList.size()));
+
 		int whatGroup = 0; 
 		for(Item item:groupsList){
 			String[] ids = item.id.split(",");
@@ -252,11 +256,6 @@ public class TreeMenuFragment extends SherlockFragment{
 
 			for(int i=0;i<ids.length;i++){
 				String groupId = ids[i];
-
-				//TODO: 
-
-
-
 				groupMembers.addAll(fetchGroupMembers(groupId));
 			}
 			String shortName = item.name;
@@ -321,7 +320,7 @@ public class TreeMenuFragment extends SherlockFragment{
 				item.id=groupName = "Mass Media";
 			}
 			else if(i==14) {
-				item.id=groupName = "Night Life";
+				item.id=groupName = "Nightlife";
 			}
 			else if(i==15) {
 				item.id=groupName = "Pets";
@@ -382,7 +381,7 @@ public class TreeMenuFragment extends SherlockFragment{
 			groupMembers = addMyMembers(toAdd, "bicycles", bicylMap);
 		}
 		else if(groupId.equals("Education")) {
-			String[] toAdd = {"education","adult education","college counseling","colleges & universities","educational services","elementary schools","middle schools & high schools","preschools","private schools","private tutors","religious schools","special education","specialty schools","art schools","cpr classes","circus schools","cooking schools","cosmetology schools","dance schools","driving schools","first aid classes","flight instruction","language schools","massage schools","swimming lessons/schools","vocational & technical school","test preparation","tutoring centers"};
+			String[] toAdd = {"education","adult education","college counseling","colleges & universities","educational services","elementary schools","middle schools & high schools","preschools","private schools","private tutors","religious schools","special education","specialty schools","art schools","cpr classes","circus schools","cooking schools","cosmetology schools","dance schools","driving schools","first aid classes","flight instruction","language schools","massage schools","vocational & technical school","test preparation","tutoring centers"};
 			groupMembers = addMyMembers(toAdd, "education", educMap);
 		}
 		else if(groupId.equals("Event Planning & Services ")) {
