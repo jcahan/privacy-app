@@ -1,11 +1,8 @@
 package myapp.columbiaprivacyapp;
 
-import java.util.List;
-
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
 import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.SurfaceView;
@@ -16,17 +13,20 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 
 import com.actionbarsherlock.app.SherlockFragment;
-import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
 
 public class MapFrag extends SherlockFragment {
-	protected ListView assocListView;
-	protected View mapFragView;
-	protected String[] assocArrayItems; 
-	protected ArrayAdapter<String> mapAdapter;
-	protected List assocList;
-	private SupportMapFragment supportMapFragment; 
-	
+	private static final LatLng MY_LOCATION = null;
+	private ListView assocListView;
+	private View mapFragView;
+	private String[] assocArrayItems; 
+	private ArrayAdapter<String> mapAdapter;
+	private final LatLng LOCATION_BURNABY = new LatLng(49.27645, -122.917587);
+
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
 		//Checks if GooglePlayService is On--> Should take this out once first check forces user to have it 
 		boolean ifPlay = MainActivity.getInstance().checkIfGooglePlay();
@@ -42,7 +42,12 @@ public class MapFrag extends SherlockFragment {
 			} catch (InflateException e) {
 				/* map is already there, just return view as it is */
 			}
-		}
+
+			GoogleMap supportMap = ((SupportMapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
+			CameraUpdate update = CameraUpdateFactory.newLatLng(MY_LOCATION);
+			supportMap.animateCamera(update);
+		}		
+
 
 		//Creating MapFragment from SharedPreferences recently stored information 
 		SharedPreferences tmpManager = MainActivity.getInstance().prefs;
@@ -69,7 +74,7 @@ public class MapFrag extends SherlockFragment {
 		assocListView.setAdapter(mapAdapter);
 		((BaseAdapter) assocListView.getAdapter()).notifyDataSetChanged();
 
-		
+
 		if(mapFragView != null) { 
 			return mapFragView;
 		}
@@ -77,9 +82,8 @@ public class MapFrag extends SherlockFragment {
 		((ViewGroup) assocListView.getParent()).removeView(assocListView);
 
 		container.addView(assocListView);
-		//		container.addView(mapFragView);
 
-		setMapTransparent(container);
+		//		setMapTransparent(container);
 		return container;
 	}
 
