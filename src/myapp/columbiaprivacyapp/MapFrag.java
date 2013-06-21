@@ -19,6 +19,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MapFrag extends SherlockFragment {
 	private static final LatLng MY_LOCATION = null;
@@ -30,9 +31,9 @@ public class MapFrag extends SherlockFragment {
 	private MapView mapView; 
 
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
+
 		//Checks if GooglePlayService is On--> Should take this out once first check forces user to have it 
 		boolean ifPlay = MainActivity.getInstance().checkIfGooglePlay();
-
 		if(ifPlay) {
 			if (mapFragView != null) {
 				ViewGroup parent = (ViewGroup) mapFragView.getParent();
@@ -46,31 +47,26 @@ public class MapFrag extends SherlockFragment {
 			}
 
 			SupportMapFragment mapFrag= (SupportMapFragment)getSherlockActivity().getSupportFragmentManager().findFragmentById(R.id.map);
-			if(mapFrag==null) System.out.println("the support map is null!!");
-			else {
-				System.out.println("not null!!");
+			if(mapFrag!=null)  {
 				GoogleMap googleMap = mapFrag.getMap();
-				if(googleMap==null) System.out.println("the google map is null");
-				else {
-					System.out.println("the google map is not null");
-					CameraUpdate update = CameraUpdateFactory.newLatLngZoom(LOCATION_COLUMBIA, 16);
-					googleMap.animateCamera(update);
+				if(googleMap!=null){
+					LatLng theLatLng = makeNewLatLng();
+					if(theLatLng!=null) {
+						CameraUpdate update = CameraUpdateFactory.newLatLngZoom(theLatLng, 13);
+						googleMap.animateCamera(update);
+						googleMap.addMarker(new MarkerOptions().position(theLatLng).title("Most Recent Location"));
+					}
 				}
 			}
 		}		
-
 
 		//Creating MapFragment from SharedPreferences recently stored information 
 		SharedPreferences tmpManager = MainActivity.getInstance().prefs;
 
 		System.out.println("now within the Map Fragment...");
-		String recLatitude = tmpManager.getString("recentLatitude", "default");
-		String recLongitude = tmpManager.getString("recentLongitude", "default");
 		String recWordAssoc = tmpManager.getString("wordAssociations", "default");
 
 		//Testing 
-		System.out.println(recLatitude);
-		System.out.println(recLongitude);
 		System.out.println(recWordAssoc);
 
 		//Building list 
@@ -96,6 +92,23 @@ public class MapFrag extends SherlockFragment {
 
 		//		setMapTransparent(container);
 		return container;
+	}
+
+	private LatLng makeNewLatLng() {
+		//Creating MapFragment from SharedPreferences recently stored information 
+		SharedPreferences tmpManager = MainActivity.getInstance().prefs;
+		LatLng toReturnLatLng = null;
+		String recLatitude = tmpManager.getString("recentLatitude", "default");
+		String recLongitude = tmpManager.getString("recentLongitude", "default");
+		if((!recLatitude.equals("default"))&&(!recLongitude.equals("default"))) {
+			double remLat = Double.parseDouble(recLatitude);
+			double remLong = Double.parseDouble(recLongitude);
+			toReturnLatLng = new LatLng(remLat, remLong);
+		}
+		//Testing 
+		System.out.println(recLatitude);
+		System.out.println(recLongitude);
+		return toReturnLatLng;
 	}
 
 	private String[] buildList(String recWordAssoc) {
