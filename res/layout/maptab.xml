@@ -8,10 +8,19 @@
     <fragment
         android:id="@+id/map"
         android:layout_width="match_parent"
+        android:layout_margin="10dp"
         android:layout_height="0dp"
         android:layout_weight="1"
         class="com.google.android.gms.maps.SupportMapFragment" />
-
+	
+	<TextView
+        android:id="@+id/texview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:layout_gravity="center"
+        android:text="@string/header_text" />
+	
     <ListView
         android:id="@+id/map_frag_view"
         android:layout_width="match_parent"

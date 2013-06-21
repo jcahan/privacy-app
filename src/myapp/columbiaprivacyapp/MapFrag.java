@@ -60,17 +60,8 @@ public class MapFrag extends SherlockFragment {
 			}
 		}		
 
-		//Creating MapFragment from SharedPreferences recently stored information 
-		SharedPreferences tmpManager = MainActivity.getInstance().prefs;
-
-		System.out.println("now within the Map Fragment...");
-		String recWordAssoc = tmpManager.getString("wordAssociations", "default");
-
-		//Testing 
-		System.out.println(recWordAssoc);
-
 		//Building list 
-		String[] theList = buildList(recWordAssoc);
+		String[] theList = buildList();
 		assocListView = (ListView) mapFragView.findViewById(R.id.map_frag_view);
 
 		if(theList==null) {
@@ -105,13 +96,12 @@ public class MapFrag extends SherlockFragment {
 			double remLong = Double.parseDouble(recLongitude);
 			toReturnLatLng = new LatLng(remLat, remLong);
 		}
-		//Testing 
-		System.out.println(recLatitude);
-		System.out.println(recLongitude);
 		return toReturnLatLng;
 	}
 
-	private String[] buildList(String recWordAssoc) {
+	private String[] buildList() {
+		SharedPreferences tmpManager = MainActivity.getInstance().prefs;
+		String recWordAssoc = tmpManager.getString("wordAssociations", "default");
 		String[] theList = null; 
 		if(!recWordAssoc.equals("default")) {
 			if(recWordAssoc.charAt(1)!=']') {
@@ -129,16 +119,16 @@ public class MapFrag extends SherlockFragment {
 		return theList; 
 	}
 
-	private void setMapTransparent(ViewGroup group) {
-		int childCount = group.getChildCount();
-		for (int i = 0; i < childCount; i++) {
-			View child = group.getChildAt(i);
-			if (child instanceof ViewGroup) {
-				setMapTransparent((ViewGroup) child);
-			} else if (child instanceof SurfaceView) {
-				child.setBackgroundColor(Color.TRANSPARENT);
-			}
-		}
-	}
+	//	private void setMapTransparent(ViewGroup group) {
+	//		int childCount = group.getChildCount();
+	//		for (int i = 0; i < childCount; i++) {
+	//			View child = group.getChildAt(i);
+	//			if (child instanceof ViewGroup) {
+	//				setMapTransparent((ViewGroup) child);
+	//			} else if (child instanceof SurfaceView) {
+	//				child.setBackgroundColor(Color.TRANSPARENT);
+	//			}
+	//		}
+	//	}
 }
 

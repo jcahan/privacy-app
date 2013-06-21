@@ -113,7 +113,8 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 			createDialogBox();
 			userNameInPref = prefs.getString("prefUsername", "default");
 		}
-		
+
+
 		//Communicating with DataSource
 		datasource = new BlacklistWordDataSource(this);
 		datasource.open();
@@ -285,10 +286,11 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 
 
 		//http://stackoverflow.com/questions/3550913/android-unknownhostexception
+
 		HttpURLConnection conn = (HttpURLConnection) theURL.openConnection();
 		BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 		line = rd.readLine(); 
-		
+
 		//Saving information to SharedPreferences (not sure if this is frowned upon
 		Editor theEditor = prefs.edit(); 
 		theEditor.putString("recentLatitude", recLat.toString());

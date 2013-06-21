@@ -9,7 +9,7 @@
 	<string name="pref_user_name">Set Username</string>
     <string name="pref_user_name_summary">Set Your Username</string>
     <string name="pref_user_profile">User Profile</string>
-    
+    <string name="header_text">Recent Location Associations</string>
     <string-array name="edit_message">
         <item>active life</item>
         <item>amateur sports teams</item>
