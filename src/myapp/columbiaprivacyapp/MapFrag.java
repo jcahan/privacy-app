@@ -16,6 +16,7 @@ import com.actionbarsherlock.app.SherlockFragment;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -25,7 +26,8 @@ public class MapFrag extends SherlockFragment {
 	private View mapFragView;
 	private String[] assocArrayItems; 
 	private ArrayAdapter<String> mapAdapter;
-	private final LatLng LOCATION_BURNABY = new LatLng(49.27645, -122.917587);
+	private final LatLng LOCATION_COLUMBIA = new LatLng(40.8094645, -73.9612458);
+	private MapView mapView; 
 
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
 		//Checks if GooglePlayService is On--> Should take this out once first check forces user to have it 
@@ -43,9 +45,18 @@ public class MapFrag extends SherlockFragment {
 				/* map is already there, just return view as it is */
 			}
 
-			GoogleMap supportMap = ((SupportMapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
-			CameraUpdate update = CameraUpdateFactory.newLatLng(MY_LOCATION);
-			supportMap.animateCamera(update);
+			SupportMapFragment mapFrag= (SupportMapFragment)getSherlockActivity().getSupportFragmentManager().findFragmentById(R.id.map);
+			if(mapFrag==null) System.out.println("the support map is null!!");
+			else {
+				System.out.println("not null!!");
+				GoogleMap googleMap = mapFrag.getMap();
+				if(googleMap==null) System.out.println("the google map is null");
+				else {
+					System.out.println("the google map is not null");
+					CameraUpdate update = CameraUpdateFactory.newLatLngZoom(LOCATION_COLUMBIA, 16);
+					googleMap.animateCamera(update);
+				}
+			}
 		}		
 
 

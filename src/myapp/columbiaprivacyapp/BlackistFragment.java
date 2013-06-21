@@ -31,9 +31,9 @@ public class BlackistFragment extends SherlockFragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
 		view = inflater.inflate(R.layout.blacklist, container, false);
 		listView = (ListView) view.findViewById(R.id.listview);
-
 		//Making BlackList 
 		TreeSet<BlacklistWord> theSet =  MainActivity.getInstance().datasource.GetAllWords();
+		
 		theList = new ArrayList<String>();
 		for(BlacklistWord i :theSet){
 			theList.add(i.getWord());

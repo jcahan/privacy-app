@@ -113,44 +113,13 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 			createDialogBox();
 			userNameInPref = prefs.getString("prefUsername", "default");
 		}
-
-
+		
 		//Communicating with DataSource
 		datasource = new BlacklistWordDataSource(this);
 		datasource.open();
 		this.blackList= datasource.GetAllWords();
 
-		//Making an Action Bar
-		ActionBar actionbar = getSupportActionBar();
-		actionbar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-		actionbar.setTitle("Columbia Privacy App");
-
-		//Creating the Tabs
-		ActionBar.Tab Frag1Tab = actionbar.newTab().setText("BlackList");
-		ActionBar.Tab Frag2Tab = actionbar.newTab().setText("TreeMenu");
-		ActionBar.Tab Frag3Tab = actionbar.newTab().setText("Map");
-		ActionBar.Tab Frag4Tab = actionbar.newTab().setText("Help");
-
-		//Fragments (Underlying Classes for Each Class)
-		Fragment1 = new BlackistFragment();
-		Fragment2 = new TreeMenuFragment();
-		Fragment3 = new MapFrag();
-		Fragment4 = new Fragment_4();
-
-		//Adding Tab Listeners 
-		//new TabListener<StationsFragment>(this, "stations", StationsFragment.class)
-		Frag1Tab.setTabListener(new TabListener<BlackistFragment>(this, "frag1", BlackistFragment.class));
-		Frag2Tab.setTabListener(new TabListener<TreeMenuFragment>(this, "frag2", TreeMenuFragment.class));
-		Frag3Tab.setTabListener(new TabListener<MapFrag>(this, "frag3", MapFrag.class));
-		Frag4Tab.setTabListener(new TabListener<Fragment_4>(this, "frag4", Fragment_4.class));
-
-
-		//Adding Tabs to Action Bar
-		actionbar.addTab(Frag1Tab);
-		actionbar.addTab(Frag2Tab);
-		actionbar.addTab(Frag3Tab);
-		actionbar.addTab(Frag4Tab);
-
+		initalizeSherlockTabs();
 
 		//LocationClient to get Location
 		mLocationClient = new LocationClient(this, this, this);
@@ -192,6 +161,39 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 				}   
 			}}, 5000, PERIODIC_UPDATE);
 		THIS = this;
+	}
+
+	private void initalizeSherlockTabs() {
+		//Making an Action Bar
+		ActionBar actionbar = getSupportActionBar();
+		actionbar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+		actionbar.setTitle("Columbia Privacy App");
+
+		//Creating the Tabs
+		ActionBar.Tab Frag1Tab = actionbar.newTab().setText("BlackList");
+		ActionBar.Tab Frag2Tab = actionbar.newTab().setText("TreeMenu");
+		ActionBar.Tab Frag3Tab = actionbar.newTab().setText("Map");
+		ActionBar.Tab Frag4Tab = actionbar.newTab().setText("Help");
+
+		//Fragments (Underlying Classes for Each Class)
+		Fragment1 = new BlackistFragment();
+		Fragment2 = new TreeMenuFragment();
+		Fragment3 = new MapFrag();
+		Fragment4 = new Fragment_4();
+
+		//Adding Tab Listeners 
+		//new TabListener<StationsFragment>(this, "stations", StationsFragment.class)
+		Frag1Tab.setTabListener(new TabListener<BlackistFragment>(this, "frag1", BlackistFragment.class));
+		Frag2Tab.setTabListener(new TabListener<TreeMenuFragment>(this, "frag2", TreeMenuFragment.class));
+		Frag3Tab.setTabListener(new TabListener<MapFrag>(this, "frag3", MapFrag.class));
+		Frag4Tab.setTabListener(new TabListener<Fragment_4>(this, "frag4", Fragment_4.class));
+
+
+		//Adding Tabs to Action Bar
+		actionbar.addTab(Frag1Tab);
+		actionbar.addTab(Frag2Tab);
+		actionbar.addTab(Frag3Tab);
+		actionbar.addTab(Frag4Tab);
 	}
 
 	protected Boolean checkIfGooglePlay() {
@@ -250,7 +252,6 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 						createDialogBox();
 					}
 				} catch (ParseException e) {
-					//TODO: Check later when this could be true.  
 					e.printStackTrace();
 				}
 			}
@@ -284,11 +285,10 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 
 
 		//http://stackoverflow.com/questions/3550913/android-unknownhostexception
-
 		HttpURLConnection conn = (HttpURLConnection) theURL.openConnection();
 		BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 		line = rd.readLine(); 
-
+		
 		//Saving information to SharedPreferences (not sure if this is frowned upon
 		Editor theEditor = prefs.edit(); 
 		theEditor.putString("recentLatitude", recLat.toString());
@@ -479,9 +479,12 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	protected void onPause() {
 		super.onPause();
 	}
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+	}
 
 	//http://stackoverflow.com/questions/6391902/how-to-start-an-application-on-startup?answertab=votes#tab-top
-	//However it is a bit controversial: http://www.androidsnippets.com/autostart-an-application-at-bootup
 	@Override
 	public void onStatusChanged(String provider, int status, Bundle extras) {
 	}
