@@ -27,7 +27,6 @@ public class MapFrag extends SherlockFragment {
 	private View mapFragView;
 	private String[] assocArrayItems; 
 	private ArrayAdapter<String> mapAdapter;
-	private final LatLng LOCATION_COLUMBIA = new LatLng(40.8094645, -73.9612458);
 	private MapView mapView; 
 
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){

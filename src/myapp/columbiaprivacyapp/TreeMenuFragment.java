@@ -215,7 +215,6 @@ public class TreeMenuFragment extends SherlockFragment{
 		expandableListView.setAdapter(adapter);
 		for(BlacklistWord eachWord :setOfWords) {
 			String toCheck = eachWord.getWord(); 
-			System.out.println("word: " + toCheck);
 			if(allStrings.containsKey(eachWord.getWord())) {
 				String theGroupName = allStrings.get(toCheck.toLowerCase());
 				int theGroupPosition = groupPositions.get(theGroupName);

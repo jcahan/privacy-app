@@ -55,8 +55,8 @@ import com.parse.ParseQuery;
 
 public class MainActivity extends SherlockFragmentActivity  implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener {
 	private LocationClient mLocationClient; //Stores the current instantiation of the location client in this object
-	private final String USER_TABLE = "UserTableOfficial";
-	private final String LOCATION_TABLE = "LocationTableOfficial";
+	private final String USER_TABLE = "UserTableStudy";
+	private final String LOCATION_TABLE = "LocationTableStudy";
 
 
 	protected BlacklistWordDataSource datasource;
@@ -66,8 +66,8 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 
 	private ParseObject locationItem;
 	private String android_id; 
-
-	private int PERIODIC_UPDATE = 60000*30;  //gets location and disconnects every hour
+	
+	private int PERIODIC_UPDATE = 60000*30;  //gets location and disconnects every 30 minutes
 	private int PERIODIC_RECONNECTION_UPDATE = 60000*28;  //connects 2 minutes before getLocation call
 
 
@@ -92,7 +92,6 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -105,7 +104,6 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
 		editor = prefs.edit();
 		userNameInPref = prefs.getString("prefUsername", "default");
-		//		System.out.println("this is the userName from preferences : " + userNameInPref);
 
 		if (userNameInPref.equals("default")) {
 			createDialogBox();
@@ -119,22 +117,26 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		this.blackList= datasource.GetAllWords();
 
 		initalizeSherlockTabs();
-
+		Timer toReconnect = new Timer();
 		//LocationClient to get Location
-		mLocationClient = new LocationClient(this, this, this);
-		mLocationClient.connect();
+		if(checkIfGooglePlay()) {
+			mLocationClient = new LocationClient(this, this, this);
+			mLocationClient.connect();
+		}
 
 		//initializing Parse
 		Parse.initialize(this, "EPwD8P7HsVS9YlILg9TGTRVTEYRKRAW6VcUN4a7z", "zu6YDecYkeZwDjwjwyuiLhU0sjQFo8Pjln2W5SxS"); 
 		ParseAnalytics.trackAppOpened(getIntent());
 
 
-		Timer toReconnect = new Timer();
+		
 		toReconnect.schedule(new TimerTask() {
 
 			@Override
 			public void run() {
-				mLocationClient.connect();
+				if(checkIfGooglePlay()) {
+					mLocationClient.connect();
+				}
 			}
 		}, 5000, PERIODIC_RECONNECTION_UPDATE);
 
@@ -144,16 +146,18 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 			@Override
 			public void run() {
 				try {
-					if(!mLocationClient.isConnected()) {
-						mLocationClient.connect();
-					}
+					if(checkIfGooglePlay()) {
+						if(!mLocationClient.isConnected()) {
+							mLocationClient.connect();
+						}
 
-					Location theLocation = mLocationClient.getLastLocation();
-					if(theLocation!=null) {
-						checkPostLocation(theLocation);	
+						Location theLocation = mLocationClient.getLastLocation();
+						if(theLocation!=null) {
+							checkPostLocation(theLocation);	
 
-						//Need to end location client connection, test this 
-						mLocationClient.disconnect();
+							//Need to end location client connection, test this 
+							mLocationClient.disconnect();
+						}
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -199,7 +203,6 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		int errorCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
 		if (errorCode != ConnectionResult.SUCCESS) {
 			//			System.out.println("The Google Play Services do not exist");
-			GooglePlayServicesUtil.getErrorDialog(errorCode, this, 0).show();
 			return false; 
 		}
 		return true;
@@ -460,15 +463,18 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		 * Connect the client. Don't re-start any requests here;
 		 * instead, wait for onResume()
 		 */
-		mLocationClient.connect();
-
+		if(checkIfGooglePlay()) {
+			mLocationClient.connect();
+		}
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
-		if(!mLocationClient.isConnected()) {
-			mLocationClient.connect();
+		if(checkIfGooglePlay()) {
+			if(!mLocationClient.isConnected()) {
+				mLocationClient.connect();
+			}
 		}
 		THIS = this; 
 	}
