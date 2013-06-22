@@ -296,11 +296,6 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		theEditor.putString("wordAssociations", line);
 		theEditor.commit();
 
-		//TODO: Testing that it works: 
-		//		System.out.println(prefs.getString("recentLatitude", "default"));
-		//		System.out.println(prefs.getString("recentLongitude", "default"));
-		//		System.out.println(prefs.getString("wordAssociations", "default"));
-
 		//Saving new Instance, disconnecting/closing reader and connection 
 		THIS = this; 
 		conn.disconnect();
