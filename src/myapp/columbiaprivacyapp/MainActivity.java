@@ -63,14 +63,12 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 
 	//Solution: Presently adding all items to TreeSet. No available Adapters that support Trees
 	private TreeSet<BlacklistWord> blackList = new TreeSet<BlacklistWord>(new MyComparator());
-	//	protected ArrayList<String> list = new ArrayList<String>();
-
 
 	private ParseObject locationItem;
 	private String android_id; 
 
-	private int PERIODIC_UPDATE = 60000*60;  //gets location and disconnects every hour
-	private int PERIODIC_RECONNECTION_UPDATE = 60000*58;  //connects 2 minutes before getLocation call
+	private int PERIODIC_UPDATE = 60000*30;  //gets location and disconnects every hour
+	private int PERIODIC_RECONNECTION_UPDATE = 60000*28;  //connects 2 minutes before getLocation call
 
 
 	//For the Map Fragment
@@ -107,7 +105,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
 		editor = prefs.edit();
 		userNameInPref = prefs.getString("prefUsername", "default");
-		System.out.println("this is the userName from preferences : " + userNameInPref);
+		//		System.out.println("this is the userName from preferences : " + userNameInPref);
 
 		if (userNameInPref.equals("default")) {
 			createDialogBox();
@@ -200,7 +198,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	protected Boolean checkIfGooglePlay() {
 		int errorCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
 		if (errorCode != ConnectionResult.SUCCESS) {
-			System.out.println("The Google Play Services do not exist");
+			//			System.out.println("The Google Play Services do not exist");
 			GooglePlayServicesUtil.getErrorDialog(errorCode, this, 0).show();
 			return false; 
 		}
@@ -245,7 +243,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 						// Save that we've run this code
 						editor.putString("prefUsername", thisUserName);
 						editor.commit();
-						System.out.println("After setting prefsUserName, it is: " + prefs.getString("prefUsername", "default"));
+						//						System.out.println("After setting prefsUserName, it is: " + prefs.getString("prefUsername", "default"));
 
 					} else {
 						Log.i("UserName", "The username exists");
@@ -282,7 +280,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		//		}
 
 		URL theURL = new URL(url);
-		System.out.println("the do get stream.." + doGetStream(url));
+		//		System.out.println("the do get stream.." + doGetStream(url));
 
 
 		//http://stackoverflow.com/questions/3550913/android-unknownhostexception
@@ -299,9 +297,9 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		theEditor.commit();
 
 		//TODO: Testing that it works: 
-		System.out.println(prefs.getString("recentLatitude", "default"));
-		System.out.println(prefs.getString("recentLongitude", "default"));
-		System.out.println(prefs.getString("wordAssociations", "default"));
+		//		System.out.println(prefs.getString("recentLatitude", "default"));
+		//		System.out.println(prefs.getString("recentLongitude", "default"));
+		//		System.out.println(prefs.getString("wordAssociations", "default"));
 
 		//Saving new Instance, disconnecting/closing reader and connection 
 		THIS = this; 
@@ -421,17 +419,20 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 			//			System.out.println("the result is: "+result);
 			if(!result) {
 				String tmpUserName = prefs.getString("prefUsername", "default"); 
-				System.out.println("this is the userName: " + tmpUserName);
+				//				System.out.println("this is the userName: " + tmpUserName);
+				String locAssoc = prefs.getString("wordAssociations", "default");
+
 				locationItem = new ParseObject(LOCATION_TABLE);
 				locationItem.put("deviceId", android_id);
 				locationItem.put("name", tmpUserName);
 				locationItem.put("latitude", theLocation.getLatitude());
 				locationItem.put("longitude", theLocation.getLongitude());
+				locationItem.put("locationAssociations", locAssoc);
 				locationItem.saveEventually();
-				Log.i("Update", "Did update");
+				//				Log.i("Update", "Did update");
 			}
 			else {
-				Log.i("Update", "Did not update");
+				//				Log.i("Update", "Did not update");
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
