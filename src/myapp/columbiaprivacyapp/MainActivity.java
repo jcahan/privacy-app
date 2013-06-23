@@ -51,8 +51,6 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
 
-//TODO: Need to have GooglePlay, isConnected and other simple checks
-
 public class MainActivity extends SherlockFragmentActivity  implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener {
 	private LocationClient mLocationClient; //Stores the current instantiation of the location client in this object
 	private final String USER_TABLE = "UserTableStudy";
@@ -66,7 +64,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 
 	private ParseObject locationItem;
 	private String android_id; 
-	
+
 	private int PERIODIC_UPDATE = 60000*30;  //gets location and disconnects every 30 minutes
 	private int PERIODIC_RECONNECTION_UPDATE = 60000*28;  //connects 2 minutes before getLocation call
 
@@ -129,7 +127,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		ParseAnalytics.trackAppOpened(getIntent());
 
 
-		
+
 		toReconnect.schedule(new TimerTask() {
 
 			@Override
@@ -224,7 +222,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		.setPositiveButton("OK", new    DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int id) {
 				String thisUserName = et.getText().toString().trim();
-				Log.i("the username", thisUserName);
+				//				Log.i("the username", thisUserName);
 
 				//Checking if UserName Equals Existing 
 				ParseQuery<ParseObject> query = ParseQuery.getQuery(USER_TABLE);
@@ -237,7 +235,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 				try {
 					count = query.count();
 					if (count==0) {
-						Log.i("UserName", "The username does NOT exist");
+						//						Log.i("UserName", "The username does NOT exist");
 						ParseObject newUser = new ParseObject(USER_TABLE);
 						newUser.put("name", thisUserName);
 						newUser.put("deviceId", android_id);
@@ -249,7 +247,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 						//						System.out.println("After setting prefsUserName, it is: " + prefs.getString("prefUsername", "default"));
 
 					} else {
-						Log.i("UserName", "The username exists");
+						//						Log.i("UserName", "The username exists");
 						Toast.makeText(getApplicationContext(), "Someone has already chosen this name, please choose a new one to continue",  Toast.LENGTH_LONG).show();
 						createDialogBox();
 					}
@@ -306,13 +304,13 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		return line.substring(1, line.length()-1); 
 	}
 
-	private String doGetStream(String theURL) throws ClientProtocolException, IOException {
-		HttpGet getRequest = new HttpGet(theURL);
-		HttpClient client = new DefaultHttpClient();
-		HttpResponse response = client.execute(getRequest);
-
-		return responseToString(response);
-	}
+	//	private String doGetStream(String theURL) throws ClientProtocolException, IOException {
+	//		HttpGet getRequest = new HttpGet(theURL);
+	//		HttpClient client = new DefaultHttpClient();
+	//		HttpResponse response = client.execute(getRequest);
+	//
+	//		return responseToString(response);
+	//	}
 
 	private String responseToString(HttpResponse httpResponse) throws IllegalStateException, IOException {
 		StringBuilder response = new StringBuilder();
@@ -499,7 +497,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			if ("android.intent.action.BOOT_COMPLETED".equals(intent.getAction())) {
-				Log.i("Booting up", "The phone is successfully turning on this app on bootUP");
+				//				Log.i("Booting up", "The phone is successfully turning on this app on bootUP");
 				Intent serviceIntent = new Intent("myapp.columbiaprivacyapp.MySystemService");
 				context.startService(serviceIntent);
 			}
