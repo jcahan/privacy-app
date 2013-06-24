@@ -22,6 +22,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ExpandableListView;
+import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockFragment;
 
@@ -147,7 +148,7 @@ public class TreeMenuFragment extends SherlockFragment{
 				MainActivity.getInstance().invalidateOptionsMenu();
 			}
 		});
-
+		Toast.makeText(getSherlockActivity(), "To add items, enter them into the text field, or select them from the drop-down menus", Toast.LENGTH_SHORT).show();
 		//Creating ExpandableListView Menu Below..
 		initViews(view);
 		if(view != null) { return view; }

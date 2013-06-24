@@ -44,7 +44,7 @@ public class BlackistFragment extends SherlockFragment {
 		listView.setAdapter(adapter);
 		((BaseAdapter) listView.getAdapter()).notifyDataSetChanged();
 		
-		Toast.makeText(getSherlockActivity(), "To delete an item, press down on it for several seconds", Toast.LENGTH_LONG).show();
+		Toast.makeText(getSherlockActivity(), "To delete an item, press down on it for several seconds", Toast.LENGTH_SHORT).show();
 		
 		listView.setOnItemLongClickListener(new OnItemLongClickListener() {
 			@Override

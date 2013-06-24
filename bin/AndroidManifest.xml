@@ -30,7 +30,7 @@
         android:label="@string/app_name"
         android:theme="@style/Theme.Sherlock" >
         <service
-            android:name="officialapp.columbiaprivacyapp.MyService"
+            android:name=".MyService"
             android:label="My Service" >
             <intent-filter>
                 <action android:name="officialapp.columbiaprivacyapp.MyService" />

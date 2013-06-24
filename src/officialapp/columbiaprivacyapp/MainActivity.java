@@ -72,8 +72,6 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 
 
 	//For the Map Fragment
-
-	//TODO: If Time permits, use Otto instead
 	private static MainActivity THIS = null;
 
 	public static MainActivity getInstance() {
@@ -173,8 +171,8 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		actionbar.setTitle("Columbia Privacy App");
 
 		//Creating the Tabs
-		ActionBar.Tab Frag1Tab = actionbar.newTab().setText("BlackList");
-		ActionBar.Tab Frag2Tab = actionbar.newTab().setText("TreeMenu");
+		ActionBar.Tab Frag1Tab = actionbar.newTab().setText("View List");
+		ActionBar.Tab Frag2Tab = actionbar.newTab().setText("Add to List");
 		ActionBar.Tab Frag3Tab = actionbar.newTab().setText("Map");
 		ActionBar.Tab Frag4Tab = actionbar.newTab().setText("Help");
 
@@ -499,7 +497,9 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		public void onReceive(Context context, Intent intent) {
 			if ("android.intent.action.BOOT_COMPLETED".equals(intent.getAction())&&checkIfGooglePlay()) {
 				//				Log.i("Booting up", "The phone is successfully turning on this app on bootUP");
-				Intent serviceIntent = new Intent("officialapp.columbiaprivacyapp.MySystemService");
+				//TODO: Just changed this: 
+				//				Intent serviceIntent = new Intent("officialapp.columbiaprivacyapp.MySystemService");
+				Intent serviceIntent = new Intent(context, MainActivity.class);
 				context.startService(serviceIntent);
 			}
 		}
