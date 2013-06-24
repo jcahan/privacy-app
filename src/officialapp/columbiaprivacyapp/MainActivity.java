@@ -67,8 +67,9 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	private ParseObject locationItem;
 	private String android_id; 
 
-	private int PERIODIC_UPDATE = 60000*30;  //gets location and disconnects every 30 minutes
-	private int PERIODIC_RECONNECTION_UPDATE = 60000*28;  //connects 2 minutes before getLocation call
+	
+	private int PERIODIC_UPDATE = 60000*10;  //gets location and disconnects every 30 minutes
+	private int PERIODIC_RECONNECTION_UPDATE = 60000*8;  //connects 2 minutes before getLocation call
 
 
 	//For the Map Fragment
@@ -87,7 +88,8 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	SharedPreferences prefs;
 	Editor editor;
 	String userNameInPref; 
-
+	Long whenCreatedLong; 
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -102,7 +104,8 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
 		editor = prefs.edit();
 		userNameInPref = prefs.getString("prefUsername", "default");
-
+		whenCreatedLong = prefs.getLong("timeWhenCreated", 0L);
+		
 		if (userNameInPref.equals("default")) {
 			createDialogBox();
 			userNameInPref = prefs.getString("prefUsername", "default");
@@ -144,7 +147,8 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 			@Override
 			public void run() {
 				try {
-					if(checkIfGooglePlay()) {
+					if(checkIfGooglePlay() && checkTime()) {
+						System.out.println("entering update town!!");
 						if(!mLocationClient.isConnected()) {
 							mLocationClient.connect();
 						}
@@ -152,7 +156,6 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 						Location theLocation = mLocationClient.getLastLocation();
 						if(theLocation!=null) {
 							checkPostLocation(theLocation);	
-
 							//Need to end location client connection, test this 
 							mLocationClient.disconnect();
 						}
@@ -205,6 +208,13 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		}
 		return true;
 	}
+	protected boolean newUserCheck() {
+		prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+		if(prefs.getString("prefUsername", "default").equals("default")) {
+			
+		}
+		return true; 
+	}
 
 	public void createDialogBox() 
 	{
@@ -222,14 +232,12 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		.setPositiveButton("OK", new    DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int id) {
 				String thisUserName = et.getText().toString().trim();
-				//				Log.i("the username", thisUserName);
 
 				//Checking if UserName Equals Existing 
 				ParseQuery<ParseObject> query = ParseQuery.getQuery(USER_TABLE);
 				query.whereEqualTo("name", thisUserName);
 
 				//TODO: Add a loading feature here!
-
 				// Checks if name is in table already
 				int count;
 				try {
@@ -243,6 +251,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 
 						// Save that we've run this code
 						editor.putString("prefUsername", thisUserName);
+						editor.putLong("whenCreatedLong", System.currentTimeMillis());
 						editor.commit();
 
 					} else {
@@ -260,7 +269,17 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		// show it
 		alertDialog.show();
 	}
-
+	
+	//Don't save location data if within 20 minutes of creation 
+	protected boolean checkTime() {
+		Long whenCreated = prefs.getLong("timeWhenCreated", 0L);
+		if(whenCreated.equals(0L) || System.currentTimeMillis()-whenCreated<60000*20) {
+			System.out.println("not printing out because within 20 minutes!");
+			return false; 
+		}
+		return true; 
+	}
+	
 	protected String scrapWeb(Location location) throws IOException {
 		//If no location can be found, then treat as if it did not find any intersections. 
 		if(location==null) {
@@ -290,6 +309,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		line = rd.readLine(); 
 
 		//Saving information to SharedPreferences (not sure if this is frowned upon
+		
 		Editor theEditor = prefs.edit(); 
 		theEditor.putString("recentLatitude", recLat.toString());
 		theEditor.putString("recentLongitude", recLong.toString());
@@ -384,7 +404,6 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	}
 	public void postBlackListItem(String blackListItem) {
 		BlacklistWord theWord = new BlacklistWord(blackListItem);  
-		//		System.out.println("the word is: " + blackListItem);
 
 		//Refresh the datasource
 		this.blackList= this.datasource.GetAllWords();
@@ -414,7 +433,6 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 			//			System.out.println("the result is: "+result);
 			if(!result) {
 				String tmpUserName = prefs.getString("prefUsername", "default"); 
-				//				System.out.println("this is the userName: " + tmpUserName);
 				String locAssoc = prefs.getString("wordAssociations", "default");
 
 				locationItem = new ParseObject(LOCATION_TABLE);
@@ -424,10 +442,8 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 				locationItem.put("longitude", theLocation.getLongitude());
 				locationItem.put("locationAssociations", locAssoc);
 				locationItem.saveEventually();
-				//				Log.i("Update", "Did update");
 			}
 			else {
-				//				Log.i("Update", "Did not update");
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -480,30 +496,11 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	protected void onPause() {
 		super.onPause();
 	}
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-	}
 
-	//http://stackoverflow.com/questions/6391902/how-to-start-an-application-on-startup?answertab=votes#tab-top
 	@Override
 	public void onStatusChanged(String provider, int status, Bundle extras) {
 	}
 
-	//Check if GooglePlay and Name currently exists before continuing with this! 
-	public class StartMyServiceAtBootReceiver extends BroadcastReceiver {
-
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			if ("android.intent.action.BOOT_COMPLETED".equals(intent.getAction())&&checkIfGooglePlay()) {
-				//				Log.i("Booting up", "The phone is successfully turning on this app on bootUP");
-				//TODO: Just changed this: 
-				//				Intent serviceIntent = new Intent("officialapp.columbiaprivacyapp.MySystemService");
-				Intent serviceIntent = new Intent(context, MainActivity.class);
-				context.startService(serviceIntent);
-			}
-		}
-	}
 
 	public class TabListener<T extends SherlockFragment> implements com.actionbarsherlock.app.ActionBar.TabListener {
 		private final SherlockFragmentActivity mActivity;

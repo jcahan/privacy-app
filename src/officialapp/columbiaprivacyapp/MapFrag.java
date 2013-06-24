@@ -45,7 +45,6 @@ public class MapFrag extends SherlockFragment {
 			} catch (InflateException e) {
 				/* map is already there, just return view as it is */
 			}
-
 			SupportMapFragment mapFrag= (SupportMapFragment)getSherlockActivity().getSupportFragmentManager().findFragmentById(R.id.map);
 			if(mapFrag!=null)  {
 				GoogleMap googleMap = mapFrag.getMap();
@@ -107,7 +106,6 @@ public class MapFrag extends SherlockFragment {
 			if(recWordAssoc.charAt(1)!=']') {
 				if(recWordAssoc.length()>0) {
 					recWordAssoc = recWordAssoc.substring(1, recWordAssoc.length()-1);
-//					System.out.println(recWordAssoc);
 					theList = recWordAssoc.split("\", ");
 					for(int i=0; i< theList.length; i++) {
 						theList[i] = theList[i].substring(1).toLowerCase();
