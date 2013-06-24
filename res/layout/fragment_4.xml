@@ -3,11 +3,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
-    <TextView 
+
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
-        android:text="For More Information, Go to http://keyword.cs.columbia.edu/. For immediate assistance, please email Chris at mnai@cs.columbia.edu"/>
-    
+        android:text="To add items, please either check them off on the TreeMenu page, or enter them into the TextField. For More Information, Go to http://keyword.cs.columbia.edu/. For immediate assistance, please email Chris at mnai@cs.columbia.edu" />
 
 </LinearLayout>
