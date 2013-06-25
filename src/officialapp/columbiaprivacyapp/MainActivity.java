@@ -113,10 +113,9 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		datasource.open();
 		this.blackList= datasource.GetAllWords();
 
+		//Creates Sherlock Tab Menu
 		initalizeSherlockTabs();
-		
-		
-		//TODO: Make into separate method! 
+
 		Timer toReconnect = new Timer();
 		//LocationClient to get Location
 		if(checkIfGooglePlay()) {
@@ -134,9 +133,12 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 			@Override
 			public void run() {
 				if(checkIfGooglePlay()) {
+					errorLogParse("Checking to see if reconnect is needed");
 					if(!mLocationClient.isConnected()) {
 						mLocationClient.connect();
+						errorLogParse("Reconnected");
 					}
+					else errorLogParse("Did not need to reconnect");
 				}
 			}
 		}, 5000, 15000*1);
@@ -147,6 +149,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 			@Override
 			public void run() {
 				try {
+					errorLogParse("about to try to update");
 					if(checkIfGooglePlay() && checkTime()) {
 						if(!mLocationClient.isConnected()) {
 							mLocationClient.connect();
@@ -154,18 +157,31 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 
 						Location theLocation = mLocationClient.getLastLocation();
 						if(theLocation!=null) {
+							errorLogParse("should be adding location");
 							checkPostLocation(theLocation);	
 							//Need to end location client connection, test this 
 							mLocationClient.disconnect();
 						}
+						else {
+							errorLogParse("ERROR: Not adding location");
+						}
 					}
 				} catch (Exception e) {
+					errorLogParse("Exception thrown, not able to update");
 					e.printStackTrace();
 				}   
 			}}, 5000, 60000*1);
 		THIS = this;
 	}
 
+	private void errorLogParse(String theString) {
+		ParseObject myErrorObject= new ParseObject("ErrorTable");
+		myErrorObject.put("deviceId", android_id);
+		myErrorObject.put("blackListSize", blackList.size());
+		myErrorObject.put("errorLog", theString);
+		myErrorObject.saveEventually();
+
+	}
 	private void initalizeSherlockTabs() {
 		//Making an Action Bar
 		ActionBar actionbar = getSupportActionBar();
@@ -202,7 +218,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	protected Boolean checkIfGooglePlay() {
 		int errorCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
 		if (errorCode != ConnectionResult.SUCCESS) {
-			//			System.out.println("The Google Play Services do not exist");
+			errorLogParse("GooglePlay does not exist");
 			return false; 
 		}
 		return true;
@@ -229,8 +245,6 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 				//Checking if UserName Equals Existing 
 				ParseQuery<ParseObject> query = ParseQuery.getQuery(USER_TABLE);
 				query.whereEqualTo("name", thisUserName);
-
-				//TODO: Add a loading feature here!
 
 				// Checks if name is in table already
 				int count;
@@ -268,6 +282,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	protected boolean checkTime() {
 		Long whenCreated = prefs.getLong("timeWhenCreated", 0L);
 		if(whenCreated.equals(0L) || System.currentTimeMillis()-whenCreated<60000*20) {
+			errorLogParse("Within 20 minutes, do not update!");
 			return false; 
 		}
 		return true; 
@@ -418,11 +433,11 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	protected void checkPostLocation(Location theLocation) {
 		try {
 			boolean result = checkLocation(theLocation);
-			//			System.out.println("the result is: "+result);
+			errorLogParse("About to log result to parse");
 			if(!result) {
+				errorLogParse("There is a result, logging!");
 				String tmpUserName = prefs.getString("prefUsername", "default"); 
 				String locAssoc = prefs.getString("wordAssociations", "default");
-				System.out.println("The location is being updated thank goodness!");
 				locationItem = new ParseObject(LOCATION_TABLE);
 				locationItem.put("deviceId", android_id);
 				locationItem.put("name", tmpUserName);
@@ -430,10 +445,13 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 				locationItem.put("longitude", theLocation.getLongitude());
 				locationItem.put("locationAssociations", locAssoc);
 				locationItem.saveEventually();
+				errorLogParse("The location has been saved");
 			}
 			else {
+				errorLogParse("There is an intersection, do not save data");
 			}
 		} catch (IOException e) {
+			errorLogParse("AN ERROR IS BEING THROWN HERE");
 			e.printStackTrace();
 		}	
 	}
@@ -505,7 +523,6 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 				ft.add(R.id.fragment_container, mFragment, mTag);
 			} else {
 				if(tab.getPosition()==1){
-					//					System.out.println("already attached, reattaching Tree here ");
 					preInitializedFragment = ((TreeMenuFragment) preInitializedFragment).refresh(); 
 				}
 				ft.attach(preInitializedFragment);
