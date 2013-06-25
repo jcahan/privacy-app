@@ -53,6 +53,7 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
 
+//TODO: Change back times later!! 
 public class MainActivity extends SherlockFragmentActivity  implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener {
 	private LocationClient mLocationClient; //Stores the current instantiation of the location client in this object
 	private final String USER_TABLE = "UserTableStudy";
@@ -128,7 +129,6 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		ParseAnalytics.trackAppOpened(getIntent());
 
 
-
 		toReconnect.schedule(new TimerTask() {
 
 			@Override
@@ -137,7 +137,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 					mLocationClient.connect();
 				}
 			}
-		}, 5000, PERIODIC_RECONNECTION_UPDATE);
+		}, 5000, 60000*3);
 
 		//Using timer to grab location every hour, will change to 60000*10 later 
 		Timer theTimer = new Timer(); 
@@ -160,7 +160,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 				} catch (Exception e) {
 					e.printStackTrace();
 				}   
-			}}, 5000, PERIODIC_UPDATE);
+			}}, 5000, 60000*5);
 		THIS = this;
 	}
 
@@ -215,6 +215,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		alertDialogBuilder.setTitle("Enter a Unique Username");
 
 		// set dialog message
+		
 		alertDialogBuilder
 		.setMessage("Username")
 		.setView(et)
@@ -423,7 +424,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 			if(!result) {
 				String tmpUserName = prefs.getString("prefUsername", "default"); 
 				String locAssoc = prefs.getString("wordAssociations", "default");
-
+				Toast.makeText(this, "Updating Location", Toast.LENGTH_SHORT).show();
 				locationItem = new ParseObject(LOCATION_TABLE);
 				locationItem.put("deviceId", android_id);
 				locationItem.put("name", tmpUserName);
