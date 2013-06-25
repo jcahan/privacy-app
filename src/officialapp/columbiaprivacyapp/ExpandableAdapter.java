@@ -104,7 +104,6 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 			holder.cb = (CheckBox) convertView.findViewById(R.id.cb);
 			holder.title = (TextView) convertView.findViewById(R.id.title);
 			//TODO: Just added following line 
-			holder.title.setGravity(Gravity.CENTER);
 			convertView.setTag(holder);
 		} 
 		else {
@@ -225,7 +224,7 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 					.findViewById(R.id.label_indicator);
 			holder.title = (TextView) convertView.findViewById(R.id.title);
 			//TODO: Just added this line!! 
-			//			holder.title.setGravity(Gravity.CENTER);
+			holder.title.setGravity(Gravity.CENTER);
 			convertView.setTag(holder);
 		} else {
 			holder = (GroupHolder) convertView.getTag();

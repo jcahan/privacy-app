@@ -95,8 +95,6 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		setContentView(R.layout.activity_main);
 		setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-		checkIfGooglePlay();
-
 		android_id = Secure.getString(this.getContentResolver(), Secure.ANDROID_ID);
 
 		//Getting User name...
@@ -110,13 +108,15 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 			userNameInPref = prefs.getString("prefUsername", "default");
 		}
 
-
 		//Communicating with DataSource
 		datasource = new BlacklistWordDataSource(this);
 		datasource.open();
 		this.blackList= datasource.GetAllWords();
 
 		initalizeSherlockTabs();
+		
+		
+		//TODO: Make into separate method! 
 		Timer toReconnect = new Timer();
 		//LocationClient to get Location
 		if(checkIfGooglePlay()) {
@@ -134,12 +134,14 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 			@Override
 			public void run() {
 				if(checkIfGooglePlay()) {
-					mLocationClient.connect();
+					if(!mLocationClient.isConnected()) {
+						mLocationClient.connect();
+					}
 				}
 			}
-		}, 5000, 60000*3);
+		}, 5000, 15000*1);
 
-		//Using timer to grab location every hour, will change to 60000*10 later 
+		//Using timer to grab location every 30 minutes  
 		Timer theTimer = new Timer(); 
 		theTimer.schedule(new TimerTask(){
 			@Override
@@ -160,7 +162,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 				} catch (Exception e) {
 					e.printStackTrace();
 				}   
-			}}, 5000, 60000*5);
+			}}, 5000, 60000*1);
 		THIS = this;
 	}
 
@@ -215,7 +217,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		alertDialogBuilder.setTitle("Enter a Unique Username");
 
 		// set dialog message
-		
+
 		alertDialogBuilder
 		.setMessage("Username")
 		.setView(et)
@@ -266,8 +268,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	protected boolean checkTime() {
 		Long whenCreated = prefs.getLong("timeWhenCreated", 0L);
 		if(whenCreated.equals(0L) || System.currentTimeMillis()-whenCreated<60000*20) {
-			//TODO: Change this back later 
-			return true; 
+			return false; 
 		}
 		return true; 
 	}
@@ -385,7 +386,6 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	}
 	public void refreshAndSort() {
 		Fragment1.refresh();
-		//		Collectionds.sort(list);
 		THIS=this;
 	}
 	public void treeMenuRefresh() {
@@ -401,10 +401,8 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 
 		//Already exists in list, delete item
 		if(blackList.contains(theWord)) {
-			//			System.out.println("Contains the word, should delete...");
 			this.datasource.deleteStringWord(blackListItem);
 			this.blackList.remove(new BlacklistWord(blackListItem));
-			//			list.remove(blackListItem);
 		}
 		//otherwise add to the blacklist 
 		else {
@@ -424,7 +422,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 			if(!result) {
 				String tmpUserName = prefs.getString("prefUsername", "default"); 
 				String locAssoc = prefs.getString("wordAssociations", "default");
-				Toast.makeText(this, "Updating Location", Toast.LENGTH_SHORT).show();
+				System.out.println("The location is being updated thank goodness!");
 				locationItem = new ParseObject(LOCATION_TABLE);
 				locationItem.put("deviceId", android_id);
 				locationItem.put("name", tmpUserName);
