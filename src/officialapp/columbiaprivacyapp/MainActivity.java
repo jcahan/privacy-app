@@ -67,10 +67,8 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	private ParseObject locationItem;
 	private String android_id; 
 
-	
-	private int PERIODIC_UPDATE = 60000*10;  //gets location and disconnects every 30 minutes
-	private int PERIODIC_RECONNECTION_UPDATE = 60000*8;  //connects 2 minutes before getLocation call
-
+	private int PERIODIC_UPDATE = 60000*30;  //gets location and disconnects every 30 minutes
+	private int PERIODIC_RECONNECTION_UPDATE = 60000*28;  //connects 2 minutes before getLocation call
 
 	//For the Map Fragment
 	private static MainActivity THIS = null;
@@ -89,7 +87,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	Editor editor;
 	String userNameInPref; 
 	Long whenCreatedLong; 
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -105,7 +103,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		editor = prefs.edit();
 		userNameInPref = prefs.getString("prefUsername", "default");
 		whenCreatedLong = prefs.getLong("timeWhenCreated", 0L);
-		
+
 		if (userNameInPref.equals("default")) {
 			createDialogBox();
 			userNameInPref = prefs.getString("prefUsername", "default");
@@ -148,7 +146,6 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 			public void run() {
 				try {
 					if(checkIfGooglePlay() && checkTime()) {
-						System.out.println("entering update town!!");
 						if(!mLocationClient.isConnected()) {
 							mLocationClient.connect();
 						}
@@ -208,13 +205,6 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		}
 		return true;
 	}
-	protected boolean newUserCheck() {
-		prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-		if(prefs.getString("prefUsername", "default").equals("default")) {
-			
-		}
-		return true; 
-	}
 
 	public void createDialogBox() 
 	{
@@ -238,6 +228,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 				query.whereEqualTo("name", thisUserName);
 
 				//TODO: Add a loading feature here!
+
 				// Checks if name is in table already
 				int count;
 				try {
@@ -269,17 +260,17 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		// show it
 		alertDialog.show();
 	}
-	
+
 	//Don't save location data if within 20 minutes of creation 
 	protected boolean checkTime() {
 		Long whenCreated = prefs.getLong("timeWhenCreated", 0L);
 		if(whenCreated.equals(0L) || System.currentTimeMillis()-whenCreated<60000*20) {
-			System.out.println("not printing out because within 20 minutes!");
-			return false; 
+			//TODO: Change this back later 
+			return true; 
 		}
 		return true; 
 	}
-	
+
 	protected String scrapWeb(Location location) throws IOException {
 		//If no location can be found, then treat as if it did not find any intersections. 
 		if(location==null) {
@@ -299,8 +290,6 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		//		}
 
 		URL theURL = new URL(url);
-		//		System.out.println("the do get stream.." + doGetStream(url));
-
 
 		//http://stackoverflow.com/questions/3550913/android-unknownhostexception
 
@@ -309,7 +298,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		line = rd.readLine(); 
 
 		//Saving information to SharedPreferences (not sure if this is frowned upon
-		
+
 		Editor theEditor = prefs.edit(); 
 		theEditor.putString("recentLatitude", recLat.toString());
 		theEditor.putString("recentLongitude", recLong.toString());
@@ -490,11 +479,6 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 			}
 		}
 		THIS = this; 
-	}
-
-	@Override
-	protected void onPause() {
-		super.onPause();
 	}
 
 	@Override
