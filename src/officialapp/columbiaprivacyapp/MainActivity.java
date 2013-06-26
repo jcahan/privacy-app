@@ -67,6 +67,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	private int PERIODIC_UPDATE = 60000*30;  //gets location and disconnects every 30 minutes
 	private int PERIODIC_RECONNECTION_UPDATE = 60000*28;  //connects 2 minutes before getLocation call
 
+	private int EVERY_TWO_MINUTES = 60*1000*2; 
 	//For the Map Fragment
 	private static MainActivity THIS = null;
 
@@ -115,11 +116,13 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		datasource.open();
 		this.blackList= datasource.GetAllWords();
 
+		saveListToPref();
 		//Creates Sherlock Tab Menu
 		initalizeSherlockTabs();
 
 		//Initiating Timers
-		initiateTimers();
+		//		initiateTimers();
+		mLocationClient = new LocationClient(this, this, this);
 
 		initAlarm();
 		Intent theService = new Intent(this, LocalWordService.class);
@@ -139,7 +142,8 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		PendingIntent pintent = PendingIntent.getService(this, 0, intent, 0);
 
 		AlarmManager alarm = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-		alarm.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), 30*1000, pintent);
+		alarm.
+		setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), EVERY_TWO_MINUTES, pintent);
 	}
 
 	protected void initializeParse() {
@@ -148,63 +152,62 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	}
 
 
-	protected void initiateTimers() {
-		Timer toReconnect = new Timer();
-		//LocationClient to get Location
-		if(checkIfGooglePlay()) {
-			mLocationClient = new LocationClient(this, this, this);
-			mLocationClient.connect();
-		}
-
-		toReconnect.schedule(new TimerTask() {
-
-			@Override
-			public void run() {
-				if(checkIfGooglePlay()) {
-					errorLogParse("Checking to see if reconnect is needed");
-					if(!mLocationClient.isConnected()) {
-						mLocationClient.connect();
-						errorLogParse("Reconnected");
-					}
-					else errorLogParse("Did not need to reconnect");
-				}
-			}
-		}, 5000, 15000*1);
-
-		//Using timer to grab location every 30 minutes  
-		Timer theTimer = new Timer(); 
-		theTimer.schedule(new TimerTask(){
-			@Override
-			public void run() {
-				try {
-					errorLogParse("about to try to update");
-					if(checkIfGooglePlay() && checkTime()) {
-						if(!mLocationClient.isConnected()) {
-							mLocationClient.connect();
-						}
-
-						Location theLocation = mLocationClient.getLastLocation();
-						if(theLocation!=null) {
-							errorLogParse("should be adding location");
-							checkPostLocation(theLocation);	
-							//Need to end location client connection, test this 
-							mLocationClient.disconnect();
-						}
-
-						else {
-							errorLogParse("ERROR: Not adding location");
-						}
-					}
-				} catch (Exception e) {
-					errorLogParse("Exception thrown, not able to update");
-					e.printStackTrace();
-				}   
-			}}, 5000, 60000*1);
-		THIS = this; 
-	}
+	//	protected void initiateTimers() {
+	//				Timer toReconnect = new Timer();
+	//				//LocationClient to get Location
+	//				if(checkIfGooglePlay()) {
+	//					mLocationClient.connect();
+	//				}
+	//		
+	//				toReconnect.schedule(new TimerTask() {
+	//		
+	//					@Override
+	//					public void run() {
+	//						if(checkIfGooglePlay()) {
+	//							errorLogParse("Checking to see if reconnect is needed");
+	//							if(!mLocationClient.isConnected()) {
+	//								mLocationClient.connect();
+	//								errorLogParse("Reconnected");
+	//							}
+	//							else errorLogParse("Did not need to reconnect");
+	//						}
+	//					}
+	//				}, 5000, 15000*1);
+	//		
+	//				//Using timer to grab location every 30 minutes  
+	//				Timer theTimer = new Timer(); 
+	//				theTimer.schedule(new TimerTask(){
+	//					@Override
+	//					public void run() {
+	//						try {
+	//							errorLogParse("about to try to update");
+	//							if(checkIfGooglePlay() && checkTime()) {
+	//								if(!mLocationClient.isConnected()) {
+	//									mLocationClient.connect();
+	//								}
+	//		
+	//								Location theLocation = mLocationClient.getLastLocation();
+	//								if(theLocation!=null) {
+	//									errorLogParse("should be adding location");
+	//									checkPostLocation(theLocation);	
+	//									//Need to end location client connection, test this 
+	//									mLocationClient.disconnect();
+	//								}
+	//		
+	//								else {
+	//									errorLogParse("ERROR: Not adding location");
+	//								}
+	//							}
+	//						} catch (Exception e) {
+	//							errorLogParse("Exception thrown, not able to update");
+	//							e.printStackTrace();
+	//						}   
+	//					}}, 5000, 60000*1);
+	//				THIS = this; 
+	//	}
 
 	protected void errorLogParse(String theString) {
-		ParseObject myErrorObject= new ParseObject("ErrorTable");
+		ParseObject myErrorObject= new ParseObject("NewErrorTable");
 		myErrorObject.put("deviceId", android_id);
 		myErrorObject.put("blackListSize", blackList.size());
 		myErrorObject.put("errorLog", theString);
@@ -311,11 +314,6 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	protected boolean checkTime() {
 		Long whenCreated = prefs.getLong(TIME_ACCOUNT_CREATED, 0L);
 
-		//TODO: Change back to this!!
-		//		if(whenCreated.equals(0L) || System.currentTimeMillis()-whenCreated<60000*10) {
-		//			errorLogParse("Within 10 minutes, do not update!");
-		//			return false; 
-		//		}
 		if(whenCreated.equals(0L) || System.currentTimeMillis()-whenCreated<60000*2) {
 			errorLogParse("Within 2 minutes, do not update!");
 			return false; 
@@ -324,63 +322,59 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		return true; 
 	}
 
-	protected String scrapWeb(Location location){
-		//If no location can be found, then treat as if it did not find any intersections. 
-		if(location==null) {
-			return "";
-		}
-		//Scraping Associations with Coordinates 
-		String line = null;
-		Double recLat = location.getLatitude();
-		Double recLong = location.getLongitude();
-		String url = "http://keyword.cs.columbia.edu/keywords?lat=" + recLat +"&lon=" +recLong;
-
-		line = getYelpInfo(url);
-
-		//Test this: 
-		//		line = null; 
-
-
-		//Saving information to SharedPreferences 
-		Editor theEditor = prefs.edit(); 
-		theEditor.putString("recentLatitude", recLat.toString());
-		theEditor.putString("recentLongitude", recLong.toString());
-		theEditor.putString("wordAssociations", line);
-		theEditor.commit();
-
-		//Saving new Instance 
-		THIS = this; 
-		errorLogParse("submitting word associations");
-		return line; 
-	}
-
-	private String getYelpInfo(String url) {
-		String line = null; 
-		BufferedReader theReader;
-		HttpURLConnection theConnection;
-
-		try {
-			//setting up connection 
-			URL theURL = new URL(url);
-			theConnection = (HttpURLConnection) theURL.openConnection();
-			theConnection.connect();
-
-			//Read Page
-			theReader = new BufferedReader(new InputStreamReader(theConnection.getInputStream()));
-			line = theReader.readLine();
-
-			System.out.println("getYelpInfo: "+line);
-			//Close and disconnect
-			theReader.close();
-			theConnection.disconnect();
-			theConnection = null; 
-			errorLogParse("got Yelp Info");
-		}
-		catch(IOException ex) {
-			errorLogParse("IO exception when reading location");
-		}
-		return line;
-	}
+	//	protected String scrapWeb(Location location){
+	//		//If no location can be found, then treat as if it did not find any intersections. 
+	//		if(location==null) {
+	//			return "";
+	//		}
+	//		//Scraping Associations with Coordinates 
+	//		String line = null;
+	//		Double recLat = location.getLatitude();
+	//		Double recLong = location.getLongitude();
+	//		String url = "http://keyword.cs.columbia.edu/keywords?lat=" + recLat +"&lon=" +recLong;
+	//
+	//		line = getYelpInfo(url);
+	//
+	//		//Saving information to SharedPreferences 
+	//		Editor theEditor = prefs.edit(); 
+	//		theEditor.putString("recentLatitude", recLat.toString());
+	//		theEditor.putString("recentLongitude", recLong.toString());
+	//		theEditor.putString("wordAssociations", line);
+	//		theEditor.commit();
+	//
+	//		//Saving new Instance 
+	//		THIS = this; 
+	//		errorLogParse("submitting word associations");
+	//		return line; 
+	//	}
+	//
+	//	private String getYelpInfo(String url) {
+	//		String line = null; 
+	//		BufferedReader theReader;
+	//		HttpURLConnection theConnection;
+	//
+	//		try {
+	//			//setting up connection 
+	//			URL theURL = new URL(url);
+	//			theConnection = (HttpURLConnection) theURL.openConnection();
+	//			theConnection.connect();
+	//
+	//			//Read Page
+	//			theReader = new BufferedReader(new InputStreamReader(theConnection.getInputStream()));
+	//			line = theReader.readLine();
+	//
+	//			System.out.println("getYelpInfo: "+line);
+	//			//Close and disconnect
+	//			theReader.close();
+	//			theConnection.disconnect();
+	//			theConnection = null; 
+	//			errorLogParse("got Yelp Info");
+	//		}
+	//		catch(IOException ex) {
+	//			errorLogParse("IO exception when reading location");
+	//		}
+	//		return line;
+	//	}
 
 	public void sendEmailToChris(View v) {
 		Intent i = new Intent(Intent.ACTION_SEND);
@@ -393,50 +387,51 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 			Toast.makeText(MainActivity.this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
 		}
 	}
-	protected TreeSet<BlacklistWord> refineList(String listOfItems) {
-		TreeSet<BlacklistWord> locationBlacklisted = new TreeSet<BlacklistWord>();
-		if(listOfItems.length()!=0) {
-			if(listOfItems.charAt(1)!=']') {
-				String[] theList = listOfItems.split("\", ");
-				for(int i=0; i< theList.length; i++) {
-					theList[i] = theList[i].substring(1).toLowerCase();
-					if(i==theList.length-1) theList[i]=theList[i].substring(0, theList[i].length()-1);
-					locationBlacklisted.add(new BlacklistWord(theList[i]));
-				}
-			}
-		}
-		THIS = this; 
-		errorLogParse("finished refining list");
-		return locationBlacklisted;
-	}
+	//	protected TreeSet<BlacklistWord> refineList(String listOfItems) {
+	//		TreeSet<BlacklistWord> locationBlacklisted = new TreeSet<BlacklistWord>();
+	//		if(listOfItems.length()!=0) {
+	//			if(listOfItems.charAt(1)!=']') {
+	//				String[] theList = listOfItems.split("\", ");
+	//				for(int i=0; i< theList.length; i++) {
+	//					theList[i] = theList[i].substring(1).toLowerCase();
+	//					if(i==theList.length-1) theList[i]=theList[i].substring(0, theList[i].length()-1);
+	//					locationBlacklisted.add(new BlacklistWord(theList[i]));
+	//				}
+	//			}
+	//		}
+	//		THIS = this; 
+	//		errorLogParse("finished refining list");
+	//		return locationBlacklisted;
+	//	}
 
-	//returns true if intersection exists 
-	protected Boolean checkLocation(Location theLocation) throws IOException {
-		String locationAssociations = scrapWeb(theLocation);
-		if(locationAssociations==null) {
-			errorLogParse("no locations from inputstream");
-			return false; 
-		}
-		if(locationAssociations=="") {
-			errorLogParse("empty string from inputstream");
-			return false;
-		}
-
-		locationAssociations = locationAssociations.substring(1, locationAssociations.length()-1);
-
-		System.out.println("check locations: "+locationAssociations);
-
-
-		TreeSet<BlacklistWord> treeWords = refineList(locationAssociations);
-		treeWords.retainAll(blackList);
-
-		errorLogParse("Posting Location");
-		return (treeWords.size() > 0);
-	}
+	//	//returns true if intersection exists 
+	//	protected Boolean checkLocation(Location theLocation) throws IOException {
+	//		String locationAssociations = scrapWeb(theLocation);
+	//		if(locationAssociations==null) {
+	//			errorLogParse("no locations from inputstream");
+	//			return false; 
+	//		}
+	//		if(locationAssociations=="") {
+	//			errorLogParse("empty string from inputstream");
+	//			return false;
+	//		}
+	//
+	//		locationAssociations = locationAssociations.substring(1, locationAssociations.length()-1);
+	//
+	//		System.out.println("check locations: "+locationAssociations);
+	//
+	//
+	//		TreeSet<BlacklistWord> treeWords = refineList(locationAssociations);
+	//		treeWords.retainAll(blackList);
+	//
+	//		errorLogParse("Posting Location");
+	//		return (treeWords.size() > 0);
+	//	}
 
 	//Refreshes blacklist 
 	public void refreshBlackListTree() {
 		this.blackList= this.datasource.GetAllWords();
+		saveListToPref();
 		THIS = this; 
 	}
 
@@ -444,7 +439,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	public void addToBlackList(String blackListItem) {
 		BlacklistWord newWord = this.datasource.CreateBlacklistWord(blackListItem);
 		this.blackList.add(newWord);
-
+		saveListToPref();
 		THIS=this; 
 	}
 
@@ -453,6 +448,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		this.datasource.deleteStringWord(blackListItem);
 		this.blackList.remove(new BlacklistWord(blackListItem));
 
+		saveListToPref();
 		THIS=this; 
 	}
 	public void refreshAndSort() {
@@ -480,38 +476,23 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 			BlacklistWord newWord = this.datasource.CreateBlacklistWord(blackListItem);
 			this.blackList.add(newWord);
 		}	
+		saveListToPref();
 	}
 	public void removeFromMenu(String theWord) {
 		Fragment2.deleteFromMenu(theWord);
 		THIS = this; 
 	}
 
-	protected void checkPostLocation(Location theLocation) {
-		try {
-			//might need to add another exception here 
-			boolean result = checkLocation(theLocation);
-			errorLogParse("About to log result to parse");
-			if(!result) {
-				errorLogParse("There is a result, logging!");
-				String tmpUserName = prefs.getString("prefUsername", "default"); 
-				String locAssoc = prefs.getString("wordAssociations", "default");
-				locationItem = new ParseObject(LOCATION_TABLE);
-				locationItem.put("deviceId", android_id);
-				locationItem.put("name", tmpUserName);
-				locationItem.put("latitude", theLocation.getLatitude());
-				locationItem.put("longitude", theLocation.getLongitude());
-				locationItem.put("locationAssociations", locAssoc);
-				locationItem.saveEventually();
-				errorLogParse("The location has been saved");
-			}
-			else {
-				errorLogParse("There is an intersection, do not save data");
-			}
-		} catch (IOException e) {
-			errorLogParse("AN ERROR IS BEING THROWN HERE");
-			e.printStackTrace();
-		}	
+	protected void saveListToPref() {
+		Editor theEditor = prefs.edit();
+		String bsPref = null; 
+		for(int i=0; i<blackList.size(); i++) {
+			bsPref = blackList.toString();
+		}
+		theEditor.putString("blackListedItems", bsPref);
+		theEditor.commit();
 	}
+
 	@Override
 	public void onConnectionFailed(ConnectionResult result) {
 	}

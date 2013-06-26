@@ -69,7 +69,6 @@ public class BlackistFragment extends SherlockFragment {
 
 				return true; 
 			}
-
 		});
 
 		if(view != null) { return view;}
