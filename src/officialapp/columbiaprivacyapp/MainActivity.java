@@ -302,20 +302,20 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		Double recLong = location.getLongitude();
 		String url = "http://keyword.cs.columbia.edu/keywords?lat=" + recLat +"&lon=" +recLong;
 
-		//		TODO: Try this as well: NetworkInfo info = (NetworkInfo) ((ConnectivityManager) this
+		//		TODO: Try this as well: 
+		//NetworkInfo info = (NetworkInfo) ((ConnectivityManager) this
 		//						.getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
 		//
 		//		if (info == null || !info.isConnected()) {
 		//			return false;
 		//		}
 
-		URL theURL = new URL(url);
+		//		URL theURL = new URL(url);
+		line = doGetStream(url);
 
-		//http://stackoverflow.com/questions/3550913/android-unknownhostexception
-
-		HttpURLConnection conn = (HttpURLConnection) theURL.openConnection();
-		BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-		line = rd.readLine(); 
+		//		HttpURLConnection conn = (HttpURLConnection) theURL.openConnection();
+		//		BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+		//		line = rd.readLine(); 
 
 		//Saving information to SharedPreferences (not sure if this is frowned upon
 
@@ -327,34 +327,35 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 
 		//Saving new Instance, disconnecting/closing reader and connection 
 		THIS = this; 
-		conn.disconnect();
-		rd.close();
+
+		//		conn.disconnect();
+		//		rd.close();
 		return line.substring(1, line.length()-1); 
 	}
 
-	//	private String doGetStream(String theURL) throws ClientProtocolException, IOException {
-	//		HttpGet getRequest = new HttpGet(theURL);
-	//		HttpClient client = new DefaultHttpClient();
-	//		HttpResponse response = client.execute(getRequest);
-	//
-	//		return responseToString(response);
-	//	}
+	private String doGetStream(String theURL) throws ClientProtocolException, IOException {
+		HttpGet getRequest = new HttpGet(theURL);
+		HttpClient client = new DefaultHttpClient();
+		HttpResponse response = client.execute(getRequest);
 
-	//	private String responseToString(HttpResponse httpResponse) throws IllegalStateException, IOException {
-	//		StringBuilder response = new StringBuilder();
-	//		String aLine = new String();
-	//
-	//		//InputStream to String conversion
-	//		InputStream is = httpResponse.getEntity().getContent();
-	//		BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-	//
-	//		while( (aLine = reader.readLine()) != null){
-	//			response.append(aLine);
-	//		}
-	//		reader.close();
-	//
-	//		return response.toString();
-	//	}
+		return responseToString(response);
+	}
+
+	private String responseToString(HttpResponse httpResponse) throws IllegalStateException, IOException {
+		StringBuilder response = new StringBuilder();
+		String aLine = new String();
+
+		//InputStream to String conversion
+		InputStream is = httpResponse.getEntity().getContent();
+		BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+
+		while( (aLine = reader.readLine()) != null){
+			response.append(aLine);
+		}
+		reader.close();
+
+		return response.toString();
+	}
 
 	public void sendEmailToChris(View v) {
 		Intent i = new Intent(Intent.ACTION_SEND);
@@ -446,6 +447,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 
 	protected void checkPostLocation(Location theLocation) {
 		try {
+			//might need to add another exception here 
 			boolean result = checkLocation(theLocation);
 			errorLogParse("About to log result to parse");
 			if(!result) {
