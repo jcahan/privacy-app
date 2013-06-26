@@ -2,40 +2,33 @@ package officialapp.columbiaprivacyapp;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Calendar;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeSet;
 
-import officialapp.columbiaprivacyapp.R;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-
+import android.app.AlarmManager;
 import android.app.AlertDialog;
-import android.content.BroadcastReceiver;
+import android.app.PendingIntent;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.ActivityInfo;
-import android.content.res.Resources.Theme;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.provider.Settings.Secure;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -93,6 +86,10 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	Long whenCreatedLong; 
 	private final String TIME_ACCOUNT_CREATED = "timeWhenCreated";
 
+	private LocalWordService s; 
+
+
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -112,6 +109,9 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 			userNameInPref = prefs.getString("prefUsername", "default");
 		}
 
+		Intent theService = new Intent(this, LocalWordService.class);
+		//		startService(theService);
+
 		//Communicating with DataSource
 		datasource = new BlacklistWordDataSource(this);
 		datasource.open();
@@ -120,17 +120,39 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		//Creates Sherlock Tab Menu
 		initalizeSherlockTabs();
 
+		//Initiating Timers
+		initiateTimers();
+
+		initAlarm();
+
+		//initializing Parse
+		initializeParse();
+
+		THIS = this;
+	}
+
+	protected void initializeParse() {
+		Parse.initialize(this, "EPwD8P7HsVS9YlILg9TGTRVTEYRKRAW6VcUN4a7z", "zu6YDecYkeZwDjwjwyuiLhU0sjQFo8Pjln2W5SxS"); 
+		ParseAnalytics.trackAppOpened(getIntent());
+	}
+
+	protected void initAlarm() {
+		Calendar cal = Calendar.getInstance();
+
+		Intent intent = new Intent(this, LocalWordService.class);
+		PendingIntent pintent = PendingIntent.getService(this, 0, intent, 0);
+
+		AlarmManager alarm = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+		alarm.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), 30*1000, pintent);
+	}
+
+	protected void initiateTimers() {
 		Timer toReconnect = new Timer();
 		//LocationClient to get Location
 		if(checkIfGooglePlay()) {
 			mLocationClient = new LocationClient(this, this, this);
 			mLocationClient.connect();
 		}
-
-		//initializing Parse
-		Parse.initialize(this, "EPwD8P7HsVS9YlILg9TGTRVTEYRKRAW6VcUN4a7z", "zu6YDecYkeZwDjwjwyuiLhU0sjQFo8Pjln2W5SxS"); 
-		ParseAnalytics.trackAppOpened(getIntent());
-
 
 		toReconnect.schedule(new TimerTask() {
 
@@ -175,8 +197,11 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 					e.printStackTrace();
 				}   
 			}}, 5000, 60000*1);
-		THIS = this;
+		THIS = this; 
 	}
+
+
+
 
 	protected void errorLogParse(String theString) {
 		ParseObject myErrorObject= new ParseObject("ErrorTable");
@@ -519,9 +544,13 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		}
 	}
 
+
 	@Override
 	protected void onResume() {
 		super.onResume();
+		bindService(new Intent(this, LocalWordService.class), mConnection,
+				Context.BIND_AUTO_CREATE);
+
 		if(checkIfGooglePlay()) {
 			if(!mLocationClient.isConnected()) {
 				mLocationClient.connect();
@@ -529,6 +558,25 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		}
 		THIS = this; 
 	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		unbindService(mConnection);
+	}
+
+	private ServiceConnection mConnection = new ServiceConnection() {
+
+		public void onServiceConnected(ComponentName className, IBinder binder) {
+			s = ((LocalWordService.MyBinder) binder).getService();
+			Toast.makeText(MainActivity.this, "Connected", Toast.LENGTH_SHORT)
+			.show();
+		}
+
+		public void onServiceDisconnected(ComponentName className) {
+			s = null;
+		}
+	};
 
 	@Override
 	public void onStatusChanged(String provider, int status, Bundle extras) {
