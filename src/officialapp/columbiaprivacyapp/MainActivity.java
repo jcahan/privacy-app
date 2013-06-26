@@ -178,7 +178,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		THIS = this;
 	}
 
-	private void errorLogParse(String theString) {
+	protected void errorLogParse(String theString) {
 		ParseObject myErrorObject= new ParseObject("ErrorTable");
 		myErrorObject.put("deviceId", android_id);
 		myErrorObject.put("blackListSize", blackList.size());

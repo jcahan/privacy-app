@@ -10,8 +10,8 @@ import android.content.Intent;
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			if ("android.intent.action.BOOT_COMPLETED".equals(intent.getAction())) {
-				//				Log.i("Booting up", "The phone is successfully turning on this app on bootUP");
-				//				Intent serviceIntent = new Intent("officialapp.columbiaprivacyapp.MySystemService");
+				MainActivity.getInstance().errorLogParse("call to bootup being made");
+				
 				Intent serviceIntent = new Intent(context, MainActivity.class);
 				serviceIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 				context.startService(serviceIntent);
