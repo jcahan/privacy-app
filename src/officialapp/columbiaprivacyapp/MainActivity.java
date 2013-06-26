@@ -88,6 +88,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	Editor editor;
 	String userNameInPref; 
 	Long whenCreatedLong; 
+	private final String TIME_ACCOUNT_CREATED = "timeWhenCreated";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -101,7 +102,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
 		editor = prefs.edit();
 		userNameInPref = prefs.getString("prefUsername", "default");
-		whenCreatedLong = prefs.getLong("timeWhenCreated", 0L);
+		whenCreatedLong = prefs.getLong(TIME_ACCOUNT_CREATED, 0L);
 
 		if (userNameInPref.equals("default")) {
 			createDialogBox();
@@ -259,7 +260,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 
 						// Save that we've run this code
 						editor.putString("prefUsername", thisUserName);
-						editor.putLong("whenCreatedLong", System.currentTimeMillis());
+						editor.putLong(TIME_ACCOUNT_CREATED, System.currentTimeMillis());
 						editor.commit();
 
 					} else {
@@ -278,13 +279,14 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		alertDialog.show();
 	}
 
-	//Don't save location data if within 20 minutes of creation 
+	//Don't save location data if within 10 minutes of creation 
 	protected boolean checkTime() {
-		Long whenCreated = prefs.getLong("timeWhenCreated", 0L);
-		if(whenCreated.equals(0L) || System.currentTimeMillis()-whenCreated<60000*20) {
-			errorLogParse("Within 20 minutes, do not update!");
+		Long whenCreated = prefs.getLong(TIME_ACCOUNT_CREATED, 0L);
+		if(whenCreated.equals(0L) || System.currentTimeMillis()-whenCreated<60000*10) {
+			errorLogParse("Within 10 minutes, do not update!");
 			return false; 
 		}
+		errorLogParse("Outside of 10 minutes, update!");
 		return true; 
 	}
 
