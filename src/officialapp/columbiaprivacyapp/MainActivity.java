@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -26,6 +27,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.ActivityInfo;
+import android.content.res.Resources.Theme;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
@@ -283,15 +285,21 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	//Don't save location data if within 10 minutes of creation 
 	protected boolean checkTime() {
 		Long whenCreated = prefs.getLong(TIME_ACCOUNT_CREATED, 0L);
-		if(whenCreated.equals(0L) || System.currentTimeMillis()-whenCreated<60000*10) {
-			errorLogParse("Within 10 minutes, do not update!");
+
+		//TODO: Change back to this!!
+		//		if(whenCreated.equals(0L) || System.currentTimeMillis()-whenCreated<60000*10) {
+		//			errorLogParse("Within 10 minutes, do not update!");
+		//			return false; 
+		//		}
+		if(whenCreated.equals(0L) || System.currentTimeMillis()-whenCreated<60000*2) {
+			errorLogParse("Within 2 minutes, do not update!");
 			return false; 
 		}
 		errorLogParse("Outside of 10 minutes, update!");
 		return true; 
 	}
 
-	protected String scrapWeb(Location location) throws IOException {
+	protected String scrapWeb(Location location){
 		//If no location can be found, then treat as if it did not find any intersections. 
 		if(location==null) {
 			return "";
@@ -302,59 +310,51 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		Double recLong = location.getLongitude();
 		String url = "http://keyword.cs.columbia.edu/keywords?lat=" + recLat +"&lon=" +recLong;
 
-		//		TODO: Try this as well: 
-		//NetworkInfo info = (NetworkInfo) ((ConnectivityManager) this
-		//						.getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
-		//
-		//		if (info == null || !info.isConnected()) {
-		//			return false;
-		//		}
+		line = getYelpInfo(url);
 
-		//		URL theURL = new URL(url);
-		line = doGetStream(url);
+		//Test this: 
+		//		line = null; 
 
-		//		HttpURLConnection conn = (HttpURLConnection) theURL.openConnection();
-		//		BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-		//		line = rd.readLine(); 
 
-		//Saving information to SharedPreferences (not sure if this is frowned upon
-
+		//Saving information to SharedPreferences 
 		Editor theEditor = prefs.edit(); 
 		theEditor.putString("recentLatitude", recLat.toString());
 		theEditor.putString("recentLongitude", recLong.toString());
 		theEditor.putString("wordAssociations", line);
 		theEditor.commit();
 
-		//Saving new Instance, disconnecting/closing reader and connection 
+		//Saving new Instance 
 		THIS = this; 
-
-		//		conn.disconnect();
-		//		rd.close();
-		return line.substring(1, line.length()-1); 
+		errorLogParse("submitting word associations");
+		return line; 
 	}
 
-	private String doGetStream(String theURL) throws ClientProtocolException, IOException {
-		HttpGet getRequest = new HttpGet(theURL);
-		HttpClient client = new DefaultHttpClient();
-		HttpResponse response = client.execute(getRequest);
+	private String getYelpInfo(String url) {
+		String line = null; 
+		BufferedReader theReader;
+		HttpURLConnection theConnection;
 
-		return responseToString(response);
-	}
+		try {
+			//setting up connection 
+			URL theURL = new URL(url);
+			theConnection = (HttpURLConnection) theURL.openConnection();
+			theConnection.connect();
 
-	private String responseToString(HttpResponse httpResponse) throws IllegalStateException, IOException {
-		StringBuilder response = new StringBuilder();
-		String aLine = new String();
+			//Read Page
+			theReader = new BufferedReader(new InputStreamReader(theConnection.getInputStream()));
+			line = theReader.readLine();
 
-		//InputStream to String conversion
-		InputStream is = httpResponse.getEntity().getContent();
-		BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-
-		while( (aLine = reader.readLine()) != null){
-			response.append(aLine);
+			System.out.println("getYelpInfo: "+line);
+			//Close and disconnect
+			theReader.close();
+			theConnection.disconnect();
+			theConnection = null; 
+			errorLogParse("got Yelp Info");
 		}
-		reader.close();
-
-		return response.toString();
+		catch(IOException ex) {
+			errorLogParse("IO exception when reading location");
+		}
+		return line;
 	}
 
 	public void sendEmailToChris(View v) {
@@ -381,15 +381,31 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 			}
 		}
 		THIS = this; 
+		errorLogParse("finished refining list");
 		return locationBlacklisted;
 	}
 
 	//returns true if intersection exists 
 	protected Boolean checkLocation(Location theLocation) throws IOException {
 		String locationAssociations = scrapWeb(theLocation);
-		if(locationAssociations=="") return false; 
+		if(locationAssociations==null) {
+			errorLogParse("no locations from inputstream");
+			return false; 
+		}
+		if(locationAssociations=="") {
+			errorLogParse("empty string from inputstream");
+			return false;
+		}
+
+		locationAssociations = locationAssociations.substring(1, locationAssociations.length()-1);
+
+		System.out.println("check locations: "+locationAssociations);
+
+
 		TreeSet<BlacklistWord> treeWords = refineList(locationAssociations);
 		treeWords.retainAll(blackList);
+
+		errorLogParse("Posting Location");
 		return (treeWords.size() > 0);
 	}
 
