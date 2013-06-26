@@ -109,8 +109,6 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 			userNameInPref = prefs.getString("prefUsername", "default");
 		}
 
-		Intent theService = new Intent(this, LocalWordService.class);
-		//		startService(theService);
 
 		//Communicating with DataSource
 		datasource = new BlacklistWordDataSource(this);
@@ -124,16 +122,14 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		initiateTimers();
 
 		initAlarm();
+		Intent theService = new Intent(this, LocalWordService.class);
+		startService(theService);
+
 
 		//initializing Parse
 		initializeParse();
 
 		THIS = this;
-	}
-
-	protected void initializeParse() {
-		Parse.initialize(this, "EPwD8P7HsVS9YlILg9TGTRVTEYRKRAW6VcUN4a7z", "zu6YDecYkeZwDjwjwyuiLhU0sjQFo8Pjln2W5SxS"); 
-		ParseAnalytics.trackAppOpened(getIntent());
 	}
 
 	protected void initAlarm() {
@@ -145,6 +141,12 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		AlarmManager alarm = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 		alarm.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), 30*1000, pintent);
 	}
+
+	protected void initializeParse() {
+		Parse.initialize(this, "EPwD8P7HsVS9YlILg9TGTRVTEYRKRAW6VcUN4a7z", "zu6YDecYkeZwDjwjwyuiLhU0sjQFo8Pjln2W5SxS"); 
+		ParseAnalytics.trackAppOpened(getIntent());
+	}
+
 
 	protected void initiateTimers() {
 		Timer toReconnect = new Timer();
@@ -188,6 +190,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 							//Need to end location client connection, test this 
 							mLocationClient.disconnect();
 						}
+
 						else {
 							errorLogParse("ERROR: Not adding location");
 						}
@@ -199,9 +202,6 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 			}}, 5000, 60000*1);
 		THIS = this; 
 	}
-
-
-
 
 	protected void errorLogParse(String theString) {
 		ParseObject myErrorObject= new ParseObject("ErrorTable");

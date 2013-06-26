@@ -16,6 +16,7 @@ public class MyStartServiceReceiver extends BroadcastReceiver {
 		errorLogParse("MyStartServiceReceiver being called");
 		Intent service = new Intent(context, LocalWordService.class);
 		context.startService(service);
+		
 	}
 	protected void errorLogParse(String theString) {
 		ParseObject myErrorObject= new ParseObject("ErrorTable");

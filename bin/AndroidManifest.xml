@@ -39,28 +39,7 @@
             </intent-filter>
         </activity>
 
-        <!--
-             <service
-            android:name="LocationService"
-            android:label="Location Service" >
-            <action android:name="officialapp.columbiaprivacyapp.LocationService" />
-        </service>
-
-        <receiver
-            android:name="StartMyServiceAtBootReceiver"
-            android:enabled="true"
-            android:exported="true"
-            android:label="StartMyServiceAtBootReceiver"
-            android:permission="android.permission.RECEIVE_BOOT_COMPLETED" >
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </receiver>
-        -->
-
-        <service
+         <service
             android:name=".LocalWordService"
             android:label="LocalWordService" >
         </service>
@@ -72,6 +51,7 @@
         </receiver>
         <receiver android:name="MyStartServiceReceiver" >
         </receiver>
+        
 
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"

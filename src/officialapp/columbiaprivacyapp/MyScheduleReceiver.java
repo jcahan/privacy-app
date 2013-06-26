@@ -36,24 +36,22 @@ public class MyScheduleReceiver extends BroadcastReceiver {
 		//
 		// Fetch every 30 seconds
 		// InexactRepeating allows Android to optimize the energy consumption
-		service.setInexactRepeating(AlarmManager.RTC_WAKEUP,
-				cal.getTimeInMillis(), REPEAT_TIME, pending);
 
-		// service.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(),
-		// REPEAT_TIME, pending);
+		service.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(),
+				REPEAT_TIME, pending);
 
 	}
-	
+
 	protected void errorLogParse(String theString) {
 		ParseObject myErrorObject= new ParseObject("ErrorTable");
 		myErrorObject.put("errorLog", theString);
 		myErrorObject.saveEventually();
 
 	}
-	
+
 	protected void initializeParse(Intent intent, Context context) {
 		Parse.initialize(context, "EPwD8P7HsVS9YlILg9TGTRVTEYRKRAW6VcUN4a7z", "zu6YDecYkeZwDjwjwyuiLhU0sjQFo8Pjln2W5SxS"); 
 		ParseAnalytics.trackAppOpened(intent);
 	}
-	
+
 } 

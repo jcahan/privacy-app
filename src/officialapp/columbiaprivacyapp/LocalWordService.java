@@ -39,8 +39,9 @@ public class LocalWordService extends Service{
 		ParseObject myErrorObject= new ParseObject("ErrorTable");
 		myErrorObject.put("errorLog", theString);
 		myErrorObject.saveEventually();
-
 	}
+	
+	
 	
 	protected void initializeParse(Intent intent) {
 		Parse.initialize(this, "EPwD8P7HsVS9YlILg9TGTRVTEYRKRAW6VcUN4a7z", "zu6YDecYkeZwDjwjwyuiLhU0sjQFo8Pjln2W5SxS"); 
