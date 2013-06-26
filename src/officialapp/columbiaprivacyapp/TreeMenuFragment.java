@@ -191,7 +191,6 @@ public class TreeMenuFragment extends SherlockFragment{
 		}
 	}
 
-	//TODO: Abstract this out later
 	public void deleteFromMenu(String blackListItem) {
 		if(allStrings.containsKey(blackListItem.toLowerCase())) {
 			//Get which group position 

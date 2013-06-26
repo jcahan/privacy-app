@@ -1115,31 +1115,32 @@ containing a value of this type.
         public static final int abs__textButton=0x7f050017;
         public static final int abs__title=0x7f05001f;
         public static final int abs__up=0x7f05000f;
-        public static final int action_settings=0x7f050041;
-        public static final int cb=0x7f050039;
+        public static final int action_settings=0x7f050042;
+        public static final int cb=0x7f05003a;
         public static final int disableHome=0x7f05000d;
-        public static final int edit_message=0x7f05003e;
+        public static final int edit_message=0x7f05003f;
         public static final int edit_query=0x7f05002a;
-        public static final int expandableListView=0x7f050040;
+        public static final int email_chris=0x7f050038;
+        public static final int expandableListView=0x7f050041;
         public static final int fragment_container=0x7f050036;
         public static final int homeAsUp=0x7f05000a;
         public static final int hybrid=0x7f050004;
-        public static final int label_indicator=0x7f05003a;
+        public static final int label_indicator=0x7f05003b;
         public static final int listMode=0x7f050006;
         public static final int listview=0x7f050037;
-        public static final int map=0x7f05003b;
-        public static final int map_frag_view=0x7f05003d;
+        public static final int map=0x7f05003c;
+        public static final int map_frag_view=0x7f05003e;
         public static final int none=0x7f050000;
         public static final int normal=0x7f050001;
-        public static final int post_blacklist_button=0x7f05003f;
+        public static final int post_blacklist_button=0x7f050040;
         public static final int satellite=0x7f050002;
         public static final int showCustom=0x7f05000c;
         public static final int showHome=0x7f050009;
         public static final int showTitle=0x7f05000b;
         public static final int tabMode=0x7f050007;
         public static final int terrain=0x7f050003;
-        public static final int texview=0x7f05003c;
-        public static final int title=0x7f050038;
+        public static final int texview=0x7f05003d;
+        public static final int title=0x7f050039;
         public static final int useLogo=0x7f050008;
         public static final int wrap_content=0x7f050005;
     }
@@ -1287,8 +1288,9 @@ containing a value of this type.
         /**  Long form sign-in button text [CHAR LIMIT=30] 
          */
         public static final int common_signin_button_text_long=0x7f06000e;
+        public static final int email_hint=0x7f06002a;
         public static final int header_text=0x7f060028;
-        public static final int latitude_longitude=0x7f06002a;
+        public static final int latitude_longitude=0x7f06002b;
         /**  Location client code resources (prefix with location_client) 
 
         Begin strings for location.reporting

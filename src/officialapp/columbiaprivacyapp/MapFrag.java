@@ -23,7 +23,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MapFrag extends SherlockFragment {
-	private static final LatLng MY_LOCATION = null;
 	private ListView assocListView;
 	private View mapFragView;
 	private String[] assocArrayItems; 
@@ -113,6 +112,9 @@ public class MapFrag extends SherlockFragment {
 					}
 				}
 			}
+		}
+		if(theList==null) {
+			theList = new String[]{"No recent locations have been acquired yet."};
 		}
 		return theList; 
 	}

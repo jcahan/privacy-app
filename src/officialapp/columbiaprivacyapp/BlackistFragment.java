@@ -35,11 +35,17 @@ public class BlackistFragment extends SherlockFragment {
 		TreeSet<BlacklistWord> theSet =  MainActivity.getInstance().datasource.GetAllWords();
 		
 		theList = new ArrayList<String>();
-		for(BlacklistWord i :theSet){
-			theList.add(i.getWord());
+		
+		if(theSet.size()==0) {
+			theList.add("Please navigate to the \"Add to List\" Tab to update your \"Blacklist.\"");
 		}
-
-		Collections.sort(theList);
+		else {
+			for(BlacklistWord i :theSet){
+				theList.add(i.getWord());
+			}
+			Collections.sort(theList);
+		}
+		
 		adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1,  theList);
 		listView.setAdapter(adapter);
 		((BaseAdapter) listView.getAdapter()).notifyDataSetChanged();
@@ -50,7 +56,6 @@ public class BlackistFragment extends SherlockFragment {
 			@Override
 			public boolean onItemLongClick(AdapterView<?> parent, View view,
 					int position, long id) {
-				//				Log.i("ItemListener","Item should be deleted");
 				String theWord = theList.get(position);
 
 				MainActivity.getInstance().deleteFromBlackList((theWord));
@@ -59,8 +64,6 @@ public class BlackistFragment extends SherlockFragment {
 				MainActivity.getInstance().removeFromMenu(theWord);
 
 				//Refresh
-				//				MainActivity.getInstance().treeMenuRefresh();
-
 				theList.remove(theWord);
 				adapter.notifyDataSetChanged();
 
@@ -76,7 +79,6 @@ public class BlackistFragment extends SherlockFragment {
 
 		return view;
 	}
-	//TODO: need to work on displaying current information 
 	public void refresh() {
 		if(listView!=null) {
 			((BaseAdapter) listView.getAdapter()).notifyDataSetChanged();

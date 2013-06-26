@@ -883,6 +883,7 @@
     </string-array>
 
     <string name="update_button">Update BlackList</string>
+    <string name="email_hint">Email Chris</string>
     <string name="latitude_longitude">%1$.8f, %2$.8f</string>
 
 </resources>

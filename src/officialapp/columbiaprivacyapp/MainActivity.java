@@ -34,6 +34,7 @@ import android.provider.Settings.Secure;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -339,22 +340,33 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	//		return responseToString(response);
 	//	}
 
-	private String responseToString(HttpResponse httpResponse) throws IllegalStateException, IOException {
-		StringBuilder response = new StringBuilder();
-		String aLine = new String();
+	//	private String responseToString(HttpResponse httpResponse) throws IllegalStateException, IOException {
+	//		StringBuilder response = new StringBuilder();
+	//		String aLine = new String();
+	//
+	//		//InputStream to String conversion
+	//		InputStream is = httpResponse.getEntity().getContent();
+	//		BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+	//
+	//		while( (aLine = reader.readLine()) != null){
+	//			response.append(aLine);
+	//		}
+	//		reader.close();
+	//
+	//		return response.toString();
+	//	}
 
-		//InputStream to String conversion
-		InputStream is = httpResponse.getEntity().getContent();
-		BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-
-		while( (aLine = reader.readLine()) != null){
-			response.append(aLine);
+	public void sendEmailToChris(View v) {
+		Intent i = new Intent(Intent.ACTION_SEND);
+		i.setType("message/rfc822");
+		i.putExtra(Intent.EXTRA_EMAIL  , new String[]{"mani@cs.columbia.edu"});
+		i.putExtra(Intent.EXTRA_SUBJECT, "Columbia Privacy App Inquiry");
+		try {
+			startActivity(Intent.createChooser(i, "Send mail..."));
+		} catch (android.content.ActivityNotFoundException ex) {
+			Toast.makeText(MainActivity.this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
 		}
-		reader.close();
-
-		return response.toString();
 	}
-
 	protected TreeSet<BlacklistWord> refineList(String listOfItems) {
 		TreeSet<BlacklistWord> locationBlacklisted = new TreeSet<BlacklistWord>();
 		if(listOfItems.length()!=0) {
