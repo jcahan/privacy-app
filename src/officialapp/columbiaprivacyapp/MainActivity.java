@@ -52,7 +52,6 @@ import com.parse.ParseQuery;
 
 //TODO: Change back times later!! 
 public class MainActivity extends SherlockFragmentActivity  implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener {
-	private LocationClient mLocationClient; //Stores the current instantiation of the location client in this object
 	private final String USER_TABLE = "UserTableStudy";
 	private final String LOCATION_TABLE = "LocationTableStudy";
 
@@ -68,9 +67,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	private int PERIODIC_UPDATE = 60000*30;  //gets location and disconnects every 30 minutes
 	private int PERIODIC_RECONNECTION_UPDATE = 60000*28;  //connects 2 minutes before getLocation call
 
-	private int EVERY_TWO_MINUTES = 60*1000*2; 
-
-	private int EVERY_45_SECONDS = 1000*45; 
+	private final int EVERY_THREE_MINUTES = 60*3*1000; 
 
 	//For the Map Fragment
 	private static MainActivity THIS = null;
@@ -116,13 +113,11 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		datasource = new BlacklistWordDataSource(this);
 		datasource.open();
 		this.blackList= datasource.GetAllWords();
-		  
+
 		//Creates Sherlock Tab Menu
 		initalizeSherlockTabs();
 
 		//Initiating Timers
-		mLocationClient = new LocationClient(this, this, this);
-
 		initAlarm();
 		Intent theService = new Intent(this, LocalWordService.class);
 
@@ -142,7 +137,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 
 		AlarmManager alarm = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 		alarm.
-		setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), EVERY_45_SECONDS, pintent);
+		setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), EVERY_THREE_MINUTES, pintent);
 	}
 
 	protected void initializeParse() {
@@ -177,7 +172,6 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		Fragment4 = new Fragment_4();
 
 		//Adding Tab Listeners 
-		//new TabListener<StationsFragment>(this, "stations", StationsFragment.class)
 		Frag1Tab.setTabListener(new TabListener<BlackistFragment>(this, "frag1", BlackistFragment.class));
 		Frag2Tab.setTabListener(new TabListener<TreeMenuFragment>(this, "frag2", TreeMenuFragment.class));
 		Frag3Tab.setTabListener(new TabListener<MapFrag>(this, "frag3", MapFrag.class));
@@ -227,7 +221,6 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 				try {
 					count = query.count();
 					if (count==0) {
-						//						Log.i("UserName", "The username does NOT exist");
 						ParseObject newUser = new ParseObject(USER_TABLE);
 						newUser.put("name", thisUserName);
 						newUser.put("deviceId", android_id);
@@ -344,9 +337,6 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		 * Connect the client. Don't re-start any requests here;
 		 * instead, wait for onResume()
 		 */
-		if(checkIfGooglePlay()) {
-			mLocationClient.connect();
-		}
 	}
 
 
@@ -356,11 +346,6 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		bindService(new Intent(this, LocalWordService.class), mConnection,
 				Context.BIND_AUTO_CREATE);
 
-		if(checkIfGooglePlay()) {
-			if(!mLocationClient.isConnected()) {
-				mLocationClient.connect();
-			}
-		}
 		THIS = this; 
 	}
 

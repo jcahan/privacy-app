@@ -105,9 +105,9 @@ public class MapFrag extends SherlockFragment {
 			if(recWordAssoc.charAt(1)!=']') {
 				if(recWordAssoc.length()>0) {
 					recWordAssoc = recWordAssoc.substring(1, recWordAssoc.length()-1);
-					theList = recWordAssoc.split("\", ");
+					theList = recWordAssoc.split(", ");
 					for(int i=0; i< theList.length; i++) {
-						theList[i] = theList[i].substring(1).toLowerCase();
+						theList[i] = theList[i].toLowerCase();
 						if(i==theList.length-1) theList[i]=theList[i].substring(0, theList[i].length()-1);
 					}
 				}

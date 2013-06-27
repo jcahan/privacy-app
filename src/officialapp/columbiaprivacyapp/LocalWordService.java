@@ -7,29 +7,27 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.TreeSet;
 
-import android.app.AlarmManager;
 import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
-import android.provider.AlarmClock;
 import android.provider.Settings.Secure;
 import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
 import com.google.android.gms.common.GooglePlayServicesClient.OnConnectionFailedListener;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.location.LocationClient;
 import com.parse.Parse;
 import com.parse.ParseAnalytics;
@@ -47,8 +45,7 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 	String userNameInPref; 
 	Long whenCreatedLong; 
 	private final String TIME_ACCOUNT_CREATED = "timeWhenCreated";
-	private String bsItems; 
-
+	private final long TWO_MINUTES = 60*1000*2; 
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
@@ -67,12 +64,25 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 			errorLogParse("Recreating LocationClient");
 			mLocationClient = new LocationClient(this, this, this);
 		}
-
-		if(checkIfGooglePlay()) {
-			getPostLocation();
+		
+		if(!mLocationClient.isConnected()) {
+			errorLogParse("Connecting the location client (won't be in time)");
+			mLocationClient.connect();
 		}
-		else {
-		}
+		
+		Timer theTimer = new Timer();
+		theTimer.schedule(new TimerTask() {
+			
+			@Override
+			public void run() {
+				if(checkIfGooglePlay()) {
+					System.out.println("TIMER is now iniating post location");
+					getPostLocation();
+				}
+			}
+		}, TWO_MINUTES);
+		
+		
 
 		//TODO: Look into this!!
 		//stopSelf();
@@ -89,10 +99,6 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 	}
 
 	private void getPostLocation() {
-		if(!mLocationClient.isConnected()) {
-			errorLogParse("Connecting the location client (won't be in time)");
-			mLocationClient.connect();
-		}
 
 		errorLogParse("About to get location");
 		Log.i("localwordservice", "setting locationclient");
@@ -186,7 +192,7 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 
 
 		TreeSet<BlacklistWord> treeWords = refineList(locationAssociations);
-
+		
 		TreeSet<BlacklistWord> blackList = getAllBlackListItems();
 		if(treeWords==null) {
 			System.out.println("treewords is null");
@@ -196,13 +202,20 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 		}
 		System.out.println("treewords: " + treeWords.toString());
 		System.out.println("blacklist words: " + blackList.toString());
+		
+		postShared("wordAssociations", treeWords.toString());
 
 		treeWords.retainAll(blackList);
 
 		errorLogParse("Posting Location");
 		return (treeWords.size() > 0);
 	}
-
+	
+	protected void postShared(String category, String whatToShare) {
+		Editor theEditor = prefs.edit(); 
+		theEditor.putString(category, whatToShare);
+		theEditor.commit();
+	}
 
 	protected TreeSet<BlacklistWord> refineList(String listOfItems) {
 		TreeSet<BlacklistWord> locationBlacklisted = new TreeSet<BlacklistWord>();
@@ -235,11 +248,9 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 		line = getYelpInfo(url);
 
 		//Saving information to SharedPreferences 
-		Editor theEditor = prefs.edit(); 
-		theEditor.putString("recentLatitude", recLat.toString());
-		theEditor.putString("recentLongitude", recLong.toString());
-		theEditor.putString("wordAssociations", line);
-		theEditor.commit();
+		postShared("recentLatitude", recLat.toString());
+		postShared("recentLongitude", recLong.toString());
+		postShared("wordAssociations", line);
 
 		//Saving new Instance 
 		errorLogParse("submitting word associations");
