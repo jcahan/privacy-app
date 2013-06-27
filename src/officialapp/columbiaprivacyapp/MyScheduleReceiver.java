@@ -28,25 +28,24 @@ public class MyScheduleReceiver extends BroadcastReceiver {
 		AlarmManager service = (AlarmManager) context
 				.getSystemService(Context.ALARM_SERVICE);
 		Intent i = new Intent(context, MyStartServiceReceiver.class);
+
 		PendingIntent pending = PendingIntent.getBroadcast(context, 0, i,
 				PendingIntent.FLAG_CANCEL_CURRENT);
+		
 		Calendar cal = Calendar.getInstance();
 		
-		// Start 2 minutes after boot completed
-		cal.add(Calendar.SECOND, 120);
+		// Start 5 minutes after boot completed
+		cal.add(Calendar.SECOND, 300);
 
 		// Fetch every 5 minutes 
-
 		service.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(),
 				REPEAT_TIME, pending);
-
 	}
 
 	protected void errorLogParse(String theString) {
 		ParseObject myErrorObject= new ParseObject("ErrorTable");
 		myErrorObject.put("errorLog", theString);
 		myErrorObject.saveEventually();
-
 	}
 
 	protected void initializeParse(Intent intent, Context context) {

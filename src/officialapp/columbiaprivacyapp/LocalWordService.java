@@ -55,12 +55,16 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 
 		//initializing parse
 		initializeParse(intent);
-		errorLogParse("Starting up");
+		errorLogParse("LocalWordService: onStartCommand launching");
 
-		prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+		getItemsBlacklisted();
 		
 		android_id = Secure.getString(this.getContentResolver(), Secure.ANDROID_ID);
 
+		//TODO: 
+		
+		
+		
 		//Getting and Posting Location 
 		if(mLocationClient==null) {
 			errorLogParse("Recreating LocationClient");
@@ -79,13 +83,19 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 	}
 
 		private void getItemsBlacklisted() {
+			prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
 			bsItems = prefs.getString("blackListedItems", "default");
+			if(bsItems!=null) {
+				if(!bsItems.equals("default")) {
+					errorLogParse(bsItems);
+				}
+			}
 		}
 		
 
 	private void getPostLocation() {
 		if(!mLocationClient.isConnected()) {
-			errorLogParse("Connecting the location client");
+			errorLogParse("Connecting the location client (won't be in time)");
 			mLocationClient.connect();
 		}
 		
@@ -141,26 +151,6 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 		return true;
 	}
 
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	
 	//Don't save location data if within 10 minutes of creation 
 	protected boolean checkTime() {
