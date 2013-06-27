@@ -11,31 +11,32 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 public class MyScheduleReceiver extends BroadcastReceiver {
 
-	// Restart service every 5 minutes 
-	private static final long REPEAT_TIME = 1000 *60* 5;
+	// Restart service every 30 seconds
+	private static final long REPEAT_TIME = 1000 *30;
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
-
 		//initializing parse
 		initializeParse(intent, context);
-		errorLogParse("Booting up");
 
+		errorLogParse("Booting up");
+		Log.i("MyScheduleReceiver", "Booting up");
 
 		AlarmManager service = (AlarmManager) context
 				.getSystemService(Context.ALARM_SERVICE);
 		Intent i = new Intent(context, MyStartServiceReceiver.class);
-
+		
 		PendingIntent pending = PendingIntent.getBroadcast(context, 0, i,
 				PendingIntent.FLAG_CANCEL_CURRENT);
-		
+
 		Calendar cal = Calendar.getInstance();
-		
+
 		// Start 5 minutes after boot completed
-		cal.add(Calendar.SECOND, 300);
+		cal.add(Calendar.SECOND, 30);
 
 		// Fetch every 5 minutes 
 		service.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(),
@@ -43,7 +44,7 @@ public class MyScheduleReceiver extends BroadcastReceiver {
 	}
 
 	protected void errorLogParse(String theString) {
-		ParseObject myErrorObject= new ParseObject("ErrorTable");
+		ParseObject myErrorObject= new ParseObject("NewErrorTable");
 		myErrorObject.put("errorLog", theString);
 		myErrorObject.saveEventually();
 	}

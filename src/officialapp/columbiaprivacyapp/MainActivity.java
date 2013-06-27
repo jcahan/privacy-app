@@ -29,6 +29,7 @@ import android.preference.PreferenceManager;
 import android.provider.Settings.Secure;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -68,6 +69,9 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	private int PERIODIC_RECONNECTION_UPDATE = 60000*28;  //connects 2 minutes before getLocation call
 
 	private int EVERY_TWO_MINUTES = 60*1000*2; 
+
+	private int EVERY_45_SECONDS = 1000*45; 
+
 	//For the Map Fragment
 	private static MainActivity THIS = null;
 
@@ -89,8 +93,6 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 
 	private LocalWordService s; 
 
-
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -110,6 +112,8 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 			userNameInPref = prefs.getString("prefUsername", "default");
 		}
 
+		Log.i("Activity onCreate", "Activity has been created");
+
 
 		//Communicating with DataSource
 		datasource = new BlacklistWordDataSource(this);
@@ -117,20 +121,20 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		this.blackList= datasource.GetAllWords();
 
 		saveListToPref();
+		
 		//Creates Sherlock Tab Menu
 		initalizeSherlockTabs();
 
 		//Initiating Timers
-		//		initiateTimers();
 		mLocationClient = new LocationClient(this, this, this);
 
 		initAlarm();
 		Intent theService = new Intent(this, LocalWordService.class);
+
 		startService(theService);
 
-
 		//initializing Parse
-		initializeParse();
+		//		initializeParse();
 
 		THIS = this;
 	}
@@ -143,7 +147,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 
 		AlarmManager alarm = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 		alarm.
-		setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), EVERY_TWO_MINUTES, pintent);
+		setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), EVERY_45_SECONDS, pintent);
 	}
 
 	protected void initializeParse() {
@@ -152,11 +156,11 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	}
 
 	protected void errorLogParse(String theString) {
-		ParseObject myErrorObject= new ParseObject("NewErrorTable");
-		myErrorObject.put("deviceId", android_id);
-		myErrorObject.put("blackListSize", blackList.size());
-		myErrorObject.put("errorLog", theString);
-		myErrorObject.saveEventually();
+		//		ParseObject myErrorObject= new ParseObject("NewErrorTable");
+		//		myErrorObject.put("deviceId", android_id);
+		//		myErrorObject.put("blackListSize", blackList.size());
+		//		myErrorObject.put("errorLog", theString);
+		//		myErrorObject.saveEventually();
 
 	}
 	private void initalizeSherlockTabs() {

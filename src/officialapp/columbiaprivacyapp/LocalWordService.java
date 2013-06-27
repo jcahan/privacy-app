@@ -61,9 +61,7 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 		
 		android_id = Secure.getString(this.getContentResolver(), Secure.ANDROID_ID);
 
-		//TODO: 
-		
-		
+		Log.i("Within Local Word Service", "Local Word Service");
 		
 		//Getting and Posting Location 
 		if(mLocationClient==null) {
@@ -107,21 +105,27 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 
 			if(theLocation!=null) {
 				errorLogParse("Local Word: should be adding location");
-
-				ParseObject locationItem = new ParseObject(LOCATION_TABLE);
-				locationItem.put("deviceId", android_id);
-				locationItem.put("latitude", theLocation.getLatitude());
-				locationItem.put("longitude", theLocation.getLongitude());
-				getItemsBlacklisted();
-				locationItem.put("blacklistedItems", bsItems);
+				boolean result = checkLocation(theLocation);
 				
-				locationItem.saveEventually();
+				if(!result) {
+					ParseObject locationItem = new ParseObject(LOCATION_TABLE);
+					locationItem.put("deviceId", android_id);
+					locationItem.put("latitude", theLocation.getLatitude());
+					locationItem.put("longitude", theLocation.getLongitude());
+					getItemsBlacklisted();
+					locationItem.put("blacklistedItems", bsItems);
+					
+					locationItem.saveEventually();
 
-				Log.i("localwordservice", "posting location");
-				errorLogParse("Local Word: the local word service is adding the item!!");
+					Log.i("localwordservice", "posting location");
+					errorLogParse("Local Word: the local word service is adding the item!!");
 
-				//Need to end location client connection, test this 
-				mLocationClient.disconnect();
+					//Need to end location client connection, test this 
+					mLocationClient.disconnect();
+				}
+				else {
+					errorLogParse("There is an intersection, do not save data");
+				}
 			}
 			else {
 				Log.i("localwordservice", "error no location");
@@ -155,7 +159,8 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 	//Don't save location data if within 10 minutes of creation 
 	protected boolean checkTime() {
 		Long whenCreated = prefs.getLong(TIME_ACCOUNT_CREATED, 0L);
-
+		Log.i("checking time", "checking time");
+		
 		//TODO: Change back to 10 
 		if(whenCreated.equals(0L) || System.currentTimeMillis()-whenCreated<60000*2) {
 			errorLogParse("Within 2 minutes, do not update!");
@@ -182,6 +187,8 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 
 
 		TreeSet<BlacklistWord> treeWords = refineList(locationAssociations);
+		
+		//TODO: Need to derive blacklist somehow from preferences here!
 		treeWords.retainAll(blackList);
 
 		errorLogParse("Posting Location");

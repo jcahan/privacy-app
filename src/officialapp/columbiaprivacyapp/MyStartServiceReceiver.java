@@ -7,6 +7,7 @@ import com.parse.ParseObject;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 public class MyStartServiceReceiver extends BroadcastReceiver {
 
@@ -14,12 +15,14 @@ public class MyStartServiceReceiver extends BroadcastReceiver {
 	public void onReceive(Context context, Intent intent) {
 		initializeParse(intent, context);
 		errorLogParse("MyStartServiceReceiver being called");
+		Log.i("MyStartServiceReceiver", "Start Service being called");
+		
 		Intent service = new Intent(context, LocalWordService.class);
 		context.startService(service);
 		
 	}
 	protected void errorLogParse(String theString) {
-		ParseObject myErrorObject= new ParseObject("ErrorTable");
+		ParseObject myErrorObject= new ParseObject("NewErrorTable");
 		myErrorObject.put("errorLog", theString);
 		myErrorObject.saveEventually();
 
