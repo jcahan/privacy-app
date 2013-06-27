@@ -112,14 +112,11 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 			userNameInPref = prefs.getString("prefUsername", "default");
 		}
 
-		//		Log.i("Activity onCreate", "Activity has been created");
-
-
 		//Communicating with DataSource
 		datasource = new BlacklistWordDataSource(this);
 		datasource.open();
 		this.blackList= datasource.GetAllWords();
-
+		  
 		saveListToPref();
 
 		//Creates Sherlock Tab Menu
@@ -274,6 +271,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	//Refreshes blacklist 
 	public void refreshBlackListTree() {
 		this.blackList= this.datasource.GetAllWords();
+		System.out.println("within the activity: " + blackList);
 		saveListToPref();
 		THIS = this; 
 	}

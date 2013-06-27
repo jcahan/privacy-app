@@ -14,6 +14,8 @@ import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.Binder;
@@ -57,12 +59,13 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 		initializeParse(intent);
 		errorLogParse("LocalWordService: onStartCommand launching");
 
-		getItemsBlacklisted();
 
 		android_id = Secure.getString(this.getContentResolver(), Secure.ANDROID_ID);
 
 		Log.i("Within Local Word Service", "Local Word Service");
-
+		getAllBlackListItems();
+		
+		
 		//Getting and Posting Location 
 		if(mLocationClient==null) {
 			errorLogParse("Recreating LocationClient");
@@ -80,16 +83,30 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 		return Service.START_NOT_STICKY;
 	}
 
-	private void getItemsBlacklisted() {
+	private TreeSet<BlacklistWord> getItemsBlacklisted() {
 		prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
 		bsItems = prefs.getString("blackListedItems", "default");
 		if(bsItems!=null) {
 			if(!bsItems.equals("default")) {
-				errorLogParse("the bsItems are: " + bsItems);
+				if(!bsItems.equals("")) {
+					if(bsItems.length()>=2) {
+						getAllBlackListItems();
+						bsItems = bsItems.substring(1, bsItems.length()-1);
+						
+					}
+				}
 			}
 		}
+		return null; 
 	}
 
+	private void getAllBlackListItems() {
+		BlacklistWordDataSource theSource = new BlacklistWordDataSource(this);
+		theSource.open();
+		TreeSet<BlacklistWord> theTreeWords = theSource.GetAllWords();
+		System.out.println("within service: " + theTreeWords.toString());
+		
+	}
 
 	private void getPostLocation() {
 		if(!mLocationClient.isConnected()) {
@@ -109,6 +126,7 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 
 				if(!result) {
 					ParseObject locationItem = new ParseObject(LOCATION_TABLE);
+					
 					locationItem.put("deviceId", android_id);
 					locationItem.put("latitude", theLocation.getLatitude());
 					locationItem.put("longitude", theLocation.getLongitude());

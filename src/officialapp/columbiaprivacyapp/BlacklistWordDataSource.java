@@ -19,7 +19,7 @@ public class BlacklistWordDataSource {
 			MySQLiteHelper.COLUMN_WORD };
 
 	public BlacklistWordDataSource(Context context) {
-		dbHelper = new MySQLiteHelper(context);
+		dbHelper = MySQLiteHelper.getHelper(context);
 	}
 
 	public void open() throws SQLException {
@@ -50,8 +50,7 @@ public class BlacklistWordDataSource {
 		newWord.setWord(cursor.getString(1));
 		return newWord;
 	}
-	
-	//TODO: Ask Chris to glance at this method 
+
 	public void deleteStringWord(String word) {
 		word = DatabaseUtils.sqlEscapeString(word);
 		database.delete(MySQLiteHelper.TABLE_WORDS, MySQLiteHelper.COLUMN_WORD + " = " + word, null);
@@ -67,6 +66,9 @@ public class BlacklistWordDataSource {
 
 	public TreeSet<BlacklistWord> GetAllWords() {
 		ArrayList<BlacklistWord> allWords = new ArrayList<BlacklistWord>();
+		if(database==null) {
+			System.out.println("teh database is null");
+		}
 		Cursor cursor = database.query(MySQLiteHelper.TABLE_WORDS,
 				this.allColumns, null, null, null, null, null);
 
