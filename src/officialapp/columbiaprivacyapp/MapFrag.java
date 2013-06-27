@@ -108,7 +108,6 @@ public class MapFrag extends SherlockFragment {
 					theList = recWordAssoc.split(", ");
 					for(int i=0; i< theList.length; i++) {
 						theList[i] = theList[i].toLowerCase();
-						if(i==theList.length-1) theList[i]=theList[i].substring(0, theList[i].length()-1);
 					}
 				}
 			}
