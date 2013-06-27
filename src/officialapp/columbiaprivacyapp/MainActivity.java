@@ -112,7 +112,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 			userNameInPref = prefs.getString("prefUsername", "default");
 		}
 
-		Log.i("Activity onCreate", "Activity has been created");
+		//		Log.i("Activity onCreate", "Activity has been created");
 
 
 		//Communicating with DataSource
@@ -121,7 +121,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		this.blackList= datasource.GetAllWords();
 
 		saveListToPref();
-		
+
 		//Creates Sherlock Tab Menu
 		initalizeSherlockTabs();
 
@@ -259,19 +259,6 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		alertDialog.show();
 	}
 
-	//Don't save location data if within 10 minutes of creation 
-	protected boolean checkTime() {
-		Long whenCreated = prefs.getLong(TIME_ACCOUNT_CREATED, 0L);
-
-		if(whenCreated.equals(0L) || System.currentTimeMillis()-whenCreated<60000*2) {
-			errorLogParse("Within 2 minutes, do not update!");
-			return false; 
-		}
-		errorLogParse("Outside of 10 minutes, update!");
-		return true; 
-	}
-
-
 	public void sendEmailToChris(View v) {
 		Intent i = new Intent(Intent.ACTION_SEND);
 		i.setType("message/rfc822");
@@ -342,10 +329,13 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	protected void saveListToPref() {
 		Editor theEditor = prefs.edit();
 		String bsPref = null; 
+		System.out.println("the list is being saved to preferences");
 		for(int i=0; i<blackList.size(); i++) {
 			bsPref = blackList.toString();
 		}
 		theEditor.putString("blackListedItems", bsPref);
+		System.out.println("the editor's blacklist items read: " + prefs.getString("blackListedItems", "default"));
+		
 		theEditor.commit();
 	}
 

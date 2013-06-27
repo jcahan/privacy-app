@@ -58,17 +58,17 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 		errorLogParse("LocalWordService: onStartCommand launching");
 
 		getItemsBlacklisted();
-		
+
 		android_id = Secure.getString(this.getContentResolver(), Secure.ANDROID_ID);
 
 		Log.i("Within Local Word Service", "Local Word Service");
-		
+
 		//Getting and Posting Location 
 		if(mLocationClient==null) {
 			errorLogParse("Recreating LocationClient");
 			mLocationClient = new LocationClient(this, this, this);
 		}
-		
+
 		if(checkIfGooglePlay()) {
 			getPostLocation();
 		}
@@ -80,23 +80,23 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 		return Service.START_NOT_STICKY;
 	}
 
-		private void getItemsBlacklisted() {
-			prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-			bsItems = prefs.getString("blackListedItems", "default");
-			if(bsItems!=null) {
-				if(!bsItems.equals("default")) {
-					errorLogParse(bsItems);
-				}
+	private void getItemsBlacklisted() {
+		prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+		bsItems = prefs.getString("blackListedItems", "default");
+		if(bsItems!=null) {
+			if(!bsItems.equals("default")) {
+				errorLogParse("the bsItems are: " + bsItems);
 			}
 		}
-		
+	}
+
 
 	private void getPostLocation() {
 		if(!mLocationClient.isConnected()) {
 			errorLogParse("Connecting the location client (won't be in time)");
 			mLocationClient.connect();
 		}
-		
+
 		errorLogParse("About to get location");
 		Log.i("localwordservice", "setting locationclient");
 
@@ -106,7 +106,7 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 			if(theLocation!=null) {
 				errorLogParse("Local Word: should be adding location");
 				boolean result = checkLocation(theLocation);
-				
+
 				if(!result) {
 					ParseObject locationItem = new ParseObject(LOCATION_TABLE);
 					locationItem.put("deviceId", android_id);
@@ -114,7 +114,7 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 					locationItem.put("longitude", theLocation.getLongitude());
 					getItemsBlacklisted();
 					locationItem.put("blacklistedItems", bsItems);
-					
+
 					locationItem.saveEventually();
 
 					Log.i("localwordservice", "posting location");
@@ -155,12 +155,12 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 		return true;
 	}
 
-	
+
 	//Don't save location data if within 10 minutes of creation 
 	protected boolean checkTime() {
 		Long whenCreated = prefs.getLong(TIME_ACCOUNT_CREATED, 0L);
 		Log.i("checking time", "checking time");
-		
+
 		//TODO: Change back to 10 
 		if(whenCreated.equals(0L) || System.currentTimeMillis()-whenCreated<60000*2) {
 			errorLogParse("Within 2 minutes, do not update!");
@@ -187,7 +187,7 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 
 
 		TreeSet<BlacklistWord> treeWords = refineList(locationAssociations);
-		
+
 		//TODO: Need to derive blacklist somehow from preferences here!
 		treeWords.retainAll(blackList);
 
@@ -252,7 +252,7 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 			theReader = new BufferedReader(new InputStreamReader(theConnection.getInputStream()));
 			line = theReader.readLine();
 
-			System.out.println("getYelpInfo: "+line);
+			//			System.out.println("getYelpInfo: "+line);
 			//Close and disconnect
 			theReader.close();
 			theConnection.disconnect();
