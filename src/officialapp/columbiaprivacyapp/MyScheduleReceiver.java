@@ -15,9 +15,9 @@ import android.util.Log;
 
 public class MyScheduleReceiver extends BroadcastReceiver {
 
-	// Restart service every 2 minutes seconds
-	private static final long THREE_MINUTES = 1000 *60*3;
-
+	// Restart service every 28 minutes
+	private int EVERY_TWENTY_EIGHT_MINUTES = 60000*28;  
+	
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		//initializing parse
@@ -40,7 +40,7 @@ public class MyScheduleReceiver extends BroadcastReceiver {
 
 		// Fetch every 5 minutes 
 		service.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(),
-				THREE_MINUTES, pending);
+				EVERY_TWENTY_EIGHT_MINUTES, pending);
 	}
 
 	protected void errorLogParse(String theString) {

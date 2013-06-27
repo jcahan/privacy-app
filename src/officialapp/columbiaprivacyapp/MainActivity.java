@@ -53,7 +53,6 @@ import com.parse.ParseQuery;
 //TODO: Change back times later!! 
 public class MainActivity extends SherlockFragmentActivity  implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener {
 	private final String USER_TABLE = "UserTableStudy";
-	private final String LOCATION_TABLE = "LocationTableStudy";
 
 
 	protected BlacklistWordDataSource datasource;
@@ -61,13 +60,9 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	//Solution: Presently adding all items to TreeSet. No available Adapters that support Trees
 	private TreeSet<BlacklistWord> blackList = new TreeSet<BlacklistWord>(new MyComparator());
 
-	private ParseObject locationItem;
 	private String android_id; 
 
-	private int PERIODIC_UPDATE = 60000*30;  //gets location and disconnects every 30 minutes
-	private int PERIODIC_RECONNECTION_UPDATE = 60000*28;  //connects 2 minutes before getLocation call
-
-	private final int EVERY_THREE_MINUTES = 60*3*1000; 
+	private int EVERY_TWENTY_EIGHT_MINUTES = 60000*28;  
 
 	//For the Map Fragment
 	private static MainActivity THIS = null;
@@ -137,7 +132,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 
 		AlarmManager alarm = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 		alarm.
-		setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), EVERY_THREE_MINUTES, pintent);
+		setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), EVERY_TWENTY_EIGHT_MINUTES, pintent);
 	}
 
 	protected void initializeParse() {

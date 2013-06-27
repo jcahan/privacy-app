@@ -103,7 +103,8 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 			holder = new ChildHolder();
 			holder.cb = (CheckBox) convertView.findViewById(R.id.cb);
 			holder.title = (TextView) convertView.findViewById(R.id.title);
-			//TODO: Just added following line 
+			holder.title.setGravity(Gravity.CENTER);
+			
 			convertView.setTag(holder);
 		} 
 		else {
@@ -223,8 +224,9 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 			holder.imageView = (ImageView) convertView
 					.findViewById(R.id.label_indicator);
 			holder.title = (TextView) convertView.findViewById(R.id.title);
-			//TODO: Just added this line!! 
 			holder.title.setGravity(Gravity.CENTER);
+			
+			
 			convertView.setTag(holder);
 		} else {
 			holder = (GroupHolder) convertView.getTag();
@@ -235,7 +237,7 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 				: R.drawable.collapse);
 		final Item groupItem = getGroup(groupPosition);
 
-		holder.title.setText(groupItem.name);
+		holder.title.setText(" "+ groupItem.name);
 
 		holder.cb.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
