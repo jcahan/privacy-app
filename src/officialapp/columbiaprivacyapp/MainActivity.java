@@ -117,8 +117,6 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		datasource.open();
 		this.blackList= datasource.GetAllWords();
 		  
-		saveListToPref();
-
 		//Creates Sherlock Tab Menu
 		initalizeSherlockTabs();
 
@@ -271,8 +269,6 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	//Refreshes blacklist 
 	public void refreshBlackListTree() {
 		this.blackList= this.datasource.GetAllWords();
-		System.out.println("within the activity: " + blackList);
-		saveListToPref();
 		THIS = this; 
 	}
 
@@ -280,7 +276,6 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	public void addToBlackList(String blackListItem) {
 		BlacklistWord newWord = this.datasource.CreateBlacklistWord(blackListItem);
 		this.blackList.add(newWord);
-		saveListToPref();
 		THIS=this; 
 	}
 
@@ -289,7 +284,6 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		this.datasource.deleteStringWord(blackListItem);
 		this.blackList.remove(new BlacklistWord(blackListItem));
 
-		saveListToPref();
 		THIS=this; 
 	}
 	public void refreshAndSort() {
@@ -317,24 +311,10 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 			BlacklistWord newWord = this.datasource.CreateBlacklistWord(blackListItem);
 			this.blackList.add(newWord);
 		}	
-		saveListToPref();
 	}
 	public void removeFromMenu(String theWord) {
 		Fragment2.deleteFromMenu(theWord);
 		THIS = this; 
-	}
-
-	protected void saveListToPref() {
-		Editor theEditor = prefs.edit();
-		String bsPref = null; 
-		System.out.println("the list is being saved to preferences");
-		for(int i=0; i<blackList.size(); i++) {
-			bsPref = blackList.toString();
-		}
-		theEditor.putString("blackListedItems", bsPref);
-		System.out.println("the editor's blacklist items read: " + prefs.getString("blackListedItems", "default"));
-		
-		theEditor.commit();
 	}
 
 	@Override

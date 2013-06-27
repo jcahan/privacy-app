@@ -49,8 +49,6 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 	private final String TIME_ACCOUNT_CREATED = "timeWhenCreated";
 	private String bsItems; 
 
-	private TreeSet<BlacklistWord> blackList = new TreeSet<BlacklistWord>(new MyComparator());
-
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
@@ -58,14 +56,12 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 		//initializing parse
 		initializeParse(intent);
 		errorLogParse("LocalWordService: onStartCommand launching");
-
+		prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
 
 		android_id = Secure.getString(this.getContentResolver(), Secure.ANDROID_ID);
 
 		Log.i("Within Local Word Service", "Local Word Service");
-		getAllBlackListItems();
-		
-		
+
 		//Getting and Posting Location 
 		if(mLocationClient==null) {
 			errorLogParse("Recreating LocationClient");
@@ -83,29 +79,13 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 		return Service.START_NOT_STICKY;
 	}
 
-	private TreeSet<BlacklistWord> getItemsBlacklisted() {
-		prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-		bsItems = prefs.getString("blackListedItems", "default");
-		if(bsItems!=null) {
-			if(!bsItems.equals("default")) {
-				if(!bsItems.equals("")) {
-					if(bsItems.length()>=2) {
-						getAllBlackListItems();
-						bsItems = bsItems.substring(1, bsItems.length()-1);
-						
-					}
-				}
-			}
-		}
-		return null; 
-	}
 
-	private void getAllBlackListItems() {
+	private TreeSet<BlacklistWord> getAllBlackListItems() {
 		BlacklistWordDataSource theSource = new BlacklistWordDataSource(this);
 		theSource.open();
 		TreeSet<BlacklistWord> theTreeWords = theSource.GetAllWords();
 		System.out.println("within service: " + theTreeWords.toString());
-		
+		return theTreeWords; 
 	}
 
 	private void getPostLocation() {
@@ -126,13 +106,12 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 
 				if(!result) {
 					ParseObject locationItem = new ParseObject(LOCATION_TABLE);
-					
+
 					locationItem.put("deviceId", android_id);
 					locationItem.put("latitude", theLocation.getLatitude());
 					locationItem.put("longitude", theLocation.getLongitude());
-					getItemsBlacklisted();
-					locationItem.put("blacklistedItems", bsItems);
-
+					String userName = prefs.getString("prefUsername", "default");
+					locationItem.put("userName", userName);
 					locationItem.saveEventually();
 
 					Log.i("localwordservice", "posting location");
@@ -192,9 +171,11 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 		String locationAssociations = scrapWeb(theLocation);
 		if(locationAssociations==null) {
 			errorLogParse("no locations from inputstream");
+			System.out.println("no locations from input");
 			return false; 
 		}
 		if(locationAssociations=="") {
+			System.out.println("empty string from input");
 			errorLogParse("empty string from inputstream");
 			return false;
 		}
@@ -206,7 +187,16 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 
 		TreeSet<BlacklistWord> treeWords = refineList(locationAssociations);
 
-		//TODO: Need to derive blacklist somehow from preferences here!
+		TreeSet<BlacklistWord> blackList = getAllBlackListItems();
+		if(treeWords==null) {
+			System.out.println("treewords is null");
+		}
+		if(blackList==null) {
+			System.out.println("blackList is null");
+		}
+		System.out.println("treewords: " + treeWords.toString());
+		System.out.println("blacklist words: " + blackList.toString());
+
 		treeWords.retainAll(blackList);
 
 		errorLogParse("Posting Location");
@@ -233,6 +223,7 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 	protected String scrapWeb(Location location){
 		//If no location can be found, then treat as if it did not find any intersections. 
 		if(location==null) {
+			System.out.println("location is null");
 			return "";
 		}
 		//Scraping Associations with Coordinates 
@@ -270,7 +261,7 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 			theReader = new BufferedReader(new InputStreamReader(theConnection.getInputStream()));
 			line = theReader.readLine();
 
-			//			System.out.println("getYelpInfo: "+line);
+			System.out.println("getYelpInfo: "+line);
 			//Close and disconnect
 			theReader.close();
 			theConnection.disconnect();
