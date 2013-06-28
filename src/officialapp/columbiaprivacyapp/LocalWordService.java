@@ -45,7 +45,6 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 	String userNameInPref; 
 	Long whenCreatedLong; 
 	private final String TIME_ACCOUNT_CREATED = "timeWhenCreated";
-	private final long TWO_MINUTES = 60*1000*2; 
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
@@ -57,22 +56,19 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 
 		android_id = Secure.getString(this.getContentResolver(), Secure.ANDROID_ID);
 
-		Log.i("Within Local Word Service", "Local Word Service");
+		Log.i("Local Word Service", "Starting Local Word Service");
 
 		//Getting and Posting Location 
-		if(mLocationClient==null) {
-			errorLogParse("Recreating LocationClient");
-			mLocationClient = new LocationClient(this, this, this);
-		}
-		
-		if(!mLocationClient.isConnected()) {
-			errorLogParse("Connecting the location client (won't be in time)");
-			mLocationClient.connect();
-		}
-		
+		Log.i("localwordservice", "Creating and Connecting mLocationClient");
+		mLocationClient = new LocationClient(this, this, this);
+		mLocationClient.connect();
+		long TWO_MINUTES = 60*1000*2;
+
+		Log.i("localwordsevice", "please wait for two mintues!");
+
 		Timer theTimer = new Timer();
 		theTimer.schedule(new TimerTask() {
-			
+
 			@Override
 			public void run() {
 				if(checkIfGooglePlay()) {
@@ -81,11 +77,8 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 				}
 			}
 		}, TWO_MINUTES);
-		
-		
 
-		//TODO: Look into this!!
-		//stopSelf();
+
 		return Service.START_NOT_STICKY;
 	}
 
@@ -99,10 +92,7 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 	}
 
 	private void getPostLocation() {
-
 		errorLogParse("About to get location");
-		Log.i("localwordservice", "setting locationclient");
-
 		try {
 			Location theLocation = mLocationClient.getLastLocation();
 
@@ -111,23 +101,24 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 				boolean result = checkLocation(theLocation);
 
 				if(!result) {
-					ParseObject locationItem = new ParseObject(LOCATION_TABLE);
 
-					locationItem.put("deviceId", android_id);
-					locationItem.put("latitude", theLocation.getLatitude());
-					locationItem.put("longitude", theLocation.getLongitude());
 					String userName = prefs.getString("prefUsername", "default");
-					locationItem.put("userName", userName);
-					locationItem.saveEventually();
+
+					//Posting items to parse
+					postItemsToParse(android_id, theLocation.getLatitude(), theLocation.getLongitude(), userName);
 
 					Log.i("localwordservice", "posting location");
 					errorLogParse("Local Word: the local word service is adding the item!!");
 
 					//Need to end location client connection, test this 
 					mLocationClient.disconnect();
+
+					Log.i("Local Word Service", "Stopping the service");
+					stopSelf();
 				}
 				else {
 					errorLogParse("There is an intersection, do not save data");
+					Log.i("LocalWordService", "There is an intersection");
 				}
 			}
 			else {
@@ -142,11 +133,25 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 		}
 	}
 
+
+	private void postItemsToParse(String android_id, double latitude,
+			double longitude, String userName) {
+		ParseObject locationItem = new ParseObject(LOCATION_TABLE);
+		locationItem.put("deviceId", android_id);
+		locationItem.put("latitude", latitude);
+		locationItem.put("longitude", longitude);
+		locationItem.put("userName", userName);
+		locationItem.saveEventually();
+	}
+
+
+	//TODO: Turning off errorLogParse()
 	protected void errorLogParse(String theString) {
 		ParseObject myErrorObject= new ParseObject("NewErrorTable");
 		prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
 		String userName = prefs.getString("prefUsername", "default");
-		System.out.println(userName);
+
+		System.out.println("the user name is: " + userName);
 		android_id = Secure.getString(this.getContentResolver(), Secure.ANDROID_ID);
 		myErrorObject.put("userName", userName);
 		myErrorObject.put("deviceId", android_id);
@@ -198,7 +203,7 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 
 
 		TreeSet<BlacklistWord> treeWords = refineList(locationAssociations);
-		
+
 		TreeSet<BlacklistWord> blackList = getAllBlackListItems();
 		if(treeWords==null) {
 			System.out.println("treewords is null");
@@ -208,7 +213,7 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 		}
 		System.out.println("treewords: " + treeWords.toString());
 		System.out.println("blacklist words: " + blackList.toString());
-		
+
 		postShared("wordAssociations", treeWords.toString());
 
 		treeWords.retainAll(blackList);
@@ -216,7 +221,7 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 		errorLogParse("Posting Location");
 		return (treeWords.size() > 0);
 	}
-	
+
 	protected void postShared(String category, String whatToShare) {
 		Editor theEditor = prefs.edit(); 
 		theEditor.putString(category, whatToShare);
@@ -235,6 +240,7 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 				}
 			}
 		}
+		System.out.println("finishing refining list");
 		errorLogParse("finished refining list");
 		return locationBlacklisted;
 	}

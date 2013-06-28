@@ -10,9 +10,11 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeSet;
 
+import android.app.ActivityManager;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
+import android.app.ActivityManager.RunningServiceInfo;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -62,7 +64,8 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 
 	private String android_id; 
 
-	private int EVERY_TWENTY_EIGHT_MINUTES = 60000*28;  
+	private final int EVERY_TWENTY_EIGHT_MINUTES = 60000*28;  
+	private final int EVERY_TWO_MINUTES = 60000*2; 
 
 	//For the Map Fragment
 	private static MainActivity THIS = null;
@@ -92,6 +95,9 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
 		android_id = Secure.getString(this.getContentResolver(), Secure.ANDROID_ID);
+		//initializing Parse
+		initializeParse();
+
 
 		//Getting User name...
 		prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
@@ -113,15 +119,25 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		initalizeSherlockTabs();
 
 		//Initiating Timers
-		//		initAlarm();
-		Intent theService = new Intent(this, LocalWordService.class);
+		initAlarm();
 
-		startService(theService);
-
-		//initializing Parse
-		//		initializeParse();
+		//		Intent theService = new Intent(this, LocalWordService.class);
+		//		startService(theService);
 
 		THIS = this;
+	}
+
+	//Is Service Already Running?
+	protected boolean isMyServiceRunning() {
+		ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+		for (RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+			if (LocalWordService.class.getName().equals(service.service.getClassName())) {
+				Log.i("MainActivity", "Service is running");
+				return true;
+			}
+		}
+		Log.i("MainActivity", "Service is NOT running");
+		return false;
 	}
 
 	protected void initAlarm() {
@@ -130,9 +146,11 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		Intent intent = new Intent(this, LocalWordService.class);
 		PendingIntent pintent = PendingIntent.getService(this, 0, intent, 0);
 
-		AlarmManager alarm = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-		alarm.
-		setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), EVERY_TWENTY_EIGHT_MINUTES, pintent);
+		if(!isMyServiceRunning()) {
+			AlarmManager alarm = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+			alarm.
+			setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), EVERY_TWO_MINUTES, pintent);
+		}
 	}
 
 	protected void initializeParse() {

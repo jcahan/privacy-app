@@ -19,13 +19,12 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 	public static synchronized MySQLiteHelper getHelper(Context context)
 	{
 		if (instance == null) {
-			System.out.println("22 MYSQLiteHelper");
 			instance = new MySQLiteHelper(context);
 		}
+		//TODO: Take this out later 
 		if(instance.getWritableDatabase()==null) {
 			System.out.println("the instance writable is null");
 		}
-		System.out.println("25 MYSQLiteHelper");
 		return instance;
 	}
 
