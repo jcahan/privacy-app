@@ -116,7 +116,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		//		initAlarm();
 		Intent theService = new Intent(this, LocalWordService.class);
 
-		//		startService(theService);
+		startService(theService);
 
 		//initializing Parse
 		//		initializeParse();

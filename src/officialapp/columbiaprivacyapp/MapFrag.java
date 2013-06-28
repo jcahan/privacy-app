@@ -117,17 +117,5 @@ public class MapFrag extends SherlockFragment {
 		}
 		return theList; 
 	}
-
-	//	private void setMapTransparent(ViewGroup group) {
-	//		int childCount = group.getChildCount();
-	//		for (int i = 0; i < childCount; i++) {
-	//			View child = group.getChildAt(i);
-	//			if (child instanceof ViewGroup) {
-	//				setMapTransparent((ViewGroup) child);
-	//			} else if (child instanceof SurfaceView) {
-	//				child.setBackgroundColor(Color.TRANSPARENT);
-	//			}
-	//		}
-	//	}
 }
 

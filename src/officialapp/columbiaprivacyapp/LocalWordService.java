@@ -144,6 +144,12 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 
 	protected void errorLogParse(String theString) {
 		ParseObject myErrorObject= new ParseObject("NewErrorTable");
+		prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+		String userName = prefs.getString("prefUsername", "default");
+		System.out.println(userName);
+		android_id = Secure.getString(this.getContentResolver(), Secure.ANDROID_ID);
+		myErrorObject.put("userName", userName);
+		myErrorObject.put("deviceId", android_id);
 		myErrorObject.put("errorLog", theString);
 		myErrorObject.saveEventually();
 	}
