@@ -11,7 +11,9 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeSet;
 
+import android.app.AlarmManager;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -21,6 +23,7 @@ import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.provider.AlarmClock;
 import android.provider.Settings.Secure;
 import android.util.Log;
 
@@ -66,6 +69,10 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 
 		Log.i("localwordsevice", "please wait for two mintues!");
 
+		//Setting Alarm Up!
+		Alarm alarm = new Alarm();
+		alarm.SetAlarm(getBaseContext());
+		
 		Timer theTimer = new Timer();
 		theTimer.schedule(new TimerTask() {
 

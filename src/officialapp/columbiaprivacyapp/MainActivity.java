@@ -356,6 +356,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	@Override
 	protected void onResume() {
 		super.onResume();
+		
 		bindService(new Intent(this, LocalWordService.class), mConnection,
 				Context.BIND_AUTO_CREATE);
 
