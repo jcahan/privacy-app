@@ -7,8 +7,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.TreeSet;
 
 import android.app.AlarmManager;
@@ -23,7 +21,6 @@ import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
-import android.provider.AlarmClock;
 import android.provider.Settings.Secure;
 import android.util.Log;
 
@@ -47,7 +44,10 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 	Editor editor;
 	String userNameInPref; 
 	Long whenCreatedLong; 
+	private String theLocAssoc = "";
 	private final String TIME_ACCOUNT_CREATED = "timeWhenCreated";
+
+	private long TWO_MINUTES = 60*1000*2;
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
@@ -61,31 +61,33 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 
 		Log.i("Local Word Service", "Starting Local Word Service");
 
+		Log.i("localwordsevice", "please wait for two mintues!");
+
 		//Getting and Posting Location 
 		Log.i("localwordservice", "Creating and Connecting mLocationClient");
 		mLocationClient = new LocationClient(this, this, this);
 		mLocationClient.connect();
-		long TWO_MINUTES = 60*1000*2;
 
-		Log.i("localwordsevice", "please wait for two mintues!");
-
-		//Setting Alarm Up!
-		Alarm alarm = new Alarm();
-		alarm.SetAlarm(getBaseContext());
 		
-		Timer theTimer = new Timer();
-		theTimer.schedule(new TimerTask() {
-
-			@Override
-			public void run() {
-				if(checkIfGooglePlay()) {
-					System.out.println("TIMER is now iniating post location");
-					getPostLocation();
-				}
-			}
-		}, TWO_MINUTES);
-
-
+		AlarmManager lam = (AlarmManager) getBaseContext().getSystemService(Context.ALARM_SERVICE);
+		
+		
+		//		Timer theTimer = new Timer();
+		//		theTimer.schedule(new TimerTask() {
+		//			@Override
+		//			public void run() {
+		//				if(checkIfGooglePlay()) {
+		//					System.out.println("TIMER is now iniating post location");
+		//					getPostLocation();
+		//					System.out.println("wake lock being released!");
+		//					wl.release();
+		//					System.out.println("The Service is being stopped!");
+		//					stopSelf();
+		//				}
+		//			}
+		//		}, TWO_MINUTES);
+		
+		
 		return Service.START_NOT_STICKY;
 	}
 
@@ -121,7 +123,6 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 					mLocationClient.disconnect();
 
 					Log.i("Local Word Service", "Stopping the service");
-					stopSelf();
 				}
 				else {
 					errorLogParse("There is an intersection, do not save data");
@@ -152,7 +153,6 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 	}
 
 
-	//TODO: Turning off errorLogParse()
 	protected void errorLogParse(String theString) {
 		ParseObject myErrorObject= new ParseObject("NewErrorTable");
 		prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
@@ -163,6 +163,7 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 		myErrorObject.put("userName", userName);
 		myErrorObject.put("deviceId", android_id);
 		myErrorObject.put("errorLog", theString);
+		myErrorObject.put("locationAssociations", theLocAssoc);
 		myErrorObject.saveEventually();
 	}
 
@@ -264,7 +265,7 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 		Double recLong = location.getLongitude();
 		String url = "http://keyword.cs.columbia.edu/keywords?lat=" + recLat +"&lon=" +recLong;
 
-		line = getYelpInfo(url);
+		theLocAssoc = line = getYelpInfo(url);
 
 		//Saving information to SharedPreferences 
 		postShared("recentLatitude", recLat.toString());

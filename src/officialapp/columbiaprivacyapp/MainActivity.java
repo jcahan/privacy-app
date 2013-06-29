@@ -64,7 +64,8 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 
 	private String android_id; 
 
-	private final int EVERY_TWENTY_EIGHT_MINUTES = 60000*28;  
+	private final int EVERY_TWENTY_EIGHT_MINUTES = 60000*28;
+	
 	private final int EVERY_TWO_MINUTES = 60000*2; 
 
 	//For the Map Fragment
@@ -127,6 +128,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 		THIS = this;
 	}
 
+	//	http://stackoverflow.com/a/5921190/2423246
 	//Is Service Already Running?
 	protected boolean isMyServiceRunning() {
 		ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
@@ -356,7 +358,7 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 	@Override
 	protected void onResume() {
 		super.onResume();
-		
+
 		bindService(new Intent(this, LocalWordService.class), mConnection,
 				Context.BIND_AUTO_CREATE);
 
@@ -373,8 +375,6 @@ public class MainActivity extends SherlockFragmentActivity  implements Connectio
 
 		public void onServiceConnected(ComponentName className, IBinder binder) {
 			s = ((LocalWordService.MyBinder) binder).getService();
-			Toast.makeText(MainActivity.this, "Connected", Toast.LENGTH_SHORT)
-			.show();
 		}
 
 		public void onServiceDisconnected(ComponentName className) {
