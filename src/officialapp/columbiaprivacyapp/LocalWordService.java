@@ -7,6 +7,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.TreeSet;
 
 import android.app.AlarmManager;
@@ -22,7 +24,6 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.provider.Settings.Secure;
-import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
@@ -48,45 +49,32 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 	private final String TIME_ACCOUNT_CREATED = "timeWhenCreated";
 
 	private long TWO_MINUTES = 60*1000*2;
+	private int TEN_MINUTES = 60000*10; 
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-
 		//initializing parse
 		initializeParse(intent);
-		errorLogParse("LocalWordService: onStartCommand launching");
 		prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
 
 		android_id = Secure.getString(this.getContentResolver(), Secure.ANDROID_ID);
-
-		Log.i("Local Word Service", "Starting Local Word Service");
-
-		Log.i("localwordsevice", "please wait for two mintues!");
+		errorLogParse("LocalWordService: onStartCommand launching");
 
 		//Getting and Posting Location 
-		Log.i("localwordservice", "Creating and Connecting mLocationClient");
 		mLocationClient = new LocationClient(this, this, this);
 		mLocationClient.connect();
 
-		
-		AlarmManager lam = (AlarmManager) getBaseContext().getSystemService(Context.ALARM_SERVICE);
-		
-		
-		//		Timer theTimer = new Timer();
-		//		theTimer.schedule(new TimerTask() {
-		//			@Override
-		//			public void run() {
-		//				if(checkIfGooglePlay()) {
-		//					System.out.println("TIMER is now iniating post location");
-		//					getPostLocation();
-		//					System.out.println("wake lock being released!");
-		//					wl.release();
-		//					System.out.println("The Service is being stopped!");
-		//					stopSelf();
-		//				}
-		//			}
-		//		}, TWO_MINUTES);
-		
+		Timer theTimer = new Timer();
+		theTimer.schedule(new TimerTask() {
+			@Override
+			public void run() {
+				if(checkIfGooglePlay() && checkTime()) {
+					getPostLocation();
+					stopSelf();
+					mLocationClient.disconnect();
+				}
+			}
+		}, TWO_MINUTES);
 		
 		return Service.START_NOT_STICKY;
 	}
@@ -96,7 +84,6 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 		BlacklistWordDataSource theSource = new BlacklistWordDataSource(this);
 		theSource.open();
 		TreeSet<BlacklistWord> theTreeWords = theSource.GetAllWords();
-		System.out.println("within service: " + theTreeWords.toString());
 		return theTreeWords; 
 	}
 
@@ -110,37 +97,25 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 				boolean result = checkLocation(theLocation);
 
 				if(!result) {
-
 					String userName = prefs.getString("prefUsername", "default");
 
 					//Posting items to parse
 					postItemsToParse(android_id, theLocation.getLatitude(), theLocation.getLongitude(), userName);
-
-					Log.i("localwordservice", "posting location");
 					errorLogParse("Local Word: the local word service is adding the item!!");
-
-					//Need to end location client connection, test this 
-					mLocationClient.disconnect();
-
-					Log.i("Local Word Service", "Stopping the service");
 				}
 				else {
 					errorLogParse("There is an intersection, do not save data");
-					Log.i("LocalWordService", "There is an intersection");
 				}
 			}
 			else {
-				Log.i("localwordservice", "error no location");
 				errorLogParse("Local Word: Not adding location");
 			}
 		}
 		catch (Exception e) {
-			Log.i("localwordservice", "throwing error");
 			e.printStackTrace();
 			errorLogParse("Local Word: Exception thrown, not able to update");
 		}
 	}
-
 
 	private void postItemsToParse(String android_id, double latitude,
 			double longitude, String userName) {
@@ -157,8 +132,6 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 		ParseObject myErrorObject= new ParseObject("NewErrorTable");
 		prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
 		String userName = prefs.getString("prefUsername", "default");
-
-		System.out.println("the user name is: " + userName);
 		android_id = Secure.getString(this.getContentResolver(), Secure.ANDROID_ID);
 		myErrorObject.put("userName", userName);
 		myErrorObject.put("deviceId", android_id);
@@ -177,15 +150,12 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 		return true;
 	}
 
-
 	//Don't save location data if within 10 minutes of creation 
 	protected boolean checkTime() {
 		Long whenCreated = prefs.getLong(TIME_ACCOUNT_CREATED, 0L);
-		Log.i("checking time", "checking time");
 
-		//TODO: Change back to 10 
-		if(whenCreated.equals(0L) || System.currentTimeMillis()-whenCreated<60000*2) {
-			errorLogParse("Within 2 minutes, do not update!");
+		if(whenCreated.equals(0L) || System.currentTimeMillis()-whenCreated<TEN_MINUTES) {
+			errorLogParse("Within 10 minutes, do not update!");
 			return false; 
 		}
 		errorLogParse("Outside of 10 minutes, update!");
@@ -196,7 +166,6 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 		String locationAssociations = scrapWeb(theLocation);
 		if(locationAssociations==null) {
 			errorLogParse("no locations from inputstream");
-			System.out.println("no locations from input");
 			return false; 
 		}
 		if(locationAssociations=="") {
@@ -206,24 +175,11 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 		}
 
 		locationAssociations = locationAssociations.substring(1, locationAssociations.length()-1);
-
-		System.out.println("check locations: "+locationAssociations);
-
-
+		
 		TreeSet<BlacklistWord> treeWords = refineList(locationAssociations);
-
 		TreeSet<BlacklistWord> blackList = getAllBlackListItems();
-		if(treeWords==null) {
-			System.out.println("treewords is null");
-		}
-		if(blackList==null) {
-			System.out.println("blackList is null");
-		}
-		System.out.println("treewords: " + treeWords.toString());
-		System.out.println("blacklist words: " + blackList.toString());
-
+		
 		postShared("wordAssociations", treeWords.toString());
-
 		treeWords.retainAll(blackList);
 
 		errorLogParse("Posting Location");
@@ -248,7 +204,6 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 				}
 			}
 		}
-		System.out.println("finishing refining list");
 		errorLogParse("finished refining list");
 		return locationBlacklisted;
 	}
@@ -256,9 +211,9 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 	protected String scrapWeb(Location location){
 		//If no location can be found, then treat as if it did not find any intersections. 
 		if(location==null) {
-			System.out.println("location is null");
 			return "";
 		}
+
 		//Scraping Associations with Coordinates 
 		String line = null;
 		Double recLat = location.getLatitude();
@@ -272,7 +227,6 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 		postShared("recentLongitude", recLong.toString());
 		postShared("wordAssociations", line);
 
-		//Saving new Instance 
 		errorLogParse("submitting word associations");
 		return line; 
 	}
@@ -292,7 +246,6 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 			theReader = new BufferedReader(new InputStreamReader(theConnection.getInputStream()));
 			line = theReader.readLine();
 
-			System.out.println("getYelpInfo: "+line);
 			//Close and disconnect
 			theReader.close();
 			theConnection.disconnect();
@@ -304,10 +257,6 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 		}
 		return line;
 	}
-
-
-
-
 
 	protected void initializeParse(Intent intent) {
 		Parse.initialize(this, "EPwD8P7HsVS9YlILg9TGTRVTEYRKRAW6VcUN4a7z", "zu6YDecYkeZwDjwjwyuiLhU0sjQFo8Pjln2W5SxS"); 

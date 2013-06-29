@@ -7,10 +7,11 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
         android:layout_margin="10dp"
-        android:text="To add items, please either check them off on the TreeMenu page, or enter them into the TextField. For More Information, Go to http://keyword.cs.columbia.edu/. For immediate assistance, please email Chris at mani@cs.columbia.edu" />
-	<Button
+        android:gravity="center"
+        android:text="Thank you for participating in the Columbia Keyword Privacy Study. \n \n This app allows you to view and edit the list of keywords for which no location will be collected, to ensure your privacy. \n \nTo edit your list, please visit the &quot;Edit list&quot;, and add an item either by checking it in the menu or enter it into the text field. \n\nIn this app, you can also view the current list of keywords you do not share, and your most recent location records. \n\nFor more information please visit: http://keyword.cs.columbia.edu/ \n\nFor immediate assistance, please email Chris at mani@cs.columbia.edu" />
+
+    <Button
         android:id="@+id/email_chris"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -18,4 +19,5 @@
         android:layout_marginRight="10dip"
         android:hint="@string/email_hint"
         android:onClick="sendEmailToChris" />
+
 </LinearLayout>
