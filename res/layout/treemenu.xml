@@ -6,10 +6,10 @@
 
     <AutoCompleteTextView
         android:id="@+id/edit_message"
+        style="@style/Theme.Sherlock.Light"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/my_hint"
-        android:textColor="#000001" />
+        android:hint="@string/my_hint" />
 
     <Button
         android:id="@+id/post_blacklist_button"
@@ -26,7 +26,7 @@
         android:cacheColorHint="@null"
         android:choiceMode="multipleChoice"
         android:groupIndicator="@null"
-        android:textSize="45pt" 
-        android:scrollbars="none" />
+        android:scrollbars="none"
+        android:textSize="45pt" />
 
 </LinearLayout>

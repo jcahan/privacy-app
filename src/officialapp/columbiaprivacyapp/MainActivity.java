@@ -54,7 +54,7 @@ public class MainActivity extends SherlockFragmentActivity implements Connection
 	private String android_id; 
 
 	private final int EVERY_TWENTY_EIGHT_MINUTES = 60000*28;
-	private final int EVERY_TWO_MINUTES = 60000*2; 
+	//	private final int EVERY_TWO_MINUTES = 60000*2; 
 
 	private static MainActivity THIS = null;
 	public static MainActivity getInstance() {
@@ -116,7 +116,6 @@ public class MainActivity extends SherlockFragmentActivity implements Connection
 	}
 
 	//	http://stackoverflow.com/a/5921190/2423246
-	//Is Service Already Running?
 	protected boolean isMyServiceRunning() {
 		ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
 		for (RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
@@ -138,7 +137,7 @@ public class MainActivity extends SherlockFragmentActivity implements Connection
 		if(!isMyServiceRunning()) {
 			AlarmManager alarm = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 			alarm.
-			setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), EVERY_TWO_MINUTES, pintent);
+			setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), EVERY_TWENTY_EIGHT_MINUTES, pintent);
 		}
 	}
 
@@ -181,10 +180,10 @@ public class MainActivity extends SherlockFragmentActivity implements Connection
 
 
 		//Adding Tabs to Action Bar
+		actionbar.addTab(Frag4Tab);
 		actionbar.addTab(Frag1Tab);
 		actionbar.addTab(Frag2Tab);
 		actionbar.addTab(Frag3Tab);
-		actionbar.addTab(Frag4Tab);
 	}
 
 	protected Boolean checkIfGooglePlay() {
@@ -214,7 +213,7 @@ public class MainActivity extends SherlockFragmentActivity implements Connection
 			public void onClick(DialogInterface dialog, int id) {
 				String thisUserName = et.getText().toString().trim();
 				Toast.makeText(getApplicationContext(), "We are evaluating your chosen username",  Toast.LENGTH_SHORT).show();
-				
+
 				//Make sure only AlphaNumeric 
 				if(!thisUserName.matches("^[a-zA-Z0-9]*$")) {
 					Toast.makeText(getApplicationContext(), "Please create a username of only AlphaNumeric characters",  Toast.LENGTH_LONG).show();
@@ -302,7 +301,7 @@ public class MainActivity extends SherlockFragmentActivity implements Connection
 
 		//Refresh the datasource
 		this.blackList= this.datasource.GetAllWords();
-		
+
 		//Already exists in list, delete item
 		if(blackList.contains(theWord)) {
 			this.datasource.deleteStringWord(blackListItem);
@@ -400,7 +399,7 @@ public class MainActivity extends SherlockFragmentActivity implements Connection
 				mFragment = (SherlockFragment) SherlockFragment.instantiate(mActivity, mClass.getName());
 				ft.add(R.id.fragment_container, mFragment, mTag);
 			} else {
-				if(tab.getPosition()==1){
+				if(tab.getPosition()==2){
 					preInitializedFragment = ((TreeMenuFragment) preInitializedFragment).refresh(); 
 				}
 				ft.attach(preInitializedFragment);
@@ -409,7 +408,7 @@ public class MainActivity extends SherlockFragmentActivity implements Connection
 
 		public void onTabUnselected(Tab tab, FragmentTransaction ft) {
 			SherlockFragment preInitializedFragment = (SherlockFragment) mActivity.getSupportFragmentManager().findFragmentByTag(mTag);
-			if(tab.getPosition()==1) {
+			if(tab.getPosition()==2) {
 				if(mFragment!=null){
 					((TreeMenuFragment) mFragment).collapseAll();
 				}

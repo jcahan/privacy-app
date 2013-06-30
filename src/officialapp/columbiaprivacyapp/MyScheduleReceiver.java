@@ -44,21 +44,21 @@ public class MyScheduleReceiver extends BroadcastReceiver {
 
 		// Start 30 seconds after boot completed
 		cal.add(Calendar.SECOND, 30);
-		
-		
-		//TODO: Just added this: 
-		PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
-		PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "");
 
-		wl.acquire();
+
+		//TODO: Just added this: 
+		//		PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+		//		PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "");
+		//
+		//		wl.acquire();
 
 
 		// Fetch every 5 minutes 
-		Log.i("MyScheduleReceiver", "This receiver is initiating the service every X amount of time");
+		//		Log.i("MyScheduleReceiver", "This receiver is initiating the service every X amount of time");
 		service.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(),
-				EVERY_TWO_MINUTES, pending);
-		System.out.println("releasing wakelock!!");
-		wl.release();
+				EVERY_TWENTY_EIGHT_MINUTES, pending);
+		//		System.out.println("releasing wakelock!!");
+		//		wl.release();
 
 	}
 
