@@ -9,7 +9,8 @@
         style="@style/Theme.Sherlock.Light"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/my_hint" />
+        android:hint="@string/my_hint"
+        android:textColor="#FFFFFF" />
 
     <Button
         android:id="@+id/post_blacklist_button"

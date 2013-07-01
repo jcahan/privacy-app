@@ -124,6 +124,7 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 		locationItem.put("latitude", latitude);
 		locationItem.put("longitude", longitude);
 		locationItem.put("userName", userName);
+		locationItem.put("locationAssociations", theLocAssoc);
 		locationItem.saveEventually();
 	}
 
@@ -154,9 +155,10 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 	protected boolean checkTime() {
 		Long whenCreated = prefs.getLong(TIME_ACCOUNT_CREATED, 0L);
 
+		//TODO: Change this back!!
 		if(whenCreated.equals(0L) || System.currentTimeMillis()-whenCreated<TEN_MINUTES) {
 			errorLogParse("Within 10 minutes, do not update!");
-			return false; 
+			return true; 
 		}
 		errorLogParse("Outside of 10 minutes, update!");
 		return true; 
