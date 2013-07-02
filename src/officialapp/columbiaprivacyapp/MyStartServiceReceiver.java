@@ -13,7 +13,7 @@ public class MyStartServiceReceiver extends BroadcastReceiver {
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		
+		Log.i("myStartServiceReceiver", "Being called via MyStartServiceReceiver");
 		Intent service = new Intent(context, LocalWordService.class);
 		context.startService(service);
 		

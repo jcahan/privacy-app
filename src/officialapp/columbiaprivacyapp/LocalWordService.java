@@ -7,11 +7,10 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.TreeSet;
 
 import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -22,8 +21,10 @@ import android.location.LocationListener;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.provider.Settings.Secure;
+import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
@@ -35,21 +36,23 @@ import com.parse.ParseAnalytics;
 import com.parse.ParseObject;
 
 public class LocalWordService extends Service implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener{
-	private final IBinder mBinder = new MyBinder();
-	private ArrayList<String> list = new ArrayList<String>();
-	private LocationClient mLocationClient; //Stores the current instantiation of the location client in this object
-	private final String LOCATION_TABLE = "LocationTableStudy";
-	private String android_id; 
+	protected final IBinder mBinder = new MyBinder();
+	protected ArrayList<String> list = new ArrayList<String>();
+	protected LocationClient mLocationClient; //Stores the current instantiation of the location client in this object
+	protected final String LOCATION_TABLE = "TESTLocationTableStudy";
+	protected String android_id; 
 
-	SharedPreferences prefs;
-	Editor editor;
-	String userNameInPref; 
-	Long whenCreatedLong; 
+	protected SharedPreferences prefs;
+	protected Editor editor;
+	protected String userNameInPref; 
+	protected Long whenCreatedLong; 
 	private String theLocAssoc = "";
 	private final String TIME_ACCOUNT_CREATED = "timeWhenCreated";
-
-	private long TWO_MINUTES = 60*1000*2;
-	private int TEN_MINUTES = 60000*10; 
+	private final long ONE_MINUTE = 60*1000*1;
+	private final int TEN_MINUTES = 60000*10; 
+	private final String THE_ERROR_TABLE = "TESTErrorTable";
+	private PowerManager pm; 
+	private PowerManager.WakeLock wl;
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
@@ -60,25 +63,49 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 		android_id = Secure.getString(this.getContentResolver(), Secure.ANDROID_ID);
 		errorLogParse("LocalWordService: onStartCommand launching");
 
-		//Getting and Posting Location 
-		mLocationClient = new LocationClient(this, this, this);
-		mLocationClient.connect();
+		if(mLocationClient==null) {
+			//Getting and Posting Location
+			initalizeLocks();
+			connectClient();
+			createSetAlarm();
+		} else {
+			System.out.println("GETTING THE LOCATION OMG!!!");
+			getPostLocation();
+			wl.release();
+			mLocationClient = null;
+			System.out.println("the service is being stopped!!");
+			stopSelf();
+		}
 
-		Timer theTimer = new Timer();
-		theTimer.schedule(new TimerTask() {
-			@Override
-			public void run() {
-				if(checkIfGooglePlay() && checkTime()) {
-					getPostLocation();
-					stopSelf();
-					mLocationClient.disconnect();
-				}
-			}
-		}, TWO_MINUTES);
-		
 		return Service.START_NOT_STICKY;
 	}
 
+	private void createSetAlarm() {
+		Context theContext = getBaseContext();
+
+		AlarmManager theService = (AlarmManager) theContext
+				.getSystemService(Context.ALARM_SERVICE);
+
+		Intent i = new Intent(LocalWordService.this, this.getClass());
+
+		PendingIntent thePending = PendingIntent.getService(this, 0, i,
+				PendingIntent.FLAG_CANCEL_CURRENT);
+		//call this after two minutes 
+		theService.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + ONE_MINUTE, thePending);
+
+	}
+
+	private void connectClient() {
+		mLocationClient = new LocationClient(this, this, this);
+		mLocationClient.connect();
+		Log.i("LocalWordService", "Shortly iniating alarm");
+	}
+
+	private void initalizeLocks() {
+		pm = (PowerManager) getBaseContext().getSystemService(Context.POWER_SERVICE);
+		wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "");
+		wl.acquire();
+	}
 
 	private TreeSet<BlacklistWord> getAllBlackListItems() {
 		BlacklistWordDataSource theSource = new BlacklistWordDataSource(this);
@@ -87,7 +114,7 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 		return theTreeWords; 
 	}
 
-	private void getPostLocation() {
+	protected void getPostLocation() {
 		errorLogParse("About to get location");
 		try {
 			Location theLocation = mLocationClient.getLastLocation();
@@ -117,7 +144,7 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 		}
 	}
 
-	private void postItemsToParse(String android_id, double latitude,
+	protected void postItemsToParse(String android_id, double latitude,
 			double longitude, String userName) {
 		ParseObject locationItem = new ParseObject(LOCATION_TABLE);
 		locationItem.put("deviceId", android_id);
@@ -130,7 +157,7 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 
 
 	protected void errorLogParse(String theString) {
-		ParseObject myErrorObject= new ParseObject("NewErrorTable");
+		ParseObject myErrorObject= new ParseObject(THE_ERROR_TABLE);
 		prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
 		String userName = prefs.getString("prefUsername", "default");
 		android_id = Secure.getString(this.getContentResolver(), Secure.ANDROID_ID);
@@ -177,10 +204,10 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 		}
 
 		locationAssociations = locationAssociations.substring(1, locationAssociations.length()-1);
-		
+
 		TreeSet<BlacklistWord> treeWords = refineList(locationAssociations);
 		TreeSet<BlacklistWord> blackList = getAllBlackListItems();
-		
+
 		postShared("wordAssociations", treeWords.toString());
 		treeWords.retainAll(blackList);
 
@@ -233,7 +260,7 @@ public class LocalWordService extends Service implements ConnectionCallbacks, On
 		return line; 
 	}
 
-	private String getYelpInfo(String url) {
+	protected String getYelpInfo(String url) {
 		String line = null; 
 		BufferedReader theReader;
 		HttpURLConnection theConnection;

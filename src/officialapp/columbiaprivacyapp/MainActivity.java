@@ -16,8 +16,6 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.ActivityInfo;
-import android.location.Location;
-import android.location.LocationListener;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
@@ -34,8 +32,6 @@ import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
-import com.google.android.gms.common.GooglePlayServicesClient.OnConnectionFailedListener;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.parse.Parse;
 import com.parse.ParseAnalytics;
@@ -44,8 +40,8 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
 
-public class MainActivity extends SherlockFragmentActivity implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener {
-	private final String USER_TABLE = "UserTableStudy";
+public class MainActivity extends SherlockFragmentActivity {
+	private final String USER_TABLE = "TESTUserTableStudy";
 	protected BlacklistWordDataSource datasource;
 
 	//Solution: Presently adding all items to TreeSet. No available Adapters that support Trees
@@ -54,7 +50,7 @@ public class MainActivity extends SherlockFragmentActivity implements Connection
 	private String android_id; 
 
 	private final int EVERY_TWENTY_EIGHT_MINUTES = 60000*28;
-	//		private final int EVERY_TWO_MINUTES = 60000*2; 
+	private final int EVERY_TWO_MINUTES = 60000*3; 
 
 	private static MainActivity THIS = null;
 	public static MainActivity getInstance() {
@@ -86,22 +82,19 @@ public class MainActivity extends SherlockFragmentActivity implements Connection
 		//initializing Parse
 		initializeParse();
 
+		//Getting preferences
+		getPreferences();
 
-		//Getting User name...
-		prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-		editor = prefs.edit();
-		userNameInPref = prefs.getString("prefUsername", "default");
-		whenCreatedLong = prefs.getLong(TIME_ACCOUNT_CREATED, 0L);
+		Log.i("Main Activity", "Look for this!!");
+		System.out.println("The Main Activity is starting!");
 
 		if (userNameInPref.equals("default")) {
 			createDialogBox();
 			userNameInPref = prefs.getString("prefUsername", "default");
 		}
-
+		
 		//Communicating with DataSource
-		datasource = new BlacklistWordDataSource(this);
-		datasource.open();
-		this.blackList= datasource.GetAllWords();
+		openDatasource();
 
 		//Creates Sherlock Tab Menu
 		initalizeSherlockTabs();
@@ -109,10 +102,20 @@ public class MainActivity extends SherlockFragmentActivity implements Connection
 		//Initiating Timers
 		initAlarm();
 
-		//		Intent theService = new Intent(this, LocalWordService.class);
-		//		startService(theService);
-
 		THIS = this;
+	}
+
+	private void openDatasource() {
+		datasource = new BlacklistWordDataSource(this);
+		datasource.open();
+		this.blackList= datasource.GetAllWords();
+	}
+
+	private void getPreferences() {
+		prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+		editor = prefs.edit();
+		userNameInPref = prefs.getString("prefUsername", "default");
+		whenCreatedLong = prefs.getLong(TIME_ACCOUNT_CREATED, 0L);
 	}
 
 	//	http://stackoverflow.com/a/5921190/2423246
@@ -120,9 +123,11 @@ public class MainActivity extends SherlockFragmentActivity implements Connection
 		ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
 		for (RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
 			if (LocalWordService.class.getName().equals(service.service.getClassName())) {
+				Log.i("MainActivity", "Service is still running, skip");
 				return true;
 			}
 		}
+		Log.i("MainActivity", "Service is NOT running, initiate it");
 		return false;
 	}
 
@@ -132,12 +137,14 @@ public class MainActivity extends SherlockFragmentActivity implements Connection
 		Intent intent = new Intent(this, LocalWordService.class);
 		PendingIntent pintent = PendingIntent.getService(this, 0, intent, 0);
 
+		//		if(!isMyServiceRunning()) {
+		AlarmManager alarm = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 
-		if(!isMyServiceRunning()) {
-			AlarmManager alarm = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-			alarm.
-			setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), EVERY_TWENTY_EIGHT_MINUTES, pintent);
-		}
+		//TODO: CHANGE the time back!!
+		Log.i("MainActivity", "Iniaiating the alarm now, wait two minutes!");
+		alarm.
+		setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), EVERY_TWO_MINUTES, pintent);
+		//		}
 	}
 
 	protected void initializeParse() {
@@ -317,24 +324,6 @@ public class MainActivity extends SherlockFragmentActivity implements Connection
 		THIS = this; 
 	}
 
-	@Override
-	public void onConnectionFailed(ConnectionResult result) {
-	}
-	@Override
-	public void onConnected(Bundle connectionHint) {
-	}
-	@Override
-	public void onDisconnected() {
-	}
-	@Override
-	public void onLocationChanged(Location location) {
-	}
-	@Override
-	public void onProviderDisabled(String provider) {
-	}
-	@Override
-	public void onProviderEnabled(String provider) {
-	}
 
 	//	 Called when the Activity is restarted, even before it becomes visible.
 	@Override
@@ -373,11 +362,6 @@ public class MainActivity extends SherlockFragmentActivity implements Connection
 			s = null;
 		}
 	};
-
-	@Override
-	public void onStatusChanged(String provider, int status, Bundle extras) {
-	}
-
 
 	public class TabListener<T extends SherlockFragment> implements com.actionbarsherlock.app.ActionBar.TabListener {
 		private final SherlockFragmentActivity mActivity;

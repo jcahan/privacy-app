@@ -17,8 +17,8 @@ import com.parse.ParseObject;
 public class MyScheduleReceiver extends BroadcastReceiver {
 
 	// Restart service every 28 minutes
-	private int EVERY_TWENTY_EIGHT_MINUTES = 60000*28; 
-	//	private int EVERY_TWO_MINUTES = 60000*2; 
+//	private int EVERY_TWENTY_EIGHT_MINUTES = 60000*28; 
+		private int EVERY_TWO_MINUTES = 60000*3; 
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
@@ -27,6 +27,8 @@ public class MyScheduleReceiver extends BroadcastReceiver {
 
 		errorLogParse("Booting up");
 
+		Log.i("ScheduleReceiver", "In the Schedule Receiver, iniating alarm shortly");
+		
 		AlarmManager service = (AlarmManager) context
 				.getSystemService(Context.ALARM_SERVICE);
 		Intent i = new Intent(context, MyStartServiceReceiver.class);
@@ -39,10 +41,9 @@ public class MyScheduleReceiver extends BroadcastReceiver {
 		// Start 30 seconds after boot completed
 		cal.add(Calendar.SECOND, 30);
 
-
-		//TODO: Must chagne thsi back 
+		//TODO: Change this back!!in ser
 		service.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(),
-				EVERY_TWENTY_EIGHT_MINUTES, pending);
+				EVERY_TWO_MINUTES, pending);
 	}
 
 	protected void errorLogParse(String theString) {
