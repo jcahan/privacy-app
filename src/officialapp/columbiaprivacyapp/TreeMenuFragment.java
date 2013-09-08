@@ -30,7 +30,7 @@ import com.actionbarsherlock.app.SherlockFragment;
 public class TreeMenuFragment extends SherlockFragment{
 	protected View view; 
 	protected LinkedHashMap<Item,ArrayList<Item>> groupList;
-	protected ExpandableListView expandableListView;
+	protected ExpandableListView expandableListView; 
 	protected ExpandableAdapter adapter; 
 
 
@@ -128,12 +128,11 @@ public class TreeMenuFragment extends SherlockFragment{
 				//First need to check if this value exists within the entire List. If it does, then check/uncheck the box. 
 				updateTreeView(enteredText); 
 				
-				MainActivity.getInstance().postBlackListItem(enteredText);
-				//refreshes the rest 
-				MainActivity.getInstance().invalidateOptionsMenu();
+				postRefreshBlackList(enteredText); 
+				
 			}
 		});
-		Toast.makeText(getSherlockActivity(), "To add items, enter them into the text field, or select them from the drop-down menus", Toast.LENGTH_SHORT).show();
+		toastForAddingItems(); 
 		
 		//Creating ExpandableListView Menu Below..
 		initViews(view);
@@ -145,15 +144,21 @@ public class TreeMenuFragment extends SherlockFragment{
 		return view;
 	}
 	
-	private void updateTreeView(String enteredText) {
-		if(allStrings.containsKey(enteredText.toLowerCase())) {
-			//Get which group position 
-			String theGroupName = allStrings.get(enteredText.toLowerCase());
-			int theGroupPosition = groupPositions.get(theGroupName);
+	private void toastForAddingItems() {
+		Toast.makeText(getSherlockActivity(), "To add items, enter them into the text field, or select them from the drop-down menus", Toast.LENGTH_SHORT).show();
+	}
 
-			//Get which child position
-			int childPosition = groupChildPosition.get(theGroupName).get(enteredText.toLowerCase());
-			Item theItem = adapter.getChild(theGroupPosition, childPosition);
+	private void postRefreshBlackList(String enteredText) {
+		MainActivity.getInstance().postBlackListItem(enteredText);
+		//refreshes the rest 
+		MainActivity.getInstance().invalidateOptionsMenu();
+	}
+	
+	//If the entered text is an existing checkbox in the ExpandableListView, then it either checks or unchecks that item. 
+	private void updateTreeView(String enteredText) {
+		String lowerCaseText = enteredText.toLowerCase(); 
+		if(allStrings.containsKey(lowerCaseText)) {
+			Item theItem = getCheckBoxToUpdate(lowerCaseText);
 			
 			//If Checked, then uncheck
 			if(theItem.isChecked) {
@@ -167,6 +172,25 @@ public class TreeMenuFragment extends SherlockFragment{
 			adapter.notifyDataSetChanged();
 		}
 	}
+	
+	private Item getCheckBoxToUpdate(String lowerCaseText) {
+		//Get which group position
+		String theGroupName = allStrings.get(lowerCaseText);
+		int theGroupPosition = findGroupPosition(theGroupName); 
+		
+		//Get which child position
+		int childPosition = getChildPosition(theGroupName, lowerCaseText);
+		return adapter.getChild(theGroupPosition, childPosition);
+	}
+
+	private int getChildPosition(String theGroupName, String lowerCaseText) {
+		return groupChildPosition.get(theGroupName).get(lowerCaseText);
+	}
+
+	private int findGroupPosition(String theGroupName) {
+		return groupPositions.get(theGroupName);
+	}
+
 	//Collapses all windows 
 	public void collapseAll() {
 		if(expandableListView!=null) {
@@ -181,7 +205,6 @@ public class TreeMenuFragment extends SherlockFragment{
 	public TreeMenuFragment refresh() {
 		if(expandableListView!=null) {
 			initGroupList();
-
 			updateExpandableListView();
 		}
 		else {
@@ -198,15 +221,9 @@ public class TreeMenuFragment extends SherlockFragment{
 	}
 
 	public void deleteFromMenu(String blackListItem) {
-		if(allStrings.containsKey(blackListItem.toLowerCase())) {
-			//Get which group position 
-			String theGroupName = allStrings.get(blackListItem.toLowerCase());
-			int theGroupPosition = groupPositions.get(theGroupName);
-
-			//Get which child position
-			int childPosition = groupChildPosition.get(theGroupName).get(blackListItem.toLowerCase());
-
-			Item theItem = adapter.getChild(theGroupPosition, childPosition);
+		String blackListLowerCase = blackListItem.toLowerCase(); 
+		if(allStrings.containsKey(blackListLowerCase)) {
+			Item theItem = getCheckBoxToUpdate(blackListLowerCase);
 			if(theItem==null) return; 
 			theItem.isChecked = false; 
 
@@ -223,14 +240,16 @@ public class TreeMenuFragment extends SherlockFragment{
 		expandableListView.setAdapter(adapter);
 		for(BlacklistWord eachWord :setOfWords) {
 			String toCheck = eachWord.getWord(); 
-			if(allStrings.containsKey(eachWord.getWord())) {
+			String toCheckLowerCase = toCheck.toLowerCase(); 
+			
+			if(allStrings.containsKey(toCheck)) {
 				String theGroupName = allStrings.get(toCheck.toLowerCase());
-				int theGroupPosition = groupPositions.get(theGroupName);
+				int theGroupPosition = findGroupPosition(theGroupName);
 				incrementGroupSize(theGroupPosition, eachGroupSize);
-
+				
 				//Get which child position
-				int childPosition = groupChildPosition.get(theGroupName).get(toCheck.toLowerCase());
-
+				int childPosition = getChildPosition(theGroupName, toCheckLowerCase);
+				
 				Item theItem = adapter.getChild(theGroupPosition, childPosition);
 				if(theItem==null) break; 
 				theItem.isChecked = true; 
@@ -245,19 +264,35 @@ public class TreeMenuFragment extends SherlockFragment{
 		}
 		updateExpandableListView();
 	}
+
+	//Creates LinkedHashMap that contains each primary category (ie Adult Education), then adds subcategories within each category. 
 	private void initGroupList(){
 		groupList = new LinkedHashMap<Item,ArrayList<Item>>();
-
+		
+		//returns List of All Groups 
+		//TODO: Could read this all from a file 
 		ArrayList<Item> groupsList = fetchGroups();
 
 		int whatGroup = 0; 
 		for(Item item:groupsList){
-			String[] ids = item.id.split(",");
+			//TODO: For Chris. See below note. Because the Android Emulator is shoddy, it is hard for me to test this change. However just do exactly this, as explained in below comment.. 
+			/*
+			 * ArrayList<Item> groupMembers =new ArrayList<Item>();
+			 * groupMembers.addAll(fetchGroupMembers(item.id));
+			 * String shortName = item.name;
+			 * item.name = item.name +" ("+groupMembers.size()+")";
+			 * groupList.put(item,groupMembers);
+			 * groupPositions.put(shortName.toLowerCase(), whatGroup++);
+			 */
+			//TODO: Remove the item.id.split(","). Just need to run groupMembers.addAll(fetchGroupMembers(item.id)), which will add all subcategories into larger category
 			
-			ArrayList<Item> groupMembers =new ArrayList<Item>();
-
+			String[] ids = item.id.split(","); //This line is actually doing nothing, it was from the original code but never removed. Could just do "item.id"
+			
+			ArrayList<Item> groupMembers =new ArrayList<Item>(); 
+			
 			for(int i=0;i<ids.length;i++){
-				System.out.println("This is the id: " + ids[i]);
+				System.out.println("This is the id: " + ids[i]); //"Alcohol / Drugs", "Adult Education" ... are the ids.
+				
 				String groupId = ids[i];
 				groupMembers.addAll(fetchGroupMembers(groupId));
 			}
