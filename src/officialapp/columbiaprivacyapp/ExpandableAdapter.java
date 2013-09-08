@@ -25,7 +25,12 @@ import android.widget.ExpandableListView.OnGroupExpandListener;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-//@SuppressLint("UseSparseArrays")
+/*Please note I encountered two errors with the ExpandableListAdapter Class, as explained more below. The first dealt with random checkboxes being checked/unchecked when 
+ * scrolling. I circumvented it by limiting the number of updates to the checkboxes to every 145 milliseconds, which has fixed it. Though this gives rise to the potential issue, 
+ * that some users might attempt to quickly add items to their lists, I doubt it will be significant. Secondly, there is an issue neither I, nor others of the SO community, could solve, 
+ * regarding the parent checkboxes's listener, upon expansion, would disrupt other action on the page. That is, occasionally after opening a parent checkbox (to display its children), if no children are selected, 
+ * and I would later attempt to display another parent's children, I would be unable to do so.  
+ */
 public class ExpandableAdapter extends BaseExpandableListAdapter {
 	private long lastAction = 0; 
 	private LayoutInflater layoutInflater;
@@ -34,8 +39,11 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 	private int[] groupStatus;
 	private long lastGroupAction = 0; 
 
+	final private int TIME_TO_WAIT = 145; 
 
+	//NB: Encountered this issue, worked around by limiting number of updates to list to at most one ever 145 milliseconds 
 	//http://stackoverflow.com/questions/6143499/expandablelistview-open-collapse-problem
+	//Creates he 
 	public ExpandableAdapter(Context context, ExpandableListView listView,
 			LinkedHashMap<Item, ArrayList<Item>> groupsList) {
 		layoutInflater = (LayoutInflater) context
@@ -48,15 +56,13 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 			public void onGroupExpand(int groupPosition) {
 				if(lastGroupAction==0) lastGroupAction= System.currentTimeMillis();
 
-				//				System.out.println("enters the onGroup EXPAND");
 				lastGroupAction = System.currentTimeMillis();
 				Item group = mainGroup.get(groupPosition);
 				if (groupList.get(group).size() > 0)
 					groupStatus[groupPosition] = 1;
 			}
 		});
-
-		//new android.widget.ExpandableListView.OnGroupClickListener
+		//NB: Inherent Group Listener Issue with Android, where a Group Listener might disrupt other actions on a page. That is, 
 		listView.setOnGroupClickListener(new android.widget.ExpandableListView.OnGroupClickListener() {
 			@Override
 			public boolean onGroupClick(ExpandableListView parent, View v,
@@ -67,7 +73,6 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 		listView.setOnGroupCollapseListener(new android.widget.ExpandableListView.OnGroupCollapseListener() {
 
 			public void onGroupCollapse(int groupPosition) {
-				//				System.out.println("enters the onGroup COLLAPSE");
 				lastGroupAction = System.currentTimeMillis();
 				Item group = mainGroup.get(groupPosition);
 				if (groupList.get(group).size() > 0)
@@ -75,7 +80,6 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 
 			}
 		});
-
 
 		mainGroup = new ArrayList<Item>();
 		for (Map.Entry<Item, ArrayList<Item>> mapEntry : groupList.entrySet()) {
@@ -103,8 +107,7 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 			holder = new ChildHolder();
 			holder.cb = (CheckBox) convertView.findViewById(R.id.cb);
 			holder.title = (TextView) convertView.findViewById(R.id.title);
-			holder.title.setGravity(Gravity.CENTER);
-			
+			holder.title.setGravity(Gravity.CENTER); //centers the children 
 			convertView.setTag(holder);
 		} 
 		else {
@@ -113,20 +116,20 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 		final Item child = getChild(groupPosition, childPosition);
 		holder.cb.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				//TODO: Total hack, change later 
+				//TODO: Continue looking for ways to improve the 145ms delay.. 
 				boolean firstActionOkay = false; 
 				if(lastAction==0) {
 					lastAction = System.currentTimeMillis();
 					firstActionOkay = true; 
 				}
 				if(firstActionOkay) {
-					if(System.currentTimeMillis() - lastGroupAction < 145) return; 
+					if(System.currentTimeMillis() - lastGroupAction < TIME_TO_WAIT) return; 
 				}
-				if(System.currentTimeMillis() - lastAction < 145 && !firstActionOkay) {
+				if(System.currentTimeMillis() - lastAction < TIME_TO_WAIT && !firstActionOkay) {
 					return; 
 				}
 				//TODO: Might be too high
-				else if(System.currentTimeMillis() - lastGroupAction < 145) {
+				else if(System.currentTimeMillis() - lastGroupAction < TIME_TO_WAIT) {
 					return; 
 				}
 				else {
@@ -152,7 +155,6 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 							Item siblings = childList.get(i);
 							if (!siblings.isChecked) {
 								isAllChildClicked = false;
-								//if(DataHolder.checkedChilds.containsKey(child.name)==false){
 								DataHolder.checkedChilds.put(child.name,
 										parentGroup.name);
 								//	}
@@ -162,7 +164,6 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 					}
 					//All the children are checked
 					if (isAllChildClicked) {
-						//						Log.i("All should be checked", "Each child is Clicked!!");
 						parentGroup.isChecked = true;
 						if(!(DataHolder.checkedChilds.containsKey(child.name)==true)){
 							DataHolder.checkedChilds.put(child.name,
@@ -184,7 +185,8 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 						DataHolder.checkedChilds.remove(child.name);
 					}
 				}
-				notifyDataSetChanged();
+				//updates lists
+				notifyDataSetChanged(); 
 				MainActivity.getInstance().refreshAndSort();
 			}
 		});
@@ -211,12 +213,10 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 		return 0;
 	}
 	//works with the GroupView
-
 	public View getGroupView(final int groupPosition, boolean isExpanded,
 			View convertView, ViewGroup parent) {
 
 		final GroupHolder holder;
-		//		System.out.println("The group view is now in effect ");
 		if (convertView == null) {
 			convertView = layoutInflater.inflate(R.layout.group_list, null);
 			holder = new GroupHolder();
@@ -225,8 +225,6 @@ public class ExpandableAdapter extends BaseExpandableListAdapter {
 					.findViewById(R.id.label_indicator);
 			holder.title = (TextView) convertView.findViewById(R.id.title);
 			holder.title.setGravity(Gravity.CENTER);
-			
-			
 			convertView.setTag(holder);
 		} else {
 			holder = (GroupHolder) convertView.getTag();

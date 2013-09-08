@@ -39,7 +39,7 @@ import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
-
+//Sets up the fragments, runs the background services 
 public class MainActivity extends SherlockFragmentActivity {
 	private final String USER_TABLE = "TESTUserTableStudy";
 	protected BlacklistWordDataSource datasource;
@@ -70,7 +70,7 @@ public class MainActivity extends SherlockFragmentActivity {
 	Long whenCreatedLong; 
 	private final String TIME_ACCOUNT_CREATED = "timeWhenCreated";
 
-	private LocalWordService s; 
+	private GetLocationService s; 
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -85,8 +85,6 @@ public class MainActivity extends SherlockFragmentActivity {
 		//Getting preferences
 		getPreferences();
 
-		Log.i("Main Activity", "Look for this!!");
-		System.out.println("The Main Activity is starting!");
 
 		if (userNameInPref.equals("default")) {
 			createDialogBox();
@@ -122,7 +120,7 @@ public class MainActivity extends SherlockFragmentActivity {
 	protected boolean isMyServiceRunning() {
 		ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
 		for (RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-			if (LocalWordService.class.getName().equals(service.service.getClassName())) {
+			if (GetLocationService.class.getName().equals(service.service.getClassName())) {
 				Log.i("MainActivity", "Service is still running, skip");
 				return true;
 			}
@@ -134,7 +132,7 @@ public class MainActivity extends SherlockFragmentActivity {
 	protected void initAlarm() {
 		Calendar cal = Calendar.getInstance();
 
-		Intent intent = new Intent(this, LocalWordService.class);
+		Intent intent = new Intent(this, GetLocationService.class);
 		PendingIntent pintent = PendingIntent.getService(this, 0, intent, 0);
 
 		//		if(!isMyServiceRunning()) {
@@ -145,6 +143,7 @@ public class MainActivity extends SherlockFragmentActivity {
 		alarm.
 		setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), EVERY_TWO_MINUTES, pintent);
 		//		}
+		
 	}
 
 	protected void initializeParse() {
@@ -184,8 +183,7 @@ public class MainActivity extends SherlockFragmentActivity {
 		Frag3Tab.setTabListener(new TabListener<MapFrag>(this, "frag3", MapFrag.class));
 		Frag4Tab.setTabListener(new TabListener<Fragment_4>(this, "frag4", Fragment_4.class));
 
-
-		//Adding Tabs to Action Bar
+		//Adding Tabs to Action Bar, Left to Right
 		actionbar.addTab(Frag4Tab);
 		actionbar.addTab(Frag1Tab);
 		actionbar.addTab(Frag2Tab);
@@ -340,7 +338,7 @@ public class MainActivity extends SherlockFragmentActivity {
 	protected void onResume() {
 		super.onResume();
 
-		bindService(new Intent(this, LocalWordService.class), mConnection,
+		bindService(new Intent(this, GetLocationService.class), mConnection,
 				Context.BIND_AUTO_CREATE);
 
 		THIS = this; 
@@ -355,7 +353,7 @@ public class MainActivity extends SherlockFragmentActivity {
 	private ServiceConnection mConnection = new ServiceConnection() {
 
 		public void onServiceConnected(ComponentName className, IBinder binder) {
-			s = ((LocalWordService.MyBinder) binder).getService();
+			s = ((GetLocationService.MyBinder) binder).getService();
 		}
 
 		public void onServiceDisconnected(ComponentName className) {

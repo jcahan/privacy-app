@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import officialapp.columbiaprivacyapp.R;
-
+//Creates help menu fragment 
 public class Fragment_4 extends SherlockFragment{
 	
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){

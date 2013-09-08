@@ -41,7 +41,7 @@ public class MyScheduleReceiver extends BroadcastReceiver {
 		// Start 30 seconds after boot completed
 		cal.add(Calendar.SECOND, 30);
 
-		//TODO: Change this back!!in ser
+		//TODO: Change this back!!
 		service.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(),
 				EVERY_TWO_MINUTES, pending);
 	}

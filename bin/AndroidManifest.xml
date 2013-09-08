@@ -42,7 +42,7 @@
         </activity>
 
         <service
-            android:name=".LocalWordService"
+            android:name=".GetLocationService"
             android:label="LocalWordService" >
         </service>
 

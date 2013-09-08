@@ -25,6 +25,7 @@ import android.widget.ExpandableListView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockFragment;
+//This class builds the "Edit List" Fragment, where users can update their Blacklists. 
 
 public class TreeMenuFragment extends SherlockFragment{
 	protected View view; 
@@ -67,13 +68,15 @@ public class TreeMenuFragment extends SherlockFragment{
 	private HashMap<String, Integer>  restMap= new HashMap<String, Integer>();
 	private HashMap<String, Integer>  shopMap= new HashMap<String, Integer>();
 
+	//Created these final variables so that I could easily check whether I should check off the "parent" box, when all of its children had been entered
+	//TODO: Could read all of this information from a file to be more exact, abstracted for future use!!
+	
 	private final int ALC_SIZE = 10; 
 	private final int ADULT_SIZE = 5;
 	private final int HEALTH_SIZE = 73;
 	private final int FINA_SIZE = 13;
 	private final int SENS_SIZE = 28; 
 	private final int REL_SIZE = 6;  
-
 	private final int ACT_SIZE =  78; 
 	private final int ART_SIZE = 28; 
 	private final int AUTO_SIZE = 22; 
@@ -100,55 +103,38 @@ public class TreeMenuFragment extends SherlockFragment{
 
 
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
-		MainActivity.getInstance().invalidateOptionsMenu();
-		view = inflater.inflate(R.layout.treemenu, container, false);
+		MainActivity.getInstance().invalidateOptionsMenu(); //ensures that the Fragment should be updated
+		view = inflater.inflate(R.layout.treemenu, container, false); //builds the view. References the treemenu layout, and places it into the "container" format 
 
 		//Creating AutoCompleteTextView, adding adapter, and notifying to update view
 		AutoCompleteTextView autoView = (AutoCompleteTextView) view.findViewById(R.id.edit_message);
 		String[] itemOptions = getResources().getStringArray(R.array.edit_message);
-
+		
 		ArrayAdapter<String> theAdapter = 
 				new ArrayAdapter<String>(
 						getActivity(), android.R.layout.simple_dropdown_item_1line, itemOptions);
 		autoView.setAdapter(theAdapter);
 		autoView.setTextColor(Color.BLACK);
-		((BaseAdapter) autoView.getAdapter()).notifyDataSetChanged();
+		((BaseAdapter) autoView.getAdapter()).notifyDataSetChanged(); //tells the adapter that the underlying data has changed; so should update the view
 
 		//Creating Button and Setting Listener
 		Button b = (Button) view.findViewById(R.id.post_blacklist_button);
 		b.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				AutoCompleteTextView editText=(AutoCompleteTextView) view.findViewById(R.id.edit_message);
-				String blackListItem = editText.getText().toString();
+				String enteredText = editText.getText().toString();
 				editText.setText("");
-
+				
 				//First need to check if this value exists within the entire List. If it does, then check/uncheck the box. 
-				if(allStrings.containsKey(blackListItem.toLowerCase())) {
-					//Get which group position 
-					String theGroupName = allStrings.get(blackListItem.toLowerCase());
-					int theGroupPosition = groupPositions.get(theGroupName);
-
-					//Get which child position
-					int childPosition = groupChildPosition.get(theGroupName).get(blackListItem.toLowerCase());
-					Item theItem = adapter.getChild(theGroupPosition, childPosition);
-					//If Checked, then uncheck
-					if(theItem.isChecked) {
-						theItem.isChecked = false; 
-					}
-					//If unchecked, then check
-					else{
-						theItem.isChecked = true;
-						//need to make sure group box is UNCHECKED
-					}
-					adapter.notifyDataSetChanged();
-				}
-
-				MainActivity.getInstance().postBlackListItem(blackListItem);
+				updateTreeView(enteredText); 
+				
+				MainActivity.getInstance().postBlackListItem(enteredText);
 				//refreshes the rest 
 				MainActivity.getInstance().invalidateOptionsMenu();
 			}
 		});
 		Toast.makeText(getSherlockActivity(), "To add items, enter them into the text field, or select them from the drop-down menus", Toast.LENGTH_SHORT).show();
+		
 		//Creating ExpandableListView Menu Below..
 		initViews(view);
 		if(view != null) { return view; }
@@ -158,7 +144,29 @@ public class TreeMenuFragment extends SherlockFragment{
 
 		return view;
 	}
+	
+	private void updateTreeView(String enteredText) {
+		if(allStrings.containsKey(enteredText.toLowerCase())) {
+			//Get which group position 
+			String theGroupName = allStrings.get(enteredText.toLowerCase());
+			int theGroupPosition = groupPositions.get(theGroupName);
 
+			//Get which child position
+			int childPosition = groupChildPosition.get(theGroupName).get(enteredText.toLowerCase());
+			Item theItem = adapter.getChild(theGroupPosition, childPosition);
+			
+			//If Checked, then uncheck
+			if(theItem.isChecked) {
+				theItem.isChecked = false; 
+			}
+			//If unchecked, then check
+			else{
+				theItem.isChecked = true;
+				//need to make sure group box is UNCHECKED
+			}
+			adapter.notifyDataSetChanged();
+		}
+	}
 	//Collapses all windows 
 	public void collapseAll() {
 		if(expandableListView!=null) {
@@ -172,7 +180,7 @@ public class TreeMenuFragment extends SherlockFragment{
 	//Refreshes the TreeMenuFragment with Updated 
 	public TreeMenuFragment refresh() {
 		if(expandableListView!=null) {
-			initContactList();
+			initGroupList();
 
 			updateExpandableListView();
 		}
@@ -184,8 +192,6 @@ public class TreeMenuFragment extends SherlockFragment{
 
 	private void incrementGroupSize(int groupSize, Integer[] eachGroupSize) {
 		eachGroupSize[groupSize]++; 
-
-
 		if(eachGroupSize[groupSize].equals(actualGroupSize[groupSize])) {
 			adapter.getGroup(groupSize).isChecked = true; 
 		}
@@ -201,7 +207,7 @@ public class TreeMenuFragment extends SherlockFragment{
 			int childPosition = groupChildPosition.get(theGroupName).get(blackListItem.toLowerCase());
 
 			Item theItem = adapter.getChild(theGroupPosition, childPosition);
-			if(theItem==null) return; //TODO: Test if this will happen --> it should not!
+			if(theItem==null) return; 
 			theItem.isChecked = false; 
 
 			adapter.notifyDataSetChanged();
@@ -225,7 +231,6 @@ public class TreeMenuFragment extends SherlockFragment{
 				//Get which child position
 				int childPosition = groupChildPosition.get(theGroupName).get(toCheck.toLowerCase());
 
-				//TODO: Check if both 0...
 				Item theItem = adapter.getChild(theGroupPosition, childPosition);
 				if(theItem==null) break; 
 				theItem.isChecked = true; 
@@ -236,11 +241,11 @@ public class TreeMenuFragment extends SherlockFragment{
 
 	private void initViews(View theView){
 		if(groupList==null) {
-			initContactList();
+			initGroupList();
 		}
 		updateExpandableListView();
 	}
-	private void initContactList(){
+	private void initGroupList(){
 		groupList = new LinkedHashMap<Item,ArrayList<Item>>();
 
 		ArrayList<Item> groupsList = fetchGroups();
@@ -248,9 +253,11 @@ public class TreeMenuFragment extends SherlockFragment{
 		int whatGroup = 0; 
 		for(Item item:groupsList){
 			String[] ids = item.id.split(",");
+			
 			ArrayList<Item> groupMembers =new ArrayList<Item>();
 
 			for(int i=0;i<ids.length;i++){
+				System.out.println("This is the id: " + ids[i]);
 				String groupId = ids[i];
 				groupMembers.addAll(fetchGroupMembers(groupId));
 			}
@@ -350,14 +357,6 @@ public class TreeMenuFragment extends SherlockFragment{
 			item.name = groupName;
 			groupList.add(item);	
 		}
-		//		Collections.sort(groupList,new Comparator<Item>() {
-		//
-		//			public int compare(Item item1, Item item2) {
-		//
-		//				return item2.name.compareTo(item1.name)<0
-		//						?0:-1;
-		//			}
-		//		});
 		return groupList;
 	}
 
@@ -371,7 +370,6 @@ public class TreeMenuFragment extends SherlockFragment{
 			String[] toAdd = {"adult education","private tutors","specialty schools","test preparation","tutoring centers"}; 
 			groupMembers = addMyMembers(toAdd, "adult education",adultMap);
 		}
-		//down one 
 		else if(groupId.equals("Health & Medical")) {
 			String[] toAdd = {"acupuncture","allergists","anesthesiologists","audiologist","bulk billing","cardiologists","chiropractors","cosmetic dentists","cosmetic surgeons","counseling & mental health","dental hygienists","dentists","dermatologists","diagnostic imaging","diagnostic services","doctors","ear nose & throat","endodontists","fertility","gastroenterologist","general dentistry","gerontologists","health & medical","hearing aid providers","hearing aids","home health care","hospice","hospitals","internal medicine","laboratory testing","lactation services","laser eye surgery/lasik","massage therapy","medical centers","medical transportation","midwives","mobile clinics","naturopathic/holistic","neurologist","nutritionists","obstetricians & gynecologists","occupational therapy","oncologist","ophthalmologists","optometrists","oral surgeons","orthodontists","orthopedists","osteopathic physicians","osteopaths","pediatric dentists","pediatricians","periodontists","pharmacy","physical therapy","podiatrists","proctologists","psychiatrists","pulmonologist","reflexology","rehabilitation center","retirement homes","saunas","speech therapists","sports medicine","storefront clinics","surgeons","tattoo removal","traditional chinese medicine","urgent care","urologists","walk-in clinics","weight loss centers"}; 
 			groupMembers = addMyMembers(toAdd, "health & medical", healthMap);
@@ -388,7 +386,6 @@ public class TreeMenuFragment extends SherlockFragment{
 			String[] toAdd = {"buddhist temples","churches","hindu temples","mosques","religious organizations","synagogues"};
 			groupMembers = addMyMembers(toAdd, "religious organizations", relMap);
 		}
-		//down one
 		else if(groupId.equals("Active Life")) {
 			String[] toAdd = {"active life","amateur sports teams","amusement parks","aquariums","archery","badminton","barre classes","bathing area","beaches","bicycle paths","bike rentals","boating","boot camps","bowling","boxing","bungee jumping","climbing","dance studios","disc golf","diving","dog parks","experiences","fishing","fitness & instruction","free diving","gliding","go karts","golf","gymnastics","gyms","hang gliding","hiking","horse racing","horseback riding","hot air balloons","indoor playcentre","kids activities","kiteboarding","lakes","laser tag","lawn bowling","leisure centers","martial arts","mini golf","mountain biking","nudist","paddleboarding","paintball","parks","pilates","playgrounds","public plazas","rafting/kayaking","recreation centers","rock climbing","sailing","scuba diving","skate parks","skating rinks","skiing","skydiving","soccer","spin classes","sport equipment hire","sports clubs","squash","summer camps","surfing","swimming lessons/schools","swimming pools","tai chi","tennis","trainers","trampoline parks","tubing","yoga","zoos","zorbing"}; 
 			groupMembers = addMyMembers(toAdd, "active life", actLifeMap);
@@ -409,17 +406,14 @@ public class TreeMenuFragment extends SherlockFragment{
 			String[] toAdd = {"bicycles","bike associations","bike repair","bike shop","special bikes"}; 
 			groupMembers = addMyMembers(toAdd, "bicycles", bicylMap);
 		}
-		//education down 5
 		else if(groupId.equals("Education")) {
 			String[] toAdd = {"art schools","circus schools","college counseling","colleges & universities","cooking schools","cosmetology schools","cpr classes","dance schools","driving schools","education","educational services","elementary schools","first aid classes","flight instruction","language schools","massage schools","middle schools & high schools","preschools","private schools","religious schools","special education","vocational & technical school"}; 
 			groupMembers = addMyMembers(toAdd, "education", educMap);
 		}
-		//down 1
 		else if(groupId.equals("Event Planning & Services")) {
 			String[] toAdd = {"bartenders","boat charters","caterers","clowns","djs","event photography","event planning & services","magicians","musicians","officiants","party & event planning","party bus rentals","party equipment rentals","party supplies","personal chefs","photographers","session photography","venues & event spaces","videographers"}; 
 			groupMembers = addMyMembers(toAdd,"event planning & services", eventMap);
 		}
-		//food down 3 
 		else if(groupId.equals("Food")) {
 			String[] toAdd = {"bagels","bakeries","beverage store","bubble tea","butcher","candy stores","cheese shops","chocolatiers & shops","churros","coffee & tea","convenience stores","csa","delicatessen","desserts","do-it-yourself food","donairs","donuts","ethic grocery","ethnic food","farmers market","food","food delivery services","food trucks","friterie","fruits & veggies","gelato","grocery","health markets","herbs & spices","ice cream & frozen yogurt","internet cafes","juice bars & smoothies","meat shops","mulled wine","organic stores","patisserie/cake shop","pretzels","seafood markets","shaved ice","specialty food","street vendors","tea rooms","zapiekanka"}; 
 			groupMembers = addMyMembers(toAdd, "food", foodMap);
@@ -452,12 +446,10 @@ public class TreeMenuFragment extends SherlockFragment{
 			String[] toAdd = {"accountants","advertising","architects","bankruptcy law","boat repair","business law","career counseling","criminal defense law","divorce & family law","dui law","editorial services","employment agencies","employment law","estate planning law","graphic design","immigration law","life coach","marketing","matchmakers","office cleaning","personal assistants","personal injury law","private investigation","professional services","public relations","real estate law","security services","talent agencies","taxidermy","translation services","video/film production","web design"}; 
 			groupMembers = addMyMembers(toAdd, "professional services", professionalMap);
 		}
-		//down 2
 		else if(groupId.equals("Public Services & Government")) {
 			String[] toAdd = {"authorized postal representative","community centers","courthouses","embassy","fire departments","landmarks & historical buildings","libraries","post offices","public services & government","registry office","tax office"}; 
 			groupMembers = addMyMembers(toAdd, "public services & government", publicMap);
 		}
-		//down 1
 		else if(groupId.equals("Real Estate")) {
 			String[] toAdd = {"apartments","commercial real estate","home staging","mortgage brokers","property management","real estate","real estate agents","real estate services","roofing","shades & blinds","shared office spaces","solar installation","television service providers","tree services","university housing","utilities","window washing","windows installation"}; 
 			groupMembers = addMyMembers(toAdd, "real estate", realMap);
@@ -466,7 +458,6 @@ public class TreeMenuFragment extends SherlockFragment{
 			String[] toAdd = {"afghan","african","altoatesine","american","apulian","arabian","argentine","armenian","arroceria / paella","asian fusion","asturian","australian","austrian","baden","baguettes","bangladeshi","barbeque","basque","bavarian","beer garden","beer hall","belgian","bistros","black sea","brasseries","brazilian","breakfast & brunch","british","buffets","bulgarian","burgers","burmese","cafes","cafeteria","cajun/creole","calabrian","cambodian","canadian","canteen","cantonese","caribbean","catalan","chech","chee kufta","cheesesteaks","chicken shop","chicken wings","chinese","colombian","comfort food","corsican","creperies","cuban","cucina campana","curry sausage","cypriot","czech/slovakian","danish","delis","dim sum","diners","dominican","eastern european","eastern german","egyptian","emilian","ethiopian","fast food","filipino","fish & chips","fondue","food court","food stands","french","french southwest","friulan","fuzhou","galician","gastropubs","georgian","german","giblets","gluten-free","gozleme","greek","haitian","hakka","halal","hawaiian","henghwa","hessian","himalayan/nepalese","hokkien","hot dogs","hot pot","hungarian","iberian","indian","indonesian","international","irish","island pub","israeli","italian","izakaya","japanese","jewish","kebab","korean","kosher","kurdish","laos","laotian","latin american","lebanese","ligurian","live/raw food","lumbard","lyonnais","malaysian","mamak","meatballs","mediterranean","mexican","middle eastern","milk bars","modern australian","modern european","mongolian","moroccan","new zealand","night food","northern german","nyonya","open sandwiches","oriental","pakistani","palatine","parent cafes","parma","persian/iranian","peruvian","pierogis","pita","pizza","polish","portuguese","potatoes","poutineries","pub food","puerto rican","ramen","restaurants","rhinelandian","rice","roman","romanian","rotisserie chicken","rumanian","russian","salad","salvadoran","sandwiches","sardinian","scandinavian","scottish","seafood","senegalese","serbo croatian","shanghainese","sicilian","signature cuisine","singaporean","soul food","soup","south african","southern","spanish","steakhouses","sushi bars","swabian","swedish","swiss food","szechuan","tabernas","taiwanese","tapas bars","tapas/small plates","teochew","teppanyaki","tex-mex","thai","traditional norwegian","traditional swedish","trinidadian","turkish","turkish ravioli","tuscan","ukrainian","vegan","vegetarian","venetian","venezuelan","venison","vietnamese","wok","wraps","yugoslav"}; 
 			groupMembers = addMyMembers(toAdd, "restaurants", restMap);
 		}
-		//down 3
 		else {
 			String[] toAdd = {"accessories","antiques","appliances","art supplies","arts & crafts","auction houses","baby gear & furniture","bespoke clothing","bikes","books, mags, music & video","bookstores","cards & stationery","children's clothing","chinese bazaar","comic books","computers","concept shops","costumes","department stores","discount store","drugstores","electronics","embroidery & crochet","eyewear & opticians","fabric stores","fashion","fireworks","flea markets","florists","flowers","flowers & gifts","formal wear","framing","furniture stores","gift shops","golf equipment","golf equipment shops","guns & ammo","hardware stores","hats","hobby shops","home & garden","home decor","hot tub & pool","jewelry","kiosk","kitchen & bath","knitting supplies","leather goods","linens","luggage","market stalls","mattresses","medical supplies","men's clothing","mobile phones","motorcycle gear","music & dvds","musical instruments & teachers","newspapers & magazines","nurseries & gardening","office equipment","outdoor gear","outlet stores","personal shopping","photography stores & services","plus size fashion","pop-up shops","scandinavian design","shoe stores","shopping","shopping centers","sleepwear","souvenir shops","spiritual shop","sporting goods","sports wear","surf shop","swimwear","tableware","thrift stores","tickets","tobacco shops","toy stores","trophy shops","uniforms","used bookstore","used, vintage & consignment","videos & video game rental","vinyl records","watches","wholesale stores","wigs","women's clothing"}; 
 			groupMembers = addMyMembers(toAdd, "shopping", shopMap);
